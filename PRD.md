@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.2 (2026-04-20)
+> Product Requirements Document  ·  v0.3.3 (2026-04-20)
 
 ## 1. 제품 개요
 
@@ -30,11 +30,15 @@ SPA 구조 (hash 라우팅).
 ### 3.1 지역 기반 탐색 (기본 진입)
 ```
 #/  (HomeView)
-  · 상단 검색창: 지역·장소·무드·카테고리 전체 매칭
-  · 17개 시·도 타일: 샘플 데이터 있는 지역만 활성, 나머지는 "준비 중"
-  ↓
-#/results?region=<id>  (ResultsView)
-  ↓ 해당 지역의 장소 리스트 / 저장
+  · 한옥 hero + 검색창: 지역·장소·무드·카테고리 전체 매칭
+  · Leaflet 한국 지도(17개 시·도 핀) + 17개 시·도 타일 grid
+  ↓ 타일 또는 핀 클릭
+#/region?id=<id>  (RegionView)
+  · 해당 시·도 히어로 + 세부 권역 grid (Seoul 8개 / 기타 3-8개)
+  · "전체 N곳 보기" 단축버튼
+  ↓ 세부 권역 클릭
+#/results?region=<id>&area=<sub>  (ResultsView)
+  ↓ 해당 세부 권역의 장소 리스트 / 저장
 ```
 
 ### 3.2 취향 기반 추천 (심화)
@@ -53,8 +57,9 @@ SPA 구조 (hash 라우팅).
 ## 4. 기능 명세
 
 ### 4.1 v0.3 (현재, 2026-04-20)
-- [x] 홈 리디자인: 한옥 풀블리드 히어로(경복궁 전경) + 중앙 검색창(지역·장소·키워드 복합) + 17개 시·도 region grid(Wikipedia Commons 랜드마크 사진) + 취향 CTA
-- [x] 지역 기반 결과 — `#/results?region=<id>`로 해당 시·도 장소 필터링, 빈 지역은 "준비 중"
+- [x] 홈 리디자인: 한옥 풀블리드 히어로(경복궁 전경) + 중앙 검색창(지역·장소·키워드 복합) + Leaflet 한국 지도(17개 시·도 핀) + 17개 시·도 region grid(Wikipedia Commons 랜드마크 사진) + 취향 CTA
+- [x] 지역 drill-down — `#/region?id=<id>` 세부 권역 grid (Seoul 8개, 기타 시·도 3-8개 stub), Seoul은 주소 keyword 매칭으로 실데이터 분배
+- [x] 지역 기반 결과 — `#/results?region=<id>` (시·도 전체) 또는 `?region=<id>&area=<sub>` (세부 권역) 필터링, 빈 지역은 "준비 중"
 - [x] 검색 드롭다운 — 입력 시 region/place 매칭 미리보기
 - [x] 토너먼트 모드 제거 (Header·BottomNav 라우트 모두 정리)
 - [x] `src/regions.js` — 17개 시·도 메타 + 주소 prefix → region id 매핑 + 카운트 헬퍼
@@ -140,6 +145,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-20 | v0.3.3 | 지역 drill-down 도입 — RegionView + `#/region?id=<id>` 라우트, regions.js에 subregions[] (Seoul 8개 실데이터 매칭 + 기타 시·도 3-8개 stub), ResultsView `?area=` 필터. 홈에 Leaflet 한국 지도(17개 시·도 핀) 추가 — 처음엔 Kakao Maps로 시도했으나 앱 OPEN_MAP_AND_LOCAL 미활성으로 Leaflet+OSM으로 교체, 한국어 라벨을 위해 CartoDB nolabels 베이스 + OSM 오버레이 2-layer 구성 |
 | 2026-04-20 | v0.3.2 | 홈 hero에 한옥 풀블리드 배경(`public/hero-hanok.jpg` 경복궁 전경, Wikipedia Commons 1280×853) 적용 — 여기어때 레퍼런스 기반. 어두운 그라데이션 오버레이 + 흰 텍스트. 로그인 화면 카피 업데이트("간편하게 시작하세요" + 2줄 서브카피). 카카오 버튼에 KakaoTalk 브랜드 SVG 아이콘(`public/kakao-icon.svg`) 적용 |
 | 2026-04-20 | v0.3.1 | 브랜드명 "The Concierge" → "정해줘". 로고 이미지(`public/logo.png`, 퍼플 심플) 도입 — Header/LoginView/favicon/PWA manifest 전면 교체. manifest 테마컬러 #436B53 → #7C3AED(퍼플). H1 "어디로 갈까요?"로 단축, 서브카피 "당신의 소중한 하루가 결정됩니다"로 교체 |
 | 2026-04-20 | v0.3 | 홈 리디자인: 지역 검색창 + 17개 시·도 grid 중심. 토너먼트 모드 제거. ResultsView에 region 필터 추가, regions.js 헬퍼 신설. 타일은 Wikipedia Commons 랜드마크 썸네일(scripts/fetch-region-photos.mjs로 갱신). Kakao SDK를 v2.7→v1으로 다운그레이드(Auth.login 팝업 복구) |

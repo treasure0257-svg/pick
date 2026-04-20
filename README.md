@@ -11,7 +11,7 @@
 
 | 진입 방식 | 라우트 | 동작 |
 |---|---|---|
-| 지역으로 찾기 | `#/results?region=<id>` | 홈의 17개 시·도 타일 또는 검색에서 선택 → 해당 지역 장소 리스트 |
+| 지역으로 찾기 | `#/region?id=<id>` → `#/results?region=<id>&area=<sub>` | 홈의 17개 시·도 타일·지도 핀·검색 → 세부 권역 grid → 장소 리스트 |
 | 장소·키워드 검색 | 홈 검색창 | 지역명/장소명/카테고리/무드 전체 텍스트 매칭, 드롭다운에 미리보기 |
 | 취향 기반 추천 | `#/preferences` → `#/results?source=preferences` | 카테고리/무드/예산/기간/음주 선택 후 `scorePlace()`로 랭킹 |
 | 로그인 | `#/login` | Google / Kakao / Naver 3-way OAuth |
@@ -26,6 +26,7 @@
 - **스타일**: Tailwind CSS 3 + PostCSS + Autoprefixer
 - **라우팅**: hash 기반 self-rolled SPA 라우터 (`src/router.js`)
 - **DOM**: `h()` 헬퍼(`src/utils/dom.js`)로 가상 DOM 없이 직접 생성
+- **지도**: Leaflet + OpenStreetMap/CartoDB 타일 (무료·무설정, 한국어 라벨)
 - **인증**: Firebase Auth (Google) + Kakao JS SDK + Naver ID Login SDK — SDK는 on-demand 동적 로드
 - **데이터**: Firestore (`users/{uid}` 문서에 preferences·saved 저장, localStorage 동기화)
 - **PWA**: `public/manifest.json` + `public/sw.js` 서비스워커
@@ -53,11 +54,13 @@ pick/
 │   ├── style.css           # Tailwind 엔트리
 │   ├── components/
 │   │   ├── Header.js
-│   │   └── BottomNav.js
+│   │   ├── BottomNav.js
+│   │   └── KoreaMap.js       # Leaflet 한국 지도 + 17개 시·도 핀
 │   ├── views/
-│   │   ├── HomeView.js       # 지역 검색 + 17개 시·도 grid + 취향 CTA
+│   │   ├── HomeView.js       # 한옥 hero + 검색 + 지도 + 17개 시·도 grid + 취향 CTA
 │   │   ├── PreferencesView.js
-│   │   ├── ResultsView.js    # region/category/place/preferences 소스 분기
+│   │   ├── RegionView.js     # 시·도 drill-down (세부 권역 grid)
+│   │   ├── ResultsView.js    # region/area/category/place/preferences 소스 분기
 │   │   ├── SavedView.js
 │   │   └── LoginView.js      # 3-way OAuth (Google/Kakao/Naver)
 │   └── utils/dom.js        # h() 엘리먼트 헬퍼
