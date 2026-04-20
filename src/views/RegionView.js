@@ -73,7 +73,7 @@ export function RegionView({ router, params }) {
   // 2-column: sub-region tile grid (left) + map (right)
   const subGrid = h('div', { className: 'grid grid-cols-1 sm:grid-cols-2 gap-3' });
   const mapSlot = h('div', {
-    className: 'bg-surfaceContainerLowest rounded-2xl overflow-hidden min-h-[360px] md:min-h-[440px] h-full relative'
+    className: 'bg-surfaceContainerLowest rounded-2xl overflow-hidden min-h-[420px] md:min-h-[520px] h-full relative'
   });
 
   const layout = h('div', {

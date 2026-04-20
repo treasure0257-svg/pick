@@ -14,29 +14,17 @@ import { h } from '../utils/dom.js';
 
 const TOPO_URL = '/data/korea-municipalities.topo.json';
 
-// 행정구역 code 앞 2자리 → 시·도 id
-const PROVINCE_CODE_PREFIX = {
-  '11': 'seoul',
-  '26': 'busan',
-  '27': 'daegu',
-  '28': 'incheon',
-  '29': 'gwangju',
-  '30': 'daejeon',
-  '31': 'ulsan',
-  '36': 'sejong',
-  '41': 'gyeonggi',
-  '42': 'gangwon',
-  '43': 'chungbuk',
-  '44': 'chungnam',
-  '45': 'jeonbuk',
-  '46': 'jeonnam',
-  '47': 'gyeongbuk',
-  '48': 'gyeongnam',
-  '50': 'jeju'
+// 행정구역 code 앞 2자리 → 시·도 id.
+// southkorea/southkorea-maps 2018 데이터가 사용하는 레거시 KOSTAT 코드 체계:
+// Seoul 11, Busan 21, Daegu 22, Incheon 23, Gwangju 24, Daejeon 25, Ulsan 26,
+// Sejong 29, Gyeonggi 31, Gangwon 32, Chungbuk 33, Chungnam 34,
+// Jeonbuk 35, Jeonnam 36, Gyeongbuk 37, Gyeongnam 38, Jeju 39
+const ID_TO_PREFIX = {
+  seoul: '11', busan: '21', daegu: '22', incheon: '23', gwangju: '24',
+  daejeon: '25', ulsan: '26', sejong: '29', gyeonggi: '31', gangwon: '32',
+  chungbuk: '33', chungnam: '34', jeonbuk: '35', jeonnam: '36',
+  gyeongbuk: '37', gyeongnam: '38', jeju: '39'
 };
-const ID_TO_PREFIX = Object.fromEntries(
-  Object.entries(PROVINCE_CODE_PREFIX).map(([k, v]) => [v, k])
-);
 
 let topoCachePromise = null;
 function loadTopo() {
@@ -58,7 +46,7 @@ function subIdForFeature(feature, subregions) {
 }
 
 export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
-  const mapEl = h('div', { className: 'w-full h-full', style: { minHeight: '320px' } });
+  const mapEl = h('div', { className: 'w-full h-full', style: { minHeight: '420px' } });
 
   const loadingEl = h('div', {
     className: 'absolute inset-0 flex items-center justify-center bg-surfaceContainerLow text-onSurfaceVariant font-body text-sm gap-2'
@@ -68,7 +56,7 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
   );
 
   const wrapper = h('div', {
-    className: 'relative rounded-2xl overflow-hidden border border-surfaceContainer h-full min-h-[320px]'
+    className: 'relative rounded-2xl overflow-hidden border border-surfaceContainer h-full min-h-[420px]'
   }, mapEl, loadingEl);
 
   // subId → L.Path[] (GeoJSON layer contains many sub-layers; we index them)
@@ -176,7 +164,10 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
         }
       }).addTo(map);
 
-      map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] });
+      // 타이트하게 맞춘 뒤 한 단계 더 확대해서 가시성 확보
+      map.fitBounds(geoLayer.getBounds(), { padding: [4, 4], maxZoom: 13 });
+      const targetZoom = Math.min(map.getZoom() + 0.3, 13);
+      map.setZoom(targetZoom);
 
       // 각 sub별로 그룹 중심에 영구 라벨 마커 추가
       subLayers.forEach((layers, subId) => {
