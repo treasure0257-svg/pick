@@ -1,11 +1,11 @@
-# Pick — The Concierge · PRD
+# 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3 (2026-04-20)
+> Product Requirements Document  ·  v0.3.1 (2026-04-20)
 
 ## 1. 제품 개요
 
 ### 1.1 한 줄 설명
-"뭐하지?"를 끝내주는, 결정장애를 위한 디지털 컨시어지.
+바쁜 현대인을 위한 정보집합소. 지역·키워드·취향으로 오늘 어디로 갈지 정해주는 웹앱.
 
 ### 1.2 문제 정의
 한국 직장인이 주말·여가 계획에 들이는 시간은 평균 2.4시간. 정보는 넘치는데 선택은 어렵다. 취향에 맞는 곳을 찾아 헤매다 결국 "그냥 집에 있기"로 끝나는 경우가 많다.
@@ -140,6 +140,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-20 | v0.3.1 | 브랜드명 "The Concierge" → "정해줘". 로고 이미지(`public/logo.png`, 퍼플 심플) 도입 — Header/LoginView/favicon/PWA manifest 전면 교체. manifest 테마컬러 #436B53 → #7C3AED(퍼플). H1 "어디로 갈까요?"로 단축, 서브카피 "당신의 소중한 하루가 결정됩니다"로 교체 |
 | 2026-04-20 | v0.3 | 홈 리디자인: 지역 검색창 + 17개 시·도 grid 중심. 토너먼트 모드 제거. ResultsView에 region 필터 추가, regions.js 헬퍼 신설. 타일은 Wikipedia Commons 랜드마크 썸네일(scripts/fetch-region-photos.mjs로 갱신). Kakao SDK를 v2.7→v1으로 다운그레이드(Auth.login 팝업 복구) |
 | 2026-04-20 | v0.2.1 | 서비스워커 network-first로 교체(cache-first 버그 수정). Kakao/Naver 로그인 재복구(LoginView + `#/login` 라우트, SDK on-demand 로드). GitHub Secrets 9개로 확장 |
 | 2026-04-20 | v0.2 | Vite + Firestore SPA로 아키텍처 전환. Google 단일 provider로 일시 축소. PWA 기반 추가. GitHub Actions에 빌드 스텝 추가 |
