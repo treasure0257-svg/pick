@@ -120,7 +120,8 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
         dragging: true,
         doubleClickZoom: false,
         keyboard: false,
-        attributionControl: false
+        attributionControl: false,
+        zoomSnap: 0.25 // fractional zoom 허용해서 추가 확대 단계를 미세조정
       });
 
       // 2-layer: 회색 베이스 (라벨 없음) + 표준 OSM (한국어 라벨 오버레이)
@@ -164,9 +165,9 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
         }
       }).addTo(map);
 
-      // 타이트하게 맞춘 뒤 한 단계 더 확대해서 가시성 확보
-      map.fitBounds(geoLayer.getBounds(), { padding: [4, 4], maxZoom: 13 });
-      const targetZoom = Math.min(map.getZoom() + 0.3, 13);
+      // 타이트하게 맞춘 뒤 더 확대해서 영역 디테일 가시성 확보
+      map.fitBounds(geoLayer.getBounds(), { padding: [2, 2] });
+      const targetZoom = Math.min(map.getZoom() + 1, 15);
       map.setZoom(targetZoom);
 
       // 각 sub별로 그룹 중심에 영구 라벨 마커 추가
