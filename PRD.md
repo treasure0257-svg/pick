@@ -53,7 +53,7 @@ SPA 구조 (hash 라우팅).
 ## 4. 기능 명세
 
 ### 4.1 v0.3 (현재, 2026-04-20)
-- [x] 홈 리디자인: 히어로(compact) + 중앙 검색창(지역·장소·키워드 복합) + 17개 시·도 region grid + 취향 CTA
+- [x] 홈 리디자인: 히어로(compact) + 중앙 검색창(지역·장소·키워드 복합) + 17개 시·도 region grid(Wikipedia Commons 랜드마크 사진) + 취향 CTA
 - [x] 지역 기반 결과 — `#/results?region=<id>`로 해당 시·도 장소 필터링, 빈 지역은 "준비 중"
 - [x] 검색 드롭다운 — 입력 시 region/place 매칭 미리보기
 - [x] 토너먼트 모드 제거 (Header·BottomNav 라우트 모두 정리)
@@ -140,7 +140,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
-| 2026-04-20 | v0.3 | 홈 리디자인: 지역 검색창 + 17개 시·도 grid 중심. 토너먼트 모드 제거. ResultsView에 region 필터 추가, regions.js 헬퍼 신설. Kakao SDK를 v2.7→v1으로 다운그레이드(Auth.login 팝업 복구) |
+| 2026-04-20 | v0.3 | 홈 리디자인: 지역 검색창 + 17개 시·도 grid 중심. 토너먼트 모드 제거. ResultsView에 region 필터 추가, regions.js 헬퍼 신설. 타일은 Wikipedia Commons 랜드마크 썸네일(scripts/fetch-region-photos.mjs로 갱신). Kakao SDK를 v2.7→v1으로 다운그레이드(Auth.login 팝업 복구) |
 | 2026-04-20 | v0.2.1 | 서비스워커 network-first로 교체(cache-first 버그 수정). Kakao/Naver 로그인 재복구(LoginView + `#/login` 라우트, SDK on-demand 로드). GitHub Secrets 9개로 확장 |
 | 2026-04-20 | v0.2 | Vite + Firestore SPA로 아키텍처 전환. Google 단일 provider로 일시 축소. PWA 기반 추가. GitHub Actions에 빌드 스텝 추가 |
 | 2026-04-20 | v0.1 | 초기 문서, 바닐라 HTML + Tailwind CDN MVP 완성, Firebase Hosting 배포 파이프라인 구축 |

@@ -46,7 +46,7 @@ pick/
 │   ├── router.js           # hash 라우터 + 토스트
 │   ├── firebase-setup.js   # Firebase 초기화 + Firestore 동기화 + Kakao/Naver
 │   ├── data.js             # 샘플 장소 데이터 (PICK_DATA)
-│   ├── regions.js          # 17개 시·도 메타데이터 + 주소→region id 매핑
+│   ├── regions.js          # 17개 시·도 메타 (label/hint/icon/image) + 주소→region id 매핑
 │   ├── style.css           # Tailwind 엔트리
 │   ├── components/
 │   │   ├── Header.js
@@ -63,7 +63,8 @@ pick/
 ├── postcss.config.js
 ├── firebase.json           # Hosting 설정 (public: dist)
 ├── .firebaserc             # Firebase 프로젝트 별칭
-└── .github/workflows/      # build + deploy 자동화
+├── .github/workflows/      # build + deploy 자동화
+└── scripts/                # 유틸리티 (예: fetch-region-photos.mjs — Wikipedia Commons 썸네일 갱신)
 ```
 
 ## 로컬 개발
