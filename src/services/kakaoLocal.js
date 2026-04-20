@@ -99,6 +99,27 @@ export async function multiKeywordSearch(queries, options = {}) {
   return dedupe(combined);
 }
 
+// 좌표·카테고리로 반경 내 검색 (디테일 뷰의 "이 근처" 섹션 용).
+// radius 단위: 미터 (최대 20000)
+export async function nearbySearch({ lat, lng, categoryCode, radius = 1500, size = 5 }) {
+  await ensureKakaoServices();
+  return new Promise((resolve, reject) => {
+    const places = new window.kakao.maps.services.Places();
+    const location = new window.kakao.maps.LatLng(lat, lng);
+    places.categorySearch(categoryCode, (data, status) => {
+      if (status === window.kakao.maps.services.Status.OK) resolve(data);
+      else if (status === window.kakao.maps.services.Status.ZERO_RESULT) resolve([]);
+      else reject(new Error('Kakao nearbySearch: ' + status));
+    }, { location, radius, size });
+  });
+}
+
+// --- 간단한 장소 메모리 캐시 (뷰 간 이동 시 재활용) ---
+const placeCache = new Map();
+export function cachePlace(p) { if (p?.id) placeCache.set(p.id, p); }
+export function cachePlaces(list) { list.forEach(cachePlace); }
+export function getCachedPlace(id) { return placeCache.get(id); }
+
 // Kakao place → 우리 앱 내부 공통 스키마로 정규화 (saved 키 호환)
 export function normalizeKakaoPlace(kp) {
   return {

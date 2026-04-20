@@ -5,7 +5,7 @@ import { PlacesMap } from '../components/PlacesMap.js';
 import { PICK_DATA } from '../data.js';
 import { AppState, STORAGE_KEYS, recommend, savePlace, isSaved } from '../App.js';
 import { regionLabel, subregionLabel, REGIONS } from '../regions.js';
-import { multiKeywordSearch, normalizeKakaoPlace } from '../services/kakaoLocal.js';
+import { multiKeywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
 
 const KAKAO_CAT_BADGE = {
   FD6: { icon: 'restaurant',     label: '맛집' },
@@ -57,7 +57,7 @@ function makeSaveBtn(p, router) {
   return btn;
 }
 
-function renderCard(p, index, router, userCoord, mapApi) {
+function renderCard(p, index, router, userCoord, mapApi, fromContext) {
   const catMeta = KAKAO_CAT_BADGE[p.category] || null;
   const iconName = catMeta?.icon || 'place';
   const categoryBadge = catMeta?.label || p.categoryLabel || '장소';
@@ -70,8 +70,10 @@ function renderCard(p, index, router, userCoord, mapApi) {
 
   const saveBtn = makeSaveBtn(p, router);
 
-  const card = h('article', {
-    className: 'card-lift bg-surfaceContainerLowest rounded-2xl p-4 md:p-5 transition-all'
+  const detailHref = `#/place?id=${encodeURIComponent(p.id)}${fromContext ? `&from=${encodeURIComponent(fromContext)}` : ''}`;
+  const card = h('a', {
+    href: detailHref,
+    className: 'card-lift block bg-surfaceContainerLowest rounded-2xl p-4 md:p-5 transition-all hover:shadow-[0px_8px_20px_rgba(45,51,53,0.08)]'
   },
     h('div', { className: 'flex gap-4' },
       // Left: numbered badge over icon
@@ -114,26 +116,13 @@ function renderCard(p, index, router, userCoord, mapApi) {
               )
             : null
         ),
-        // Action row
+        // Action row: save + "자세히" chevron (카드 전체가 디테일 링크라서 외부 링크는 디테일에서)
         h('div', { className: 'flex items-center gap-3 mt-3 flex-wrap' },
           saveBtn,
-          p.placeUrl
-            ? h('a', {
-                href: p.placeUrl, target: '_blank', rel: 'noopener',
-                className: 'text-onSurfaceVariant hover:text-primary transition-colors inline-flex items-center gap-1 text-xs font-medium'
-              },
-                h('span', { className: 'material-symbols-outlined text-[18px]' }, 'reviews'),
-                '사진·리뷰'
-              )
-            : null,
-          h('a', {
-              href: `https://map.kakao.com/link/to/${encodeURIComponent(p.name)},${p.lat},${p.lng}`,
-              target: '_blank', rel: 'noopener',
-              className: 'text-onSurfaceVariant hover:text-primary transition-colors inline-flex items-center gap-1 text-xs font-medium'
-            },
-              h('span', { className: 'material-symbols-outlined text-[18px]' }, 'directions'),
-              '길찾기'
-            )
+          h('span', { className: 'ml-auto inline-flex items-center gap-0.5 text-xs font-medium text-primary' },
+            '자세히',
+            h('span', { className: 'material-symbols-outlined text-[16px]' }, 'chevron_right')
+          )
         )
       )
     )
@@ -277,6 +266,8 @@ export function ResultsView({ router, params }) {
     );
   }
 
+  const fromContext = region ? (area ? `region:${region}:${area}` : `region:${region}`) : null;
+
   function renderPlaces(places, mapApi) {
     resultList.innerHTML = '';
     if (places.length === 0) {
@@ -290,7 +281,7 @@ export function ResultsView({ router, params }) {
       return;
     }
     places.forEach((p, idx) => {
-      resultList.appendChild(renderCard(p, idx, router, userCoord, mapApi));
+      resultList.appendChild(renderCard(p, idx, router, userCoord, mapApi, fromContext));
     });
     listHeader.querySelector('span').textContent = `총 ${places.length}곳 · 맛집·카페·명소`;
   }
@@ -441,6 +432,7 @@ export function ResultsView({ router, params }) {
         }
         const raw = await multiKeywordSearch(queries, { size: 10 });
         const allPlaces = raw.slice(0, 30).map(normalizeKakaoPlace);
+        cachePlaces(allPlaces);
 
         // Side map (starts with all places)
         const mapApi = PlacesMap({ places: allPlaces });
