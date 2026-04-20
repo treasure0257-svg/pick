@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>취향 설정 — The Concierge</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="assets/js/config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<link href="assets/css/app.css" rel="stylesheet" />
+</head>
+<body class="bg-background text-on-background font-body antialiased min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="bg-surface text-primary font-headline font-semibold tracking-tight sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+  <a class="flex items-center gap-3" href="index.html">
+    <span class="material-symbols-outlined text-2xl">spa</span>
+    <span class="text-xl font-bold tracking-tight">The Concierge</span>
+  </a>
+  <nav class="hidden md:flex items-center gap-6">
+    <a class="text-on-surface-variant hover:bg-surface-container rounded-lg px-3 py-1 transition-colors" href="index.html">홈</a>
+    <a class="text-primary font-bold rounded-lg px-3 py-1" href="preferences.html">취향 설정</a>
+    <a class="text-on-surface-variant hover:bg-surface-container rounded-lg px-3 py-1 transition-colors" href="tournament.html">토너먼트</a>
+    <a class="text-on-surface-variant hover:bg-surface-container rounded-lg px-3 py-1 transition-colors" href="saved.html">저장됨</a>
+    <a class="text-on-surface-variant hover:bg-surface-container rounded-lg px-3 py-1 transition-colors" href="profile.html">프로필</a>
+  </nav>
+  <div data-auth-slot class="flex items-center gap-2"></div>
+</header>
+<div class="bg-surface-container h-[1px] w-full"></div>
+
+<!-- Main -->
+<main class="flex-grow flex flex-col md:flex-row max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 md:py-20 gap-12 relative z-10 pb-32 md:pb-12">
+
+  <!-- Left editorial -->
+  <aside class="w-full md:w-5/12 flex flex-col justify-start md:sticky md:top-24 md:self-start relative">
+    <div class="absolute inset-0 bg-primary-fixed-dim/20 blur-3xl rounded-full -z-10 w-3/4 h-3/4 left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"></div>
+    <span class="font-label text-sm text-on-surface-variant mb-4">STEP 1 · 취향 설정</span>
+    <h1 class="font-headline text-[3rem] md:text-[3.5rem] leading-[1.05] tracking-[-0.02em] font-extrabold text-on-surface mb-6">
+      당신만의 완벽한 <br />
+      <span class="text-primary">휴식을 디자인하세요.</span>
+    </h1>
+    <p class="font-body text-lg text-on-surface-variant mb-10 max-w-md leading-relaxed">
+      당신이 어떻게 쉬고 싶은지 알려주세요. 당신의 리듬에 딱 맞는 경험을 설계해 드립니다.
+    </p>
+    <div class="hidden md:block rounded-[2rem] overflow-hidden">
+      <img alt="Relaxing scene" class="w-full h-64 object-cover opacity-90 mix-blend-multiply filter grayscale-[20%]" src="https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=1000&q=70" />
+    </div>
+  </aside>
+
+  <!-- Right form -->
+  <section class="w-full md:w-7/12 flex flex-col gap-10">
+
+    <!-- Text area -->
+    <section class="bg-surface-container-low rounded-[2rem] p-8 md:p-10 relative overflow-hidden group">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-secondary-container/30 rounded-full blur-2xl -mr-10 -mt-10 transition-transform duration-700 group-hover:scale-150"></div>
+      <label class="block font-headline text-2xl font-bold text-on-surface mb-4 relative z-10" for="ideal-weekend">이상적인 주말</label>
+      <p class="font-body text-sm text-on-surface-variant mb-6 relative z-10">
+        당신이 꿈꾸는 완벽한 이틀을 설명해 주세요. 하이킹을 하고 싶으신가요, 갤러리를 구경하고 싶으신가요, 아니면 커피와 함께 느긋한 아침을 즐기고 싶으신가요?
+      </p>
+      <div class="relative z-10">
+        <textarea id="ideal-weekend" name="ideal-weekend" rows="5" placeholder="나의 토요일은 대개 이렇게 시작합니다..."
+          class="w-full bg-surface-container-highest border-0 rounded-xl p-5 font-body text-on-surface focus:ring-2 focus:ring-primary/40 focus:bg-surface-container-lowest transition-colors resize-none placeholder:text-on-surface-variant/50"></textarea>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="bg-surface-container-low rounded-[2rem] p-8 md:p-10">
+      <h2 class="font-headline text-2xl font-bold text-on-surface mb-2">관심 카테고리</h2>
+      <p class="font-body text-sm text-on-surface-variant mb-8">복수 선택 가능. 비워두면 전체에서 추천해요.</p>
+      <div id="category-chips" class="flex flex-wrap gap-3"></div>
+    </section>
+
+    <!-- Moods -->
+    <section class="bg-surface-container-low rounded-[2rem] p-8 md:p-10">
+      <h2 class="font-headline text-2xl font-bold text-on-surface mb-2">분위기 및 스타일</h2>
+      <p class="font-body text-sm text-on-surface-variant mb-8">당신의 여가 시간을 구성하는 요소들을 선택해 주세요.</p>
+      <div id="mood-chips" class="flex flex-wrap gap-3"></div>
+    </section>
+
+    <!-- Budget & Duration -->
+    <section class="grid sm:grid-cols-2 gap-6">
+      <div class="bg-surface-container-low rounded-[2rem] p-8">
+        <h3 class="font-headline text-xl font-bold text-on-surface mb-4">예산</h3>
+        <div id="budget-chips" class="flex flex-wrap gap-2"></div>
+      </div>
+      <div class="bg-surface-container-low rounded-[2rem] p-8">
+        <h3 class="font-headline text-xl font-bold text-on-surface mb-4">소요 시간</h3>
+        <div id="duration-chips" class="flex flex-wrap gap-2"></div>
+      </div>
+    </section>
+
+    <!-- Drinks -->
+    <section class="bg-surface-container-low rounded-[2rem] p-8 md:p-10">
+      <h2 class="font-headline text-2xl font-bold text-on-surface mb-2">술은 어떻게?</h2>
+      <p class="font-body text-sm text-on-surface-variant mb-8">술 없이 놀지, 반주로 곁들일지, 제대로 한잔 할지 — 분위기에 맞춰 걸러드려요.</p>
+      <div id="drinks-chips" class="flex flex-wrap gap-3"></div>
+    </section>
+
+    <!-- Actions -->
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 bg-transparent text-on-surface-variant font-body font-semibold py-4 px-6 rounded-xl hover:bg-surface-container transition-colors">
+        돌아가기
+      </a>
+      <button id="save-btn" class="inline-flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-primary-dim text-on-primary font-body font-semibold py-4 px-10 rounded-xl hover:shadow-[0px_12px_32px_rgba(45,51,53,0.12)] transition-all duration-300 hover:-translate-y-0.5">
+        <span class="material-symbols-outlined">auto_awesome</span>
+        추천 받기
+      </button>
+    </div>
+
+  </section>
+</main>
+
+<!-- Mobile bottom nav -->
+<nav class="md:hidden bg-surface/80 backdrop-blur-xl text-primary text-[11px] font-label font-medium uppercase tracking-wider fixed bottom-0 left-0 w-full z-50 rounded-t-[1.5rem] shadow-[0px_-4px_24px_rgba(45,51,53,0.04)] flex justify-around items-center px-4 pt-3 pb-6">
+  <a class="flex flex-col items-center text-on-surface-variant px-4 py-2" href="index.html">
+    <span class="material-symbols-outlined mb-1">home</span><span>홈</span>
+  </a>
+  <a class="flex flex-col items-center text-primary bg-primary/10 rounded-2xl px-4 py-2" href="preferences.html">
+    <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 1;">tune</span><span>취향</span>
+  </a>
+  <a class="flex flex-col items-center text-on-surface-variant px-4 py-2" href="tournament.html">
+    <span class="material-symbols-outlined mb-1">swords</span><span>토너먼트</span>
+  </a>
+  <a class="flex flex-col items-center text-on-surface-variant px-4 py-2" href="saved.html">
+    <span class="material-symbols-outlined mb-1">bookmark</span><span>저장됨</span>
+  </a>
+</nav>
+
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/auth-header.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  (function () {
+    const state = {
+      categories: new Set(),
+      moods: new Set(),
+      budget: null,
+      duration: null,
+      drinks: null
+    };
+
+    // Hydrate from previous session
+    const saved = PickApp.storage.get(PickApp.keys.preferences, null);
+    if (saved) {
+      (saved.categories || []).forEach(x => state.categories.add(x));
+      (saved.moods || []).forEach(x => state.moods.add(x));
+      state.budget = saved.budget || null;
+      state.duration = saved.duration || null;
+      state.drinks = saved.drinks || null;
+      if (saved.note) document.getElementById("ideal-weekend").value = saved.note;
+    }
+
+    function chipHTML(id, label, icon, selected) {
+      return `
+        <button type="button" data-id="${id}"
+          class="chip ${selected ? 'is-selected' : ''} font-body text-sm font-medium py-2.5 px-5 rounded-full flex items-center gap-2 focus-ring">
+          ${icon ? `<span class="material-symbols-outlined text-[18px]">${icon}</span>` : ""}
+          <span>${label}</span>
+        </button>`;
+    }
+
+    function renderChips(containerId, items, stateKey, multi = true, hasIcon = true) {
+      const el = document.getElementById(containerId);
+      const render = () => {
+        el.innerHTML = items.map(item => {
+          const selected = multi
+            ? state[stateKey].has(item.id)
+            : state[stateKey] === item.id;
+          return chipHTML(item.id, item.label, hasIcon ? item.icon : null, selected);
+        }).join("");
+      };
+      render();
+      el.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-id]");
+        if (!btn) return;
+        const id = btn.dataset.id;
+        if (multi) {
+          state[stateKey].has(id) ? state[stateKey].delete(id) : state[stateKey].add(id);
+        } else {
+          state[stateKey] = state[stateKey] === id ? null : id;
+        }
+        render();
+      });
+    }
+
+    renderChips("category-chips", PICK_DATA.categories, "categories", true, true);
+    renderChips("mood-chips",     PICK_DATA.moods,      "moods",      true, true);
+    renderChips("budget-chips",   PICK_DATA.budgets,    "budget",     false, false);
+    renderChips("duration-chips", PICK_DATA.durations,  "duration",   false, false);
+    renderChips("drinks-chips",   PICK_DATA.drinks,     "drinks",     false, true);
+
+    document.getElementById("save-btn").addEventListener("click", () => {
+      const prefs = {
+        categories: Array.from(state.categories),
+        moods:      Array.from(state.moods),
+        budget:     state.budget,
+        duration:   state.duration,
+        drinks:     state.drinks,
+        note:       document.getElementById("ideal-weekend").value
+      };
+      PickApp.storage.set(PickApp.keys.preferences, prefs);
+      location.href = "results.html?source=preferences";
+    });
+  })();
+</script>
+</body>
+</html>

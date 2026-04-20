@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Concierge — 결정을 도와드립니다</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="assets/js/config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<link href="assets/css/app.css" rel="stylesheet" />
+</head>
+<body class="bg-background text-on-background font-body antialiased min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="bg-surface text-primary font-headline font-semibold tracking-tight sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+  <a class="flex items-center gap-3" href="index.html">
+    <span class="material-symbols-outlined text-2xl">spa</span>
+    <span class="text-xl font-bold tracking-tight">The Concierge</span>
+  </a>
+  <nav class="hidden md:flex items-center gap-6">
+    <a class="text-primary font-bold rounded-lg px-3 py-1" href="index.html">홈</a>
+    <a class="text-on-surface-variant hover:bg-surface-container rounded-lg px-3 py-1 transition-colors" href="preferences.html">취향 설정</a>
+    <a class="text-on-surface-variant hover:bg-surface-container rounded-lg px-3 py-1 transition-colors" href="tournament.html">토너먼트</a>
+    <a class="text-on-surface-variant hover:bg-surface-container rounded-lg px-3 py-1 transition-colors" href="saved.html">저장됨</a>
+    <a class="text-on-surface-variant hover:bg-surface-container rounded-lg px-3 py-1 transition-colors" href="profile.html">프로필</a>
+  </nav>
+  <div data-auth-slot class="flex items-center gap-2"></div>
+</header>
+<div class="bg-surface-container h-[1px] w-full"></div>
+
+<!-- Main -->
+<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 pb-32 md:pb-20">
+
+  <!-- Hero -->
+  <section class="relative grid md:grid-cols-2 gap-10 md:gap-16 items-center mb-24">
+    <div class="absolute inset-0 bg-primary-fixed-dim/20 blur-3xl rounded-full -z-10 w-3/4 h-3/4 left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"></div>
+    <div>
+      <span class="inline-block bg-secondary-container text-on-secondary-container text-xs font-medium px-3 py-1 rounded-full mb-6">결정장애를 위한 디지털 컨시어지</span>
+      <h1 class="font-headline text-[3rem] md:text-[3.5rem] leading-[1.05] tracking-[-0.02em] font-extrabold text-on-surface mb-6">
+        "뭐하지?"를 <br />
+        <span class="text-primary">끝내는 곳.</span>
+      </h1>
+      <p class="font-body text-lg text-on-surface-variant mb-10 max-w-md leading-relaxed">
+        매주 검색하며 허비하는 시간, 우리가 대신 고민해 드려요. 취향으로 추천받거나, 토너먼트로 좁혀가거나 — 원하는 방식으로.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="preferences.html" class="inline-flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-primary-dim text-on-primary font-body font-semibold py-4 px-8 rounded-xl hover:shadow-[0px_12px_32px_rgba(45,51,53,0.12)] transition-all duration-300 hover:-translate-y-0.5">
+          <span class="material-symbols-outlined">tune</span>
+          취향으로 추천받기
+        </a>
+        <a href="tournament.html" class="inline-flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container font-body font-semibold py-4 px-8 rounded-xl hover:bg-secondary-fixed-dim transition-colors">
+          <span class="material-symbols-outlined">swords</span>
+          토너먼트로 고르기
+        </a>
+      </div>
+    </div>
+    <div class="relative">
+      <div class="rounded-[2rem] overflow-hidden bg-surface-container-low aspect-[4/3] relative">
+        <img alt="Relaxing weekend" class="w-full h-full object-cover mix-blend-multiply filter grayscale-[15%]" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=70" />
+        <div class="absolute bottom-4 left-4 right-4 frosted rounded-xl p-4">
+          <p class="font-headline text-sm font-semibold text-on-surface">이번 주말, 평균 2.4시간을 검색에 썼어요.</p>
+          <p class="font-body text-xs text-on-surface-variant mt-1">2025년 국내 직장인 조사 기준</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Two paths -->
+  <section class="mb-24">
+    <div class="flex items-end justify-between mb-8">
+      <div>
+        <h2 class="font-headline text-3xl md:text-4xl font-extrabold text-on-surface tracking-tight">두 가지 방식</h2>
+        <p class="font-body text-on-surface-variant mt-2">지금 기분에 맞는 방식을 고르세요.</p>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6">
+
+      <a href="preferences.html" class="card-lift group bg-surface-container-lowest rounded-[2rem] p-10 flex flex-col justify-between min-h-[280px] relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-primary-fixed-dim/30 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700"></div>
+        <div class="relative">
+          <div class="inline-flex w-12 h-12 items-center justify-center rounded-xl bg-primary-fixed text-primary mb-6">
+            <span class="material-symbols-outlined">tune</span>
+          </div>
+          <h3 class="font-headline text-2xl font-bold text-on-surface mb-3">취향 기반 추천</h3>
+          <p class="font-body text-on-surface-variant leading-relaxed">
+            몇 가지 질문과 분위기 태그로 당신의 리듬에 맞춘 맞춤 코스를 제안해요.
+          </p>
+        </div>
+        <div class="relative mt-8 flex items-center gap-2 text-primary font-semibold">
+          취향 설정 시작
+          <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+        </div>
+      </a>
+
+      <a href="tournament.html" class="card-lift group bg-surface-container-lowest rounded-[2rem] p-10 flex flex-col justify-between min-h-[280px] relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-tertiary-fixed/30 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700"></div>
+        <div class="relative">
+          <div class="inline-flex w-12 h-12 items-center justify-center rounded-xl bg-tertiary-fixed text-on-tertiary-container mb-6">
+            <span class="material-symbols-outlined">swords</span>
+          </div>
+          <h3 class="font-headline text-2xl font-bold text-on-surface mb-3">이상형 월드컵</h3>
+          <p class="font-body text-on-surface-variant leading-relaxed">
+            A와 B, 계속 둘 중 하나만 고르다 보면 오늘 하고 싶은 게 선명해져요.
+          </p>
+        </div>
+        <div class="relative mt-8 flex items-center gap-2 text-primary font-semibold">
+          토너먼트 시작
+          <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Category quick pick -->
+  <section class="mb-24">
+    <div class="mb-8">
+      <h2 class="font-headline text-3xl md:text-4xl font-extrabold text-on-surface tracking-tight">카테고리로 바로 시작</h2>
+      <p class="font-body text-on-surface-variant mt-2">뭘 하고 싶은지만 정해져 있다면, 바로 이동.</p>
+    </div>
+    <div id="category-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+  </section>
+
+  <!-- Stats band -->
+  <section class="bg-surface-container-low rounded-[2rem] p-10 md:p-14 grid md:grid-cols-3 gap-10 mb-12">
+    <div>
+      <p class="font-headline text-4xl font-extrabold text-primary">2.4h</p>
+      <p class="font-body text-on-surface-variant mt-1">주말마다 검색으로 낭비되는 평균 시간</p>
+    </div>
+    <div>
+      <p class="font-headline text-4xl font-extrabold text-primary">3단계</p>
+      <p class="font-body text-on-surface-variant mt-1">Concierge로 결정까지 필요한 최대 클릭</p>
+    </div>
+    <div>
+      <p class="font-headline text-4xl font-extrabold text-primary">200+</p>
+      <p class="font-body text-on-surface-variant mt-1">큐레이션 된 장소와 경험</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- Mobile bottom nav -->
+<nav class="md:hidden bg-surface/80 backdrop-blur-xl text-primary text-[11px] font-label font-medium uppercase tracking-wider fixed bottom-0 left-0 w-full z-50 rounded-t-[1.5rem] shadow-[0px_-4px_24px_rgba(45,51,53,0.04)] flex justify-around items-center px-4 pt-3 pb-6">
+  <a class="flex flex-col items-center text-primary bg-primary/10 rounded-2xl px-4 py-2" href="index.html">
+    <span class="material-symbols-outlined mb-1" style="font-variation-settings:'FILL' 1;">home</span>
+    <span>홈</span>
+  </a>
+  <a class="flex flex-col items-center text-on-surface-variant px-4 py-2" href="preferences.html">
+    <span class="material-symbols-outlined mb-1">tune</span>
+    <span>취향</span>
+  </a>
+  <a class="flex flex-col items-center text-on-surface-variant px-4 py-2" href="tournament.html">
+    <span class="material-symbols-outlined mb-1">swords</span>
+    <span>토너먼트</span>
+  </a>
+  <a class="flex flex-col items-center text-on-surface-variant px-4 py-2" href="saved.html">
+    <span class="material-symbols-outlined mb-1">bookmark</span>
+    <span>저장됨</span>
+  </a>
+</nav>
+
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/auth-header.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  (function () {
+    const grid = document.getElementById("category-grid");
+    const cats = window.PICK_DATA.categories;
+    grid.innerHTML = cats.map(c => `
+      <a href="results.html?category=${c.id}" class="card-lift bg-surface-container-lowest rounded-xl p-6 flex flex-col gap-3 focus-ring">
+        <span class="material-symbols-outlined text-primary">${c.icon}</span>
+        <span class="font-headline font-semibold text-on-surface">${c.label}</span>
+      </a>
+    `).join("");
+  })();
+</script>
+</body>
+</html>

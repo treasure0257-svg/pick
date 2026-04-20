@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Concierge - Discover</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#f9f8ff",
+                        "surface-container-high": "#e5e9eb",
+                        "on-primary-container": "#1e5469",
+                        "on-secondary-fixed": "#264350",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "on-primary-fixed": "#004155",
+                        "on-primary-fixed-variant": "#2a5e73",
+                        "primary-container": "#b1e4fd",
+                        "primary": "#32657a",
+                        "surface-dim": "#d5dbdd",
+                        "tertiary-fixed-dim": "#b1c0ec",
+                        "tertiary-fixed": "#becefa",
+                        "surface-container": "#ebeef0",
+                        "on-error": "#fff7f6",
+                        "on-surface": "#2d3335",
+                        "on-tertiary-fixed-variant": "#3f4e73",
+                        "on-secondary": "#f3faff",
+                        "error-dim": "#67040d",
+                        "inverse-on-surface": "#9b9d9e",
+                        "primary-fixed": "#b1e4fd",
+                        "surface-variant": "#dee3e6",
+                        "background": "#f8f9fa",
+                        "tertiary-dim": "#435278",
+                        "surface-container-low": "#f1f4f5",
+                        "secondary-fixed-dim": "#bbd9e9",
+                        "primary-fixed-dim": "#a4d6ef",
+                        "tertiary-container": "#becefa",
+                        "primary-dim": "#24596e",
+                        "secondary": "#466370",
+                        "on-tertiary-container": "#354569",
+                        "error": "#a83836",
+                        "secondary-container": "#c9e7f7",
+                        "surface-tint": "#32657a",
+                        "on-error-container": "#6e0a12",
+                        "tertiary": "#4f5e84",
+                        "outline": "#767c7e",
+                        "on-primary": "#f3faff",
+                        "inverse-surface": "#0c0f10",
+                        "surface-container-highest": "#dee3e6",
+                        "secondary-dim": "#3a5764",
+                        "on-tertiary-fixed": "#213155",
+                        "inverse-primary": "#b1e4fd",
+                        "error-container": "#fa746f",
+                        "on-background": "#2d3335",
+                        "outline-variant": "#adb3b5",
+                        "secondary-fixed": "#c9e7f7",
+                        "surface": "#f8f9fa",
+                        "on-secondary-fixed-variant": "#435f6d",
+                        "on-surface-variant": "#5a6062",
+                        "on-secondary-container": "#395663"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #2d3335; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Manrope', sans-serif; }
+        .bg-gradient-primary { background: linear-gradient(135deg, #32657a, #24596e); }
+        .glass-overlay { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(24px); }
+        .ambient-shadow { box-shadow: 0px 12px 32px rgba(45, 51, 53, 0.06); }
+        .ghost-border { border: 1px solid rgba(173, 179, 181, 0.15); }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="hidden md:flex flex-col bg-[#f8f9fa] dark:bg-[#1a1c1e] text-[#32657a] dark:text-[#a4d6ef] font-['Manrope'] font-semibold tracking-tight text-[#2d3335] dark:text-[#e1e2e4] text-xl font-bold tracking-tight text-[#32657a] dark:text-[#a4d6ef] docked full-width top-0 z-50 flat no-shadows flex justify-between items-center w-full px-6 py-4 max-w-full sticky">
+<div class="flex items-center gap-4 w-full">
+<span class="material-symbols-outlined text-2xl" data-icon="spa">spa</span>
+<span class="text-xl font-bold tracking-tight">The Concierge</span>
+<nav class="ml-10 hidden lg:flex items-center gap-8 text-sm font-medium">
+<a class="text-[#32657a] dark:text-[#a4d6ef] font-bold hover:bg-[#ebeef0] dark:hover:bg-[#33393b] transition-colors px-3 py-2 rounded-md" href="#">Discover</a>
+<a class="text-[#5a6062] dark:text-[#8e9193] hover:bg-[#ebeef0] dark:hover:bg-[#33393b] transition-colors px-3 py-2 rounded-md" href="#">Preferences</a>
+<a class="text-[#5a6062] dark:text-[#8e9193] hover:bg-[#ebeef0] dark:hover:bg-[#33393b] transition-colors px-3 py-2 rounded-md" href="#">Saved</a>
+<a class="text-[#5a6062] dark:text-[#8e9193] hover:bg-[#ebeef0] dark:hover:bg-[#33393b] transition-colors px-3 py-2 rounded-md" href="#">Profile</a>
+</nav>
+<div class="ml-auto flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-[#ebeef0] dark:hover:bg-[#33393b] transition-colors p-2 rounded-full scale-95 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-[#ebeef0] dark:hover:bg-[#33393b] transition-colors p-2 rounded-full scale-95 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+<div class="bg-[#ebeef0] dark:bg-[#2d3133] h-[1px] w-full mt-4 absolute bottom-0 left-0"></div>
+</header>
+<!-- Mobile Header (Simplified) -->
+<header class="md:hidden flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50 bg-surface/90 backdrop-blur-lg">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-2xl" data-icon="spa">spa</span>
+<span class="font-headline font-bold text-lg tracking-tight">The Concierge</span>
+</div>
+<button class="text-on-surface-variant p-2">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+<!-- Hero Section: Recommended Courses -->
+<section class="mb-16">
+<div class="mb-8 pl-2 border-l-4 border-primary">
+<h1 class="font-headline text-4xl md:text-5xl font-extrabold text-on-surface tracking-tight leading-tight">
+                    This Weekend's Curated Selection
+                </h1>
+<p class="mt-2 text-on-surface-variant font-body text-base max-w-2xl">
+                    Tailored experiences selected for clarity and calm. Escape the noise.
+                </p>
+</div>
+<!-- Bento Grid Layout for Recommendations -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+<!-- Large Feature Card -->
+<div class="md:col-span-2 md:row-span-2 relative rounded-3xl overflow-hidden ambient-shadow group cursor-pointer bg-surface-container-low">
+<img alt="Serene mountain retreat" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="peaceful misty pine forest mountain valley at dawn with soft diffuse light and serene atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUI3kngRobU99OH21Qz8lODc6bxyUym7AfegGFifTbFnJ5Wv--U6EL5kGgD5dU6dCu0vCznqs8kIRDfvzUjJqObzUEGIIyg3awf3eAy1-UG7RYe9XaZeRakle2bAJ7B6lx9BmVJ20SBmPMFJ0Tf8LCCW-vVi60Y9baj1eMtsOpdVxsXK5YZA68Gey8EuG7ggxAVrS2fZOWLwRDblUYgidCr9fT4K3x_zfm-qgyDMcNLh7MtBZv30dzkT2hVuZxGG9tCoxCbyvpqBg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 w-full flex flex-col justify-end">
+<div class="flex items-center gap-2 mb-3">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase font-label">Highly Recommended</span>
+<span class="glass-overlay text-on-surface px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span> 4.9
+                            </span>
+</div>
+<h2 class="font-headline text-3xl font-bold text-white mb-2 leading-tight">The Alpine Mindfulness Retreat</h2>
+<p class="text-surface-container-high text-sm mb-6 max-w-md line-clamp-2">A three-day immersive experience focused on deep rest, guided meditation, and digital detox in a pristine mountain setting.</p>
+<button class="bg-gradient-primary text-white px-6 py-3 rounded-xl font-medium w-max hover:opacity-90 transition-opacity">Explore Details</button>
+</div>
+</div>
+<!-- Small Card 1 -->
+<div class="relative rounded-3xl overflow-hidden ambient-shadow group cursor-pointer bg-surface-container-low">
+<img alt="Coastal wellness center" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="modern minimalist coastal spa architecture over looking calm blue ocean during golden hour" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBObZDmskvas2S5Rd8oJ5Y3B0UcxWz8MoKmYTuT3d7wgMkkMF14ysA7PbdSZetGkSCZbc7t4nNFb2qRoG-Qscg2qVQZTPJmPH4pWMjuraWOY8O4jFD9bi30UjHyuK8Cy6CDI4WCHfnerc3ei71fuTS7IzDtO3cGoxN4EK0RP1rUMkXHw2Yre7IS-sYbC0apIstJ1A8sC0WVlFC4hxOBcOKmhUS1q6XktKCZO7wpRLI8VnPtazgeVOz5dpl077CuzroHBcPHcpVpCM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full text-[10px] font-bold uppercase font-label">Coastal</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-white mb-1">Oceanic Flow</h3>
+<p class="text-surface-container-high text-xs line-clamp-1">Restorative yoga by the sea.</p>
+</div>
+</div>
+<!-- Small Card 2 -->
+<div class="relative rounded-3xl overflow-hidden ambient-shadow group cursor-pointer bg-surface-container-low flex flex-col justify-between p-6">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="self_improvement">self_improvement</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="bookmark_border">bookmark_border</span>
+</button>
+</div>
+<div>
+<span class="text-primary font-semibold text-sm mb-1 block">Virtual Course</span>
+<h3 class="font-headline text-xl font-bold text-on-surface mb-2">Mastering Focus</h3>
+<p class="text-on-surface-variant text-sm mb-4">A 4-week cognitive clarity program.</p>
+<button class="text-primary font-medium text-sm hover:underline flex items-center gap-1">
+                            Start Module 1 <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Community Stories Section -->
+<section>
+<div class="flex justify-between items-end mb-8 border-b border-surface-container pb-4">
+<div>
+<h2 class="font-headline text-2xl font-bold text-on-surface">Community Stories</h2>
+<p class="text-on-surface-variant text-sm mt-1">Experiences shared by our verified members.</p>
+</div>
+<button class="text-primary text-sm font-medium hover:underline hidden sm:block">View All</button>
+</div>
+<!-- Reviews Feed (Asymmetric masonry-style feel) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Review Card 1 -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 ambient-shadow ghost-border flex flex-col h-full">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden">
+<img alt="User avatar" class="w-full h-full object-cover" data-alt="portrait of smiling professional woman with short brown hair in soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKp98W2Qe3YVVokIrh2iPoQ6p-b5M3BZ8s-mMRPmbcYw8V3e-hvwFFpv5o-kXyuP_TkP70bK2gA_jBiDU7UMIwl3BqyGnIegVWMB6O332mfOCZLag75g4x0CydJapVs3lCvhfn5_azwjZOI-pGE2qVogS5BzmgNP_LhymaTR5XHZB7jCVBmk0kX9TnDlYl2eNi7d6eNbkTIbDEPn3xgV8Zzo0TN9SHCBP2mQA-KXV-aX3Bs9hmzOAmKaY1gcVEEeq__cEaAY5wqB4"/>
+</div>
+<div>
+<h4 class="font-semibold text-sm text-on-surface">Elena R.</h4>
+<div class="flex items-center gap-1 text-[10px] text-on-surface-variant">
+<span class="material-symbols-outlined text-[12px] text-tertiary-dim" data-icon="verified" data-weight="fill">verified</span>
+                                Verified Member
+                            </div>
+</div>
+<div class="ml-auto flex text-primary">
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+</div>
+</div>
+<div class="bg-surface-variant rounded-xl p-4 mb-4 flex-grow relative">
+<span class="material-symbols-outlined text-outline-variant/30 text-4xl absolute top-2 left-2" data-icon="format_quote">format_quote</span>
+<p class="text-on-surface text-sm relative z-10 leading-relaxed italic pl-4 pt-2">
+                            "The Alpine Retreat completely reset my baseline. The guided sessions were perfectly paced, and the environment forced me to disconnect in the best way possible. Highly recommend for anyone feeling burnout."
+                        </p>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+<span>Alpine Mindfulness Retreat</span>
+</div>
+</div>
+<!-- Review Card 2 (With Image) -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 ambient-shadow ghost-border flex flex-col h-full">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden">
+<img alt="User avatar" class="w-full h-full object-cover" data-alt="portrait of young man with slight smile outdoors in natural daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApCFy3wiuJPSjVJZoqkvE7jcvhp5IURiG4hHvOh2Jq0a8Hq0dqa0gJEpUGiw1tfNpoJYfwAfqwnX7l1ouvmwF4W7nFjGVTbkrMYmXPfi6BIPudrvWc0k2IDas8T2F_PmDicW8_axIJjjdfGmSsffVvpi-yqC7Vr1hJWz8d2JnyIjdQQB0m1RyxXStKcURAL3T_o79ls5DFD5X6IB-2k-LTm2u_8vX_AVPd5Gn_PV8LsnpUQGUy7PlxWyrhpvFFWY4orthpr9L0tqA"/>
+</div>
+<div>
+<h4 class="font-semibold text-sm text-on-surface">Marcus T.</h4>
+</div>
+<div class="ml-auto flex text-primary">
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant" data-icon="star">star</span>
+</div>
+</div>
+<div class="mb-4 rounded-xl overflow-hidden h-32 relative">
+<img alt="Yoga session" class="w-full h-full object-cover" data-alt="group of people practicing yoga on wooden deck overlooking calm lake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0Zgy2MfileqZqNYEazr3Nz_5LUV1EcOY7w_HTPNPvMV_N-VwGexRIidlo0_evjHGGMkTDh3PvB7nr6Plrj0rNFzTowHoIoosR4J2TZRBEKwQHNB7514Rgvrg90ZkDCnxMo6t32Uhn3KtXiixgjgcLr5Vsy0TYsdqVa2JbEEaCqmUjF1gVNv1bxvFaKy3bmUDpmAQQommXqT9-FyDJ0Bsk-_JdOJZSTD2VTpExSrHEv4MIpvTbAprFrOBvTR-6FAz10bUDEXayz_k"/>
+</div>
+<div class="bg-surface-variant rounded-xl p-4 flex-grow relative">
+<p class="text-on-surface text-sm leading-relaxed">
+                            The Oceanic Flow sessions were challenging but rewarding. The instructor was incredibly attentive.
+                        </p>
+</div>
+</div>
+<!-- Review Card 3 -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 ambient-shadow ghost-border flex flex-col h-full lg:col-start-3">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden flex items-center justify-center bg-secondary-container text-on-secondary-container font-bold">
+                            S
+                        </div>
+<div>
+<h4 class="font-semibold text-sm text-on-surface">Sarah J.</h4>
+<div class="flex items-center gap-1 text-[10px] text-on-surface-variant">
+<span class="material-symbols-outlined text-[12px] text-tertiary-dim" data-icon="verified" data-weight="fill">verified</span>
+                                Verified Member
+                            </div>
+</div>
+<div class="ml-auto flex text-primary">
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill">star</span>
+</div>
+</div>
+<div class="bg-surface-variant rounded-xl p-4 mb-4 flex-grow relative">
+<p class="text-on-surface text-sm leading-relaxed">
+                            I was skeptical about the virtual "Mastering Focus" course, but the actionable steps provided in week one alone have significantly reduced my daily anxiety. Highly effective.
+                        </p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden bg-[#f8f9fa]/80 dark:bg-[#1a1c1e]/80 backdrop-blur-xl text-[11px] font-['Inter'] font-medium uppercase tracking-wider fixed bottom-0 w-full z-50 rounded-t-[1.5rem] border-t-[0.5px] border-[#adb3b5]/15 shadow-[0px_-4px_24px_rgba(45,51,53,0.04)] fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-3 pb-8">
+<button class="flex flex-col items-center justify-center text-[#32657a] dark:text-[#a4d6ef] bg-[#32657a]/10 rounded-2xl px-5 py-2 active:scale-95 transition-all duration-300 ease-out group">
+<span class="material-symbols-outlined mb-1 group-hover:text-[#32657a] dark:group-hover:text-[#a4d6ef]" data-icon="explore" data-weight="fill">explore</span>
+<span>Discover</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#5a6062] dark:text-[#8e9193] px-5 py-2 hover:text-[#32657a] dark:hover:text-[#a4d6ef] active:scale-95 transition-all duration-300 ease-out group">
+<span class="material-symbols-outlined mb-1 group-hover:text-[#32657a] dark:group-hover:text-[#a4d6ef]" data-icon="tune">tune</span>
+<span>Preferences</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#5a6062] dark:text-[#8e9193] px-5 py-2 hover:text-[#32657a] dark:hover:text-[#a4d6ef] active:scale-95 transition-all duration-300 ease-out group">
+<span class="material-symbols-outlined mb-1 group-hover:text-[#32657a] dark:group-hover:text-[#a4d6ef]" data-icon="bookmark">bookmark</span>
+<span>Saved</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#5a6062] dark:text-[#8e9193] px-5 py-2 hover:text-[#32657a] dark:hover:text-[#a4d6ef] active:scale-95 transition-all duration-300 ease-out group">
+<span class="material-symbols-outlined mb-1 group-hover:text-[#32657a] dark:group-hover:text-[#a4d6ef]" data-icon="person">person</span>
+<span>Profile</span>
+</button>
+</nav>
+</body></html>

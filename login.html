@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>로그인 — The Concierge</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="assets/js/config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<link href="assets/css/app.css" rel="stylesheet" />
+</head>
+<body class="bg-background text-on-background font-body antialiased min-h-screen flex flex-col">
+
+<header class="bg-surface text-primary font-headline font-semibold tracking-tight sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+  <a class="flex items-center gap-3" href="index.html">
+    <span class="material-symbols-outlined text-2xl">spa</span>
+    <span class="text-xl font-bold tracking-tight">The Concierge</span>
+  </a>
+  <a href="index.html" class="text-on-surface-variant hover:bg-surface-container rounded-lg px-3 py-1 transition-colors text-sm font-body">돌아가기</a>
+</header>
+<div class="bg-surface-container h-[1px] w-full"></div>
+
+<main class="flex-grow flex items-center justify-center px-4 py-10 md:py-20 relative">
+  <div class="absolute inset-0 -z-10 overflow-hidden">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-fixed-dim/30 blur-3xl rounded-full"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-tertiary-fixed/20 blur-3xl rounded-full"></div>
+  </div>
+
+  <section class="w-full max-w-md bg-surface-container-lowest rounded-[2rem] p-8 md:p-10 shadow-[0px_12px_32px_rgba(45,51,53,0.06)]">
+    <div class="flex justify-center mb-6">
+      <div class="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary text-3xl">spa</span>
+      </div>
+    </div>
+
+    <h1 class="font-headline text-[2rem] leading-tight tracking-tight font-extrabold text-on-surface text-center">
+      다시 오신 걸 <span class="text-primary">환영해요.</span>
+    </h1>
+    <p class="font-body text-sm text-on-surface-variant text-center mt-2 mb-10">
+      취향과 저장된 장소를 계정에 동기화하세요.
+    </p>
+
+    <div class="flex flex-col gap-3">
+      <button id="btn-google" class="social-btn group w-full flex items-center justify-center gap-3 bg-surface-container-lowest border border-outline-variant/40 hover:bg-surface-container transition-colors font-body font-medium text-on-surface py-3.5 px-4 rounded-xl">
+        <svg class="w-5 h-5" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.676 32.636 29.223 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+          <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+          <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+          <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.086 5.571.001-.001.002-.001.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+        </svg>
+        <span>Google로 계속하기</span>
+      </button>
+
+      <button id="btn-kakao" class="social-btn w-full flex items-center justify-center gap-3 bg-[#FEE500] text-[#000000]/85 hover:brightness-95 transition font-body font-medium py-3.5 px-4 rounded-xl">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="currentColor" d="M12 3C6.48 3 2 6.58 2 11c0 2.82 1.86 5.3 4.65 6.72L5.5 21.5c-.11.35.26.65.57.46L10.8 19.1c.39.04.79.07 1.2.07 5.52 0 10-3.58 10-8S17.52 3 12 3z"/>
+        </svg>
+        <span>카카오로 계속하기</span>
+      </button>
+
+      <button id="btn-naver" class="social-btn w-full flex items-center justify-center gap-3 bg-[#03C75A] text-white hover:brightness-95 transition font-body font-medium py-3.5 px-4 rounded-xl">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="currentColor" d="M16.273 12.845L7.376 0H0v24h7.727V11.156L16.624 24H24V0h-7.727v12.845z"/>
+        </svg>
+        <span>네이버로 계속하기</span>
+      </button>
+      <!-- Naver SDK requires a container for its login button; kept hidden. -->
+      <div id="naverIdLogin" class="hidden"></div>
+    </div>
+
+    <div class="relative my-8">
+      <div class="absolute inset-0 flex items-center"><div class="w-full h-px bg-outline-variant/30"></div></div>
+      <div class="relative flex justify-center">
+        <span class="bg-surface-container-lowest px-4 font-label text-xs text-on-surface-variant uppercase tracking-widest">또는</span>
+      </div>
+    </div>
+
+    <a href="index.html" class="block text-center text-sm font-body text-on-surface-variant hover:text-primary transition-colors">
+      게스트로 계속 이용하기 →
+    </a>
+
+    <p id="status-line" class="hidden mt-6 font-body text-sm text-center"></p>
+  </section>
+</main>
+
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+  const status = document.getElementById("status-line");
+  function setStatus(msg, kind = "info") {
+    status.classList.remove("hidden", "text-on-surface-variant", "text-error", "text-primary");
+    status.textContent = msg;
+    status.classList.add(kind === "error" ? "text-error" : kind === "success" ? "text-primary" : "text-on-surface-variant");
+  }
+
+  PickAuth.init();
+
+  PickAuth.onChange((u) => {
+    if (u) {
+      setStatus(`${u.displayName || u.email || "사용자"}님으로 로그인됨 → 잠시 후 이동`, "success");
+      setTimeout(() => { location.href = "profile.html"; }, 800);
+    }
+  });
+
+  function guard(fn, label) {
+    return async () => {
+      try {
+        setStatus(`${label} 로그인 중…`);
+        await fn();
+      } catch (e) {
+        console.error(e);
+        const msg = e?.message || "로그인 실패";
+        setStatus(`${label} 로그인 실패: ${msg}`, "error");
+      }
+    };
+  }
+
+  document.getElementById("btn-google").addEventListener("click", guard(() => PickAuth.signInGoogle(), "Google"));
+  document.getElementById("btn-kakao").addEventListener("click", guard(() => PickAuth.signInKakao(), "Kakao"));
+  document.getElementById("btn-naver").addEventListener("click", guard(() => PickAuth.signInNaver(), "Naver"));
+</script>
+</body>
+</html>
