@@ -303,8 +303,33 @@ export function ResultsView({ router, params }) {
     { id: 'AT4',  label: '즐길거리', icon: 'attractions', match: 'AT4'  }
   ];
 
-  function renderTabs(allPlaces, activeId, onSelect) {
+  // 맛집(FD6) 서브 분류. Kakao category_name 2번째 세그먼트 기반.
+  const CUISINE_GROUPS = [
+    { id: 'all',     label: '전체 맛집' },
+    { id: 'korean',  label: '한식',     match: (c) => c === '한식' },
+    { id: 'meat',    label: '고기·구이', match: (c) => c && (c.includes('고기') || c === '육류,고기요리' || c === '구이') },
+    { id: 'jp',      label: '일식·회',   match: (c) => c === '일식' || (c && c.includes('회')) },
+    { id: 'cn',      label: '중식',     match: (c) => c === '중식' },
+    { id: 'western', label: '양식',     match: (c) => c === '양식' },
+    { id: 'asian',   label: '아시안',   match: (c) => c === '아시아음식' },
+    { id: 'chicken', label: '치킨·분식', match: (c) => c === '치킨' || c === '분식' || c === '패스트푸드' },
+    { id: 'bar',     label: '술집',     match: (c) => c === '술집' || c === '주점' || c === '포차' || (c && c.includes('이자카야')) }
+  ];
+
+  function cuisineOf(place) {
+    if (place.category !== 'FD6') return null;
+    const parts = (place.categoryFull || '').split('>').map(s => s.trim());
+    const second = parts[1] || '';
+    for (const g of CUISINE_GROUPS) {
+      if (g.match && g.match(second)) return g.id;
+    }
+    return 'other';
+  }
+
+  function renderTabs(allPlaces, activeId, onSelect, activeCuisine, onCuisine) {
     tabsBar.innerHTML = '';
+    // Top row: main categories
+    const topRow = h('div', { className: 'flex items-center gap-2 flex-wrap' });
     TABS.forEach(t => {
       const count = t.match
         ? allPlaces.filter(p => p.category === t.match).length
@@ -324,8 +349,51 @@ export function ResultsView({ router, params }) {
           className: `font-label text-[10px] ${isActive ? 'text-onPrimary/80' : 'text-onSurfaceVariant'}`
         }, String(count))
       );
-      tabsBar.appendChild(btn);
+      topRow.appendChild(btn);
     });
+    tabsBar.appendChild(topRow);
+
+    // Sub row: cuisine groups (only when 맛집 tab active)
+    if (activeId === 'FD6') {
+      const foodOnly = allPlaces.filter(p => p.category === 'FD6');
+      const cuisineCounts = {};
+      foodOnly.forEach(p => {
+        const cid = cuisineOf(p);
+        if (cid) cuisineCounts[cid] = (cuisineCounts[cid] || 0) + 1;
+      });
+      const subRow = h('div', { className: 'flex items-center gap-1.5 flex-wrap pl-2 border-l-2 border-primary/20 ml-1' });
+      CUISINE_GROUPS.forEach(g => {
+        const count = g.id === 'all' ? foodOnly.length : (cuisineCounts[g.id] || 0);
+        if (g.id !== 'all' && count === 0) return; // 결과에 없는 sub는 숨김
+        const isActive = activeCuisine === g.id;
+        const btn = h('button', {
+          className: `inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-body font-medium transition-colors ${
+            isActive
+              ? 'bg-red-600 text-white'
+              : 'bg-red-50 text-red-800 hover:bg-red-100'
+          }`,
+          onClick: () => onCuisine(g.id)
+        },
+          g.label,
+          h('span', { className: 'font-label text-[10px] opacity-80' }, String(count))
+        );
+        subRow.appendChild(btn);
+      });
+      // "기타" if there are uncategorized
+      if ((cuisineCounts['other'] || 0) > 0) {
+        const isActive = activeCuisine === 'other';
+        const btn = h('button', {
+          className: `inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-body font-medium transition-colors ${
+            isActive
+              ? 'bg-red-600 text-white'
+              : 'bg-red-50 text-red-800 hover:bg-red-100'
+          }`,
+          onClick: () => onCuisine('other')
+        }, '기타', h('span', { className: 'font-label text-[10px] opacity-80' }, String(cuisineCounts['other'])));
+        subRow.appendChild(btn);
+      }
+      tabsBar.appendChild(subRow);
+    }
   }
 
   function pickOneFromCategory(list, catCode) {
@@ -441,10 +509,20 @@ export function ResultsView({ router, params }) {
 
         // Tab state → filters list + map
         let activeTab = 'all';
+        let activeCuisine = 'all';
         function applyTab() {
           const tab = TABS.find(t => t.id === activeTab);
-          const filtered = tab.match ? allPlaces.filter(p => p.category === tab.match) : allPlaces;
-          renderTabs(allPlaces, activeTab, (id) => { activeTab = id; applyTab(); });
+          let filtered = tab.match ? allPlaces.filter(p => p.category === tab.match) : allPlaces;
+          if (activeTab === 'FD6' && activeCuisine !== 'all') {
+            filtered = filtered.filter(p => cuisineOf(p) === activeCuisine);
+          }
+          renderTabs(
+            allPlaces,
+            activeTab,
+            (id) => { activeTab = id; activeCuisine = 'all'; applyTab(); },
+            activeCuisine,
+            (cid) => { activeCuisine = cid; applyTab(); }
+          );
           renderPlaces(filtered, mapApi);
           mapApi.setPlaces(filtered);
         }
