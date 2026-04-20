@@ -3,11 +3,13 @@ import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
 import { PICK_DATA } from '../data.js';
 import { AppState, STORAGE_KEYS, recommend, savePlace, isSaved } from '../App.js';
+import { placesInRegion, regionLabel } from '../regions.js';
 
 export function ResultsView({ router, params }) {
   const source = params.get('source');
   const category = params.get('category');
   const placeId = params.get('place');
+  const region = params.get('region');
   const prefs = AppState.get(STORAGE_KEYS.preferences, {});
 
   let results = [];
@@ -18,9 +20,17 @@ export function ResultsView({ router, params }) {
   if (placeId) {
     const single = PICK_DATA.places.find(p => p.id === placeId);
     results = single ? [single] : [];
-    heading = "선택한 장소";
-    sourceLabel = "토너먼트 우승";
+    heading = single?.name || "선택한 장소";
+    sourceLabel = "상세 보기";
     desc = "골라주신 장소, 지도에서 바로 확인하세요.";
+  } else if (region) {
+    results = placesInRegion(PICK_DATA.places, region);
+    const label = regionLabel(region);
+    heading = `${label}에서 놀기`;
+    sourceLabel = "지역 기반";
+    desc = results.length
+      ? `${label}에서 즐길 수 있는 ${results.length}곳을 모았어요.`
+      : `${label}은(는) 아직 준비 중입니다. 곧 채워드릴게요.`;
   } else if (category) {
     const cat = PICK_DATA.categories.find(c => c.id === category);
     results = PICK_DATA.places.filter(p => p.category === category).slice(0, 8);
@@ -54,11 +64,11 @@ export function ResultsView({ router, params }) {
         h('p', { className: 'font-body text-onSurfaceVariant mt-3 max-w-2xl' }, desc)
       ),
       h('div', { className: 'flex gap-2' },
-        h('a', { href: '#/preferences', className: 'inline-flex items-center gap-2 bg-surfaceContainerLowest text-onSurface font-body font-medium py-3 px-5 rounded-xl hover:bg-surfaceContainer transition-colors' },
-          h('span', { className: 'material-symbols-outlined text-[18px]' }, 'tune'), '취향 조정'
+        h('a', { href: '#/', className: 'inline-flex items-center gap-2 bg-surfaceContainerLowest text-onSurface font-body font-medium py-3 px-5 rounded-xl hover:bg-surfaceContainer transition-colors' },
+          h('span', { className: 'material-symbols-outlined text-[18px]' }, 'arrow_back'), '지역 다시'
         ),
-        h('a', { href: '#/tournament', className: 'inline-flex items-center gap-2 bg-secondaryContainer text-onSecondaryContainer font-body font-semibold py-3 px-5 rounded-xl hover:bg-secondaryFixedDim transition-colors' },
-          h('span', { className: 'material-symbols-outlined text-[18px]' }, 'swords'), '토너먼트'
+        h('a', { href: '#/preferences', className: 'inline-flex items-center gap-2 bg-secondaryContainer text-onSecondaryContainer font-body font-semibold py-3 px-5 rounded-xl hover:bg-secondaryFixedDim transition-colors' },
+          h('span', { className: 'material-symbols-outlined text-[18px]' }, 'tune'), '취향 조정'
         )
       )
     )
@@ -99,8 +109,8 @@ export function ResultsView({ router, params }) {
     resultList.appendChild(
       h('div', { className: 'text-center p-10 bg-surfaceContainerLowest rounded-2xl border border-dashed border-surfaceContainerHighest' },
         h('span', { className: 'material-symbols-outlined text-4xl text-onSurfaceVariant mb-2' }, 'search_off'),
-        h('h3', { className: 'font-headline text-lg font-bold text-onSurface' }, '조건에 맞는 결과가 없어요'),
-        h('p', { className: 'font-body text-sm text-onSurfaceVariant mt-2' }, '취향 설정에서 카테고리나 필터를 조금 완화해보세요.')
+        h('h3', { className: 'font-headline text-lg font-bold text-onSurface' }, region ? '이 지역은 준비 중입니다' : '조건에 맞는 결과가 없어요'),
+        h('p', { className: 'font-body text-sm text-onSurfaceVariant mt-2' }, region ? '실제 장소 데이터는 순차적으로 추가됩니다. 다른 지역이나 취향 설정으로 먼저 둘러보세요.' : '취향 설정에서 카테고리나 필터를 조금 완화해보세요.')
       )
     );
   } else {

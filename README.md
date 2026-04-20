@@ -2,18 +2,21 @@
 
 > "뭐하지?"를 끝내는 곳. 결정장애를 위한 디지털 컨시어지.
 
-매주 검색에 허비하는 시간을 줄이는 SPA(Single Page App). 취향 기반 추천과 이상형 월드컵 두 가지 방식으로 "오늘 뭘 할지"를 대신 좁혀줍니다.
+매주 검색에 허비하는 시간을 줄이는 SPA(Single Page App). 지역을 고르거나 키워드로 검색하고, 필요하면 취향 설정으로 더 좁혀서 "오늘 뭘 할지"를 대신 정해줍니다.
 
 - **라이브**: https://pick-concierge.web.app
 - **백업 도메인**: https://pick-concierge.firebaseapp.com
 
-## 두 가지 사용 흐름
+## 홈 진입 경로
 
-| 모드 | 라우트 | 동작 |
+| 진입 방식 | 라우트 | 동작 |
 |---|---|---|
-| 취향 기반 추천 | `#/preferences` → `#/results` | 카테고리/무드/예산/기간/음주 유무 선택 후 `scorePlace()`로 랭킹 |
-| 이상형 월드컵 | `#/tournament` | A/B 이미지 대결로 점진적으로 좁혀 최종 1위 도출 |
+| 지역으로 찾기 | `#/results?region=<id>` | 홈의 17개 시·도 타일 또는 검색에서 선택 → 해당 지역 장소 리스트 |
+| 장소·키워드 검색 | 홈 검색창 | 지역명/장소명/카테고리/무드 전체 텍스트 매칭, 드롭다운에 미리보기 |
+| 취향 기반 추천 | `#/preferences` → `#/results?source=preferences` | 카테고리/무드/예산/기간/음주 선택 후 `scorePlace()`로 랭킹 |
 | 로그인 | `#/login` | Google / Kakao / Naver 3-way OAuth |
+
+현재 샘플 데이터가 들어간 지역은 서울·경기·강원이고 나머지 14개 시·도는 "준비 중" 상태로 노출됩니다 (API 연동 후 자동 채워짐).
 
 로그인 없이 체험 가능. `#/login`에서 Google·Kakao·Naver 중 한 곳으로 로그인하면 세션이 유지됩니다 (Google 로그인 시에는 취향·저장 목록이 Firestore에 동기화되어 기기 간 유지).
 
@@ -41,17 +44,17 @@ pick/
 │   ├── main.js             # 엔트리, 라우터 초기화, 인증 UI
 │   ├── App.js              # AppState + scorePlace + recommend 로직
 │   ├── router.js           # hash 라우터 + 토스트
-│   ├── firebase-setup.js   # Firebase 초기화 + Firestore 동기화
+│   ├── firebase-setup.js   # Firebase 초기화 + Firestore 동기화 + Kakao/Naver
 │   ├── data.js             # 샘플 장소 데이터 (PICK_DATA)
+│   ├── regions.js          # 17개 시·도 메타데이터 + 주소→region id 매핑
 │   ├── style.css           # Tailwind 엔트리
 │   ├── components/
 │   │   ├── Header.js
 │   │   └── BottomNav.js
 │   ├── views/
-│   │   ├── HomeView.js
+│   │   ├── HomeView.js       # 지역 검색 + 17개 시·도 grid + 취향 CTA
 │   │   ├── PreferencesView.js
-│   │   ├── TournamentView.js
-│   │   ├── ResultsView.js
+│   │   ├── ResultsView.js    # region/category/place/preferences 소스 분기
 │   │   ├── SavedView.js
 │   │   └── LoginView.js      # 3-way OAuth (Google/Kakao/Naver)
 │   └── utils/dom.js        # h() 엘리먼트 헬퍼

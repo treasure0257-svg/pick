@@ -2,7 +2,6 @@ import './style.css';
 import { Router } from './router.js';
 import { HomeView } from './views/HomeView.js';
 import { PreferencesView } from './views/PreferencesView.js';
-import { TournamentView } from './views/TournamentView.js';
 import { ResultsView } from './views/ResultsView.js';
 import { SavedView } from './views/SavedView.js';
 import { LoginView } from './views/LoginView.js';
@@ -12,7 +11,6 @@ import { h } from './utils/dom.js';
 const routes = [
   { path: '#/', component: HomeView },
   { path: '#/preferences', component: PreferencesView },
-  { path: '#/tournament', component: TournamentView },
   { path: '#/results', component: ResultsView },
   { path: '#/saved', component: SavedView },
   { path: '#/login', component: LoginView }

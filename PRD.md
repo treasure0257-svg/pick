@@ -1,6 +1,6 @@
 # Pick — The Concierge · PRD
 
-> Product Requirements Document  ·  v0.2.1 (2026-04-20)
+> Product Requirements Document  ·  v0.3 (2026-04-20)
 
 ## 1. 제품 개요
 
@@ -11,9 +11,8 @@
 한국 직장인이 주말·여가 계획에 들이는 시간은 평균 2.4시간. 정보는 넘치는데 선택은 어렵다. 취향에 맞는 곳을 찾아 헤매다 결국 "그냥 집에 있기"로 끝나는 경우가 많다.
 
 ### 1.3 핵심 가치 제안
-- 능동적 검색 없이, **두 가지 방식 중 하나**로 오늘의 한 곳이 정해진다.
-  1. 취향 슬라이더 기반 필터링
-  2. 이상형 월드컵 스타일 대결
+- 첫 화면에서 **지역 선택 또는 키워드 검색**으로 즉시 장소를 좁힌다.
+- 더 좁히고 싶으면 **취향 설정**으로 카테고리·무드·예산·기간·음주를 반영한 랭킹을 받는다.
 - 로그인 없이도 체험 가능, 로그인 시 Firestore로 기기 간 동기화.
 
 ## 2. 타깃 사용자
@@ -28,26 +27,24 @@
 
 SPA 구조 (hash 라우팅).
 
-### 3.1 취향 기반 추천
+### 3.1 지역 기반 탐색 (기본 진입)
 ```
 #/  (HomeView)
-  ↓ [취향으로 추천받기]
-#/preferences  (PreferencesView)
-  ↓ 카테고리 · 무드 · 예산 · 기간 · 음주 선택
-#/results  (ResultsView)
-  ↓ 스코어 기반 랭킹 / 저장
+  · 상단 검색창: 지역·장소·무드·카테고리 전체 매칭
+  · 17개 시·도 타일: 샘플 데이터 있는 지역만 활성, 나머지는 "준비 중"
+  ↓
+#/results?region=<id>  (ResultsView)
+  ↓ 해당 지역의 장소 리스트 / 저장
 ```
 
-### 3.2 이상형 월드컵
+### 3.2 취향 기반 추천 (심화)
 ```
-#/  (HomeView)
-  ↓ [토너먼트로 고르기]
-#/tournament setup
-  ↓ 카테고리 범위 · 음주 · 대진 규모(4/8/16강) 설정
-#/tournament match
-  ↓ A/B 양자택일 반복
-#/tournament result
-  ↓ 최종 1위 표시 / 저장
+#/  (HomeView 하단 CTA)
+  ↓ [취향 설정 시작]
+#/preferences  (PreferencesView)
+  ↓ 카테고리 · 무드 · 예산 · 기간 · 음주 선택
+#/results?source=preferences  (ResultsView)
+  ↓ scorePlace() 랭킹 / 저장
 ```
 
 ### 3.3 로그인
@@ -55,21 +52,23 @@ SPA 구조 (hash 라우팅).
 
 ## 4. 기능 명세
 
-### 4.1 v0.2 (현재, 2026-04-20)
-- [x] SPA 전환 완료 — Vite 빌드 + hash 라우터
-- [x] HomeView (히어로 섹션, 두 가지 모드 진입)
+### 4.1 v0.3 (현재, 2026-04-20)
+- [x] 홈 리디자인: 히어로(compact) + 중앙 검색창(지역·장소·키워드 복합) + 17개 시·도 region grid + 취향 CTA
+- [x] 지역 기반 결과 — `#/results?region=<id>`로 해당 시·도 장소 필터링, 빈 지역은 "준비 중"
+- [x] 검색 드롭다운 — 입력 시 region/place 매칭 미리보기
+- [x] 토너먼트 모드 제거 (Header·BottomNav 라우트 모두 정리)
+- [x] `src/regions.js` — 17개 시·도 메타 + 주소 prefix → region id 매핑 + 카운트 헬퍼
 - [x] PreferencesView — 카테고리/무드/예산/기간/음주 입력
-- [x] ResultsView — `scorePlace()` 기반 랭킹
-- [x] TournamentView — setup · match · result 3단계
+- [x] ResultsView — region/category/place/preferences 4개 소스 분기 지원
 - [x] SavedView — 저장된 장소 목록
 - [x] LoginView — 3-way OAuth (Google / Kakao / Naver) on `#/login`
 - [x] Google 로그인 via Firebase Auth
-- [x] Kakao 로그인 via Kakao JS SDK (JS 키 등록 완료, 팝업 플로우)
+- [x] Kakao 로그인 via Kakao JS SDK v1 (팝업 플로우)
 - [x] Naver 로그인 UI (Client ID 미등록 — 클릭 시 명시적 안내, 등록되면 즉시 활성)
 - [x] Firestore 동기화 — Google 로그인 시 preferences·saved가 클라우드에 merge 저장
-- [x] PWA 기반 — manifest + 서비스워커 등록
+- [x] PWA 기반 — manifest + network-first 서비스워커 (v2)
 - [x] GitHub Actions CI/CD — `npm ci` → `vite build` → Firebase Hosting 배포
-- [x] `.env` 기반 Firebase 설정 주입 (빌드 타임, 로컬/CI 모두)
+- [x] `.env` 기반 Firebase/Kakao/Naver 설정 주입 (빌드 타임, 로컬/CI 모두)
 
 ### 4.2 v1.0 (목표)
 - [ ] 장소 데이터 API 연동 (Google Places / 카카오 로컬 / 네이버 지역 등)
@@ -141,6 +140,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-20 | v0.3 | 홈 리디자인: 지역 검색창 + 17개 시·도 grid 중심. 토너먼트 모드 제거. ResultsView에 region 필터 추가, regions.js 헬퍼 신설. Kakao SDK를 v2.7→v1으로 다운그레이드(Auth.login 팝업 복구) |
 | 2026-04-20 | v0.2.1 | 서비스워커 network-first로 교체(cache-first 버그 수정). Kakao/Naver 로그인 재복구(LoginView + `#/login` 라우트, SDK on-demand 로드). GitHub Secrets 9개로 확장 |
 | 2026-04-20 | v0.2 | Vite + Firestore SPA로 아키텍처 전환. Google 단일 provider로 일시 축소. PWA 기반 추가. GitHub Actions에 빌드 스텝 추가 |
 | 2026-04-20 | v0.1 | 초기 문서, 바닐라 HTML + Tailwind CDN MVP 완성, Firebase Hosting 배포 파이프라인 구축 |

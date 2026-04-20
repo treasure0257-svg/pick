@@ -4,7 +4,6 @@ export function Header(router) {
   const navLinks = [
     { name: '홈', path: '#/' },
     { name: '취향 설정', path: '#/preferences' },
-    { name: '토너먼트', path: '#/tournament' },
     { name: '저장됨', path: '#/saved' }
   ];
 

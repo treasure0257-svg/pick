@@ -4,7 +4,6 @@ export function BottomNav(router) {
   const navLinks = [
     { name: '홈', path: '#/', icon: 'home' },
     { name: '취향', path: '#/preferences', icon: 'tune' },
-    { name: '토너먼트', path: '#/tournament', icon: 'swords' },
     { name: '저장됨', path: '#/saved', icon: 'bookmark' }
   ];
 
