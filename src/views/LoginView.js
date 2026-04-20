@@ -39,7 +39,7 @@ export function LoginView({ router }) {
   },
     h('div', { className: 'flex justify-center mb-6' },
       h('div', { className: 'w-14 h-14 rounded-2xl bg-primaryFixed flex items-center justify-center' },
-        h('span', { className: 'material-symbols-outlined text-primary text-3xl' }, 'spa')
+        h('span', { className: 'material-symbols-outlined text-primary text-3xl' }, 'pin_drop')
       )
     ),
     h('h1', {
