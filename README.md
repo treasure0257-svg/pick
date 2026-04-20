@@ -80,7 +80,9 @@ pick/
 ├── firebase.json           # Hosting 설정 (public: dist)
 ├── .firebaserc             # Firebase 프로젝트 별칭
 ├── .github/workflows/      # build + deploy 자동화
-└── scripts/                # 유틸리티 (예: fetch-region-photos.mjs — Wikipedia Commons 썸네일 갱신)
+└── scripts/                # 유틸리티
+    ├── fetch-region-photos.mjs      # Wikipedia API로 페이지 썸네일 URL 조회 (레퍼런스)
+    └── download-region-photos.mjs   # 원본 다운로드 + sharp 1280px 리사이즈 → public/data/regions/
 ```
 
 ## 로컬 개발

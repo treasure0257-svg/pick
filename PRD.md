@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.6 (2026-04-20)
+> Product Requirements Document  ·  v0.3.7 (2026-04-20)
 
 ## 1. 제품 개요
 
@@ -157,6 +157,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-20 | v0.3.7 | 지역 히어로 이미지 자체 호스팅으로 전환 — 기존 Wikimedia /thumb/ 330px 썸네일은 확대 시 픽셀화, 고해상도 버전은 429 rate limit. `scripts/download-region-photos.mjs` 로 원본(6000px급) 받아 sharp 1280px JPEG(quality 82, mozjpeg)로 리사이즈해 `public/data/regions/{id}.jpg` 에 보관, Firebase Hosting CDN 서빙. 이미지 총 ~3MB, lazy-load |
 | 2026-04-20 | v0.3.6 | 맛집 서브 탭(요리 유형별) 추가 — Kakao `category_name` 2번째 세그먼트로 한식/고기·구이/일식·회/중식/양식/아시안/치킨·분식/술집 자동 분류, 맛집 메인탭 활성 시만 빨간 톤 2번째 row 노출. 시·도/세부 지역 타일의 정적 샘플 기준 count·"준비 중" 표시 제거 — 모든 타일 항상 클릭 가능, 실제 Kakao 실시간 검색이 전국 커버 |
 | 2026-04-20 | v0.3.5 | 결과 화면 UX 전면 강화: 카테고리 탭(전체/맛집/카페/즐길거리 건수 배지, 목록+지도 동시 필터링), 2-컬럼 sticky 지도(카테고리별 색상 핀, 카드 호버 연동), 카드 정보 확장(도로명+지번·거리·카테고리 풀패스). "하루 코스 추천" 배너(맛집→카페→즐길거리 셔플). 장소 상세 뷰(`#/place?id=`) 신설 — 히어로·지도·카카오 CTA·주변 1.5km fetchers. `src/components/PlacesMap.js`, `src/views/PlaceDetailView.js`, `src/utils/place-ui.js` 분리 |
 | 2026-04-20 | v0.3.4 | **Kakao Local API 실시간 연동** — OPEN_MAP_AND_LOCAL 서비스 활성화 후 `src/services/kakaoLocal.js` 신설(Kakao Maps services SDK 동적 로드 + keywordSearch). ResultsView가 region/area 진입 시 "맛집·카페·명소" 키워드 병렬 검색해 실제 장소 카드 렌더. 홈 지도 제거하고 RegionView에 정적 thematic 지도(행정구역 경계·구별 라벨·양방향 호버) 적용, TopoJSON(`public/data/korea-municipalities.topo.json`) + `topojson-client` 사용 |
