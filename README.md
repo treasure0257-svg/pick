@@ -39,7 +39,10 @@ pick/
 ├── index.html              # Vite entry (SPA 루트)
 ├── public/
 │   ├── manifest.json       # PWA 매니페스트
-│   └── sw.js               # 서비스워커
+│   ├── sw.js               # 서비스워커
+│   ├── logo.png            # 정해줘 로고 (PWA 아이콘·favicon·헤더)
+│   ├── hero-hanok.jpg      # 홈 히어로 배경 (경복궁 전경)
+│   └── kakao-icon.svg      # 카카오 로그인 버튼 브랜드 아이콘
 ├── src/
 │   ├── main.js             # 엔트리, 라우터 초기화, 인증 UI
 │   ├── App.js              # AppState + scorePlace + recommend 로직
