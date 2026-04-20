@@ -135,11 +135,16 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
         attributionControl: false
       });
 
-      // 심플한 회색 베이스 (라벨 포함)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      // 2-layer: 회색 베이스 (라벨 없음) + 표준 OSM (한국어 라벨 오버레이)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
         subdomains: 'abcd',
         maxZoom: 19,
-        opacity: 0.4
+        opacity: 0.55
+      }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        subdomains: 'abc',
+        maxZoom: 19,
+        opacity: 0.5
       }).addTo(map);
 
       const geoLayer = L.geoJSON({ type: 'FeatureCollection', features }, {
@@ -149,9 +154,6 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
         },
         onEachFeature: (feature, layer) => {
           const subId = subIdForFeature(feature, subregions);
-          layer.bindTooltip(feature.properties.name, {
-            direction: 'top', offset: [0, -4], className: 'region-map-tooltip'
-          });
 
           if (subId) {
             if (!subLayers.has(subId)) subLayers.set(subId, []);
@@ -165,11 +167,36 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
               api.clearHighlight();
               onSubHover?.(null);
             });
+          } else {
+            // 매칭 안된 구/군은 짧은 호버 툴팁 (이름만)
+            layer.bindTooltip(feature.properties.name, {
+              direction: 'top', offset: [0, -4], className: 'region-map-tooltip'
+            });
           }
         }
       }).addTo(map);
 
       map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] });
+
+      // 각 sub별로 그룹 중심에 영구 라벨 마커 추가
+      subLayers.forEach((layers, subId) => {
+        const sub = subregions.find(s => s.id === subId);
+        if (!sub || layers.length === 0) return;
+        const bounds = layers.reduce((acc, l) => {
+          const b = l.getBounds();
+          return acc ? acc.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
+        }, null);
+        if (!bounds) return;
+        const center = bounds.getCenter();
+
+        const labelIcon = L.divIcon({
+          className: 'region-sub-label-wrap',
+          html: `<span class="region-sub-label">${sub.label}</span>`,
+          iconSize: [0, 0]
+        });
+        const marker = L.marker(center, { icon: labelIcon, interactive: false, keyboard: false });
+        marker.addTo(map);
+      });
 
       loadingEl.classList.add('hidden');
     } catch (e) {
