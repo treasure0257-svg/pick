@@ -188,7 +188,7 @@
       if (!window.Kakao.Auth) throw new Error("Kakao SDK unavailable");
       await new Promise((resolve, reject) => {
         window.Kakao.Auth.login({
-          scope: "profile_nickname profile_image account_email",
+          scope: "profile_nickname profile_image",
           success: resolve,
           fail: reject
         });
