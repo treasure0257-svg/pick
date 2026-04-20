@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.3 (2026-04-20)
+> Product Requirements Document  ·  v0.3.4 (2026-04-20)
 
 ## 1. 제품 개요
 
@@ -58,8 +58,8 @@ SPA 구조 (hash 라우팅).
 
 ### 4.1 v0.3 (현재, 2026-04-20)
 - [x] 홈 리디자인: 한옥 풀블리드 히어로(경복궁 전경) + 중앙 검색창(지역·장소·키워드 복합) + Leaflet 한국 지도(17개 시·도 핀) + 17개 시·도 region grid(Wikipedia Commons 랜드마크 사진) + 취향 CTA
-- [x] 지역 drill-down — `#/region?id=<id>` 세부 권역 grid (Seoul 8개, 기타 시·도 3-8개 stub), Seoul은 주소 keyword 매칭으로 실데이터 분배
-- [x] 지역 기반 결과 — `#/results?region=<id>` (시·도 전체) 또는 `?region=<id>&area=<sub>` (세부 권역) 필터링, 빈 지역은 "준비 중"
+- [x] 지역 drill-down — `#/region?id=<id>` 세부 권역 grid + 해당 시·도 행정구역 정적 thematic 지도 (Leaflet + TopoJSON), tile ↔ polygon 양방향 호버
+- [x] 지역 기반 결과 — `#/results?region=<id>` 또는 `?region=<id>&area=<sub>` 진입 시 Kakao Local API 실시간 검색 (맛집·카페·명소 키워드 병렬 호출, 중복 제거)
 - [x] 검색 드롭다운 — 입력 시 region/place 매칭 미리보기
 - [x] 토너먼트 모드 제거 (Header·BottomNav 라우트 모두 정리)
 - [x] `src/regions.js` — 17개 시·도 메타 + 주소 prefix → region id 매핑 + 카운트 헬퍼
@@ -104,9 +104,11 @@ SPA 구조 (hash 라우팅).
 - Kakao/Naver → Firebase 통합(Custom Token 발급)은 v2.0 Cloud Functions로 처리 예정
 
 ### 5.3 데이터
-- **샘플**: `src/data.js`의 `PICK_DATA.places` 하드코딩 (MVP 한정)
+- **장소 (동적)**: Kakao Local API 실시간 검색 — 지역·세부 권역 레이블 × {맛집, 카페, 명소} 키워드 조합 병렬 호출, place_url/lat/lng/category 사용
+- **장소 (샘플)**: `src/data.js`의 `PICK_DATA.places` 하드코딩 — preferences 기반 추천 플로우 및 fallback에 사용
+- **행정구역 경계**: `public/data/korea-municipalities.topo.json` (southkorea/southkorea-maps 2018 simple, 553KB) — RegionMap에서 TopoJSON → GeoJSON 변환해 polygon 렌더
 - **사용자 데이터**: Firestore `users/{uid}` 문서에 `{ preferences, saved }` 저장. 로컬은 `localStorage` 키 `pick.preferences` / `pick.saved`
-- v1.0: 외부 지도 API 프록시 + App Check 필수
+- v1.0: Kakao 외 장소 소스 추가, App Check 필수
 
 ### 5.4 빌드·배포
 - 빌드: `vite build` → `dist/` 산출 (현재 JS ~389KB / CSS ~24KB, gzip 기준 ~119KB / 5KB)
@@ -145,6 +147,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-20 | v0.3.4 | **Kakao Local API 실시간 연동** — OPEN_MAP_AND_LOCAL 서비스 활성화 후 `src/services/kakaoLocal.js` 신설(Kakao Maps services SDK 동적 로드 + keywordSearch). ResultsView가 region/area 진입 시 "맛집·카페·명소" 키워드 병렬 검색해 실제 장소 카드 렌더. 홈 지도 제거하고 RegionView에 정적 thematic 지도(행정구역 경계·구별 라벨·양방향 호버) 적용, TopoJSON(`public/data/korea-municipalities.topo.json`) + `topojson-client` 사용 |
 | 2026-04-20 | v0.3.3 | 지역 drill-down 도입 — RegionView + `#/region?id=<id>` 라우트, regions.js에 subregions[] (Seoul 8개 실데이터 매칭 + 기타 시·도 3-8개 stub), ResultsView `?area=` 필터. 홈에 Leaflet 한국 지도(17개 시·도 핀) 추가 — 처음엔 Kakao Maps로 시도했으나 앱 OPEN_MAP_AND_LOCAL 미활성으로 Leaflet+OSM으로 교체, 한국어 라벨을 위해 CartoDB nolabels 베이스 + OSM 오버레이 2-layer 구성 |
 | 2026-04-20 | v0.3.2 | 홈 hero에 한옥 풀블리드 배경(`public/hero-hanok.jpg` 경복궁 전경, Wikipedia Commons 1280×853) 적용 — 여기어때 레퍼런스 기반. 어두운 그라데이션 오버레이 + 흰 텍스트. 로그인 화면 카피 업데이트("간편하게 시작하세요" + 2줄 서브카피). 카카오 버튼에 KakaoTalk 브랜드 SVG 아이콘(`public/kakao-icon.svg`) 적용 |
 | 2026-04-20 | v0.3.1 | 브랜드명 "The Concierge" → "정해줘". 로고 이미지(`public/logo.png`, 퍼플 심플) 도입 — Header/LoginView/favicon/PWA manifest 전면 교체. manifest 테마컬러 #436B53 → #7C3AED(퍼플). H1 "어디로 갈까요?"로 단축, 서브카피 "당신의 소중한 하루가 결정됩니다"로 교체 |

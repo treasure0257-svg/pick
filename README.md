@@ -26,7 +26,8 @@
 - **스타일**: Tailwind CSS 3 + PostCSS + Autoprefixer
 - **라우팅**: hash 기반 self-rolled SPA 라우터 (`src/router.js`)
 - **DOM**: `h()` 헬퍼(`src/utils/dom.js`)로 가상 DOM 없이 직접 생성
-- **지도**: Leaflet + OpenStreetMap/CartoDB 타일 (무료·무설정, 한국어 라벨)
+- **지도**: Leaflet + TopoJSON (행정구역 경계, 정적 thematic 스타일)
+- **장소 데이터**: Kakao Local API (실시간 맛집·카페·명소 검색, Kakao Maps services SDK 경유)
 - **인증**: Firebase Auth (Google) + Kakao JS SDK + Naver ID Login SDK — SDK는 on-demand 동적 로드
 - **데이터**: Firestore (`users/{uid}` 문서에 preferences·saved 저장, localStorage 동기화)
 - **PWA**: `public/manifest.json` + `public/sw.js` 서비스워커
@@ -43,7 +44,9 @@ pick/
 │   ├── sw.js               # 서비스워커
 │   ├── logo.png            # 정해줘 로고 (PWA 아이콘·favicon·헤더)
 │   ├── hero-hanok.jpg      # 홈 히어로 배경 (경복궁 전경)
-│   └── kakao-icon.svg      # 카카오 로그인 버튼 브랜드 아이콘
+│   ├── kakao-icon.svg      # 카카오 로그인 버튼 브랜드 아이콘
+│   └── data/
+│       └── korea-municipalities.topo.json  # 시·군·구 경계 TopoJSON (RegionMap용)
 ├── src/
 │   ├── main.js             # 엔트리, 라우터 초기화, 인증 UI
 │   ├── App.js              # AppState + scorePlace + recommend 로직
@@ -55,9 +58,11 @@ pick/
 │   ├── components/
 │   │   ├── Header.js
 │   │   ├── BottomNav.js
-│   │   └── KoreaMap.js       # Leaflet 한국 지도 + 17개 시·도 핀
+│   │   └── RegionMap.js      # 시·도 행정구역 경계(정적 thematic) + 양방향 호버 API
+│   ├── services/
+│   │   └── kakaoLocal.js     # Kakao Maps services SDK 로더 + 키워드 검색 Promise 래퍼
 │   ├── views/
-│   │   ├── HomeView.js       # 한옥 hero + 검색 + 지도 + 17개 시·도 grid + 취향 CTA
+│   │   ├── HomeView.js       # 한옥 hero + 검색 + 17개 시·도 grid + 취향 CTA
 │   │   ├── PreferencesView.js
 │   │   ├── RegionView.js     # 시·도 drill-down (세부 권역 grid)
 │   │   ├── ResultsView.js    # region/area/category/place/preferences 소스 분기
