@@ -3,7 +3,8 @@ import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
 import { RegionMap } from '../components/RegionMap.js';
 import { PICK_DATA } from '../data.js';
-import { REGIONS, countPlacesBySubregion, placesInRegion } from '../regions.js';
+import { REGIONS, countPlacesBySubregion, placesInRegion, featuredFor } from '../regions.js';
+import { keywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
 
 export function RegionView({ router, params }) {
   const id = params.get('id');
@@ -51,6 +52,83 @@ export function RegionView({ router, params }) {
     className: 'flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 pb-32 md:pb-12'
   });
   container.appendChild(main);
+
+  // Featured (대표 명소) section — 지역별 큐레이션 장소를 Kakao에서 fetch 해 horizontal scroll 카드로
+  const featuredNames = featuredFor(id);
+  if (featuredNames.length > 0) {
+    const section = h('section', { className: 'mb-10 md:mb-12' });
+    section.appendChild(
+      h('div', { className: 'flex items-end justify-between mb-4' },
+        h('div', {},
+          h('span', { className: 'font-label text-xs text-primary uppercase tracking-widest' }, '✨ 이 지역 대표 명소'),
+          h('h2', { className: 'font-headline text-xl md:text-2xl font-extrabold text-onSurface tracking-tight mt-1' },
+            `${region.label}에서 놓치면 안 되는 곳`
+          )
+        )
+      )
+    );
+
+    const scroll = h('div', {
+      className: 'flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory'
+    });
+    section.appendChild(scroll);
+    // 로딩 플레이스홀더
+    const skeletons = featuredNames.map(() =>
+      h('div', {
+        className: 'flex-none w-64 h-40 rounded-2xl bg-surfaceContainerLow animate-pulse snap-start'
+      })
+    );
+    skeletons.forEach(s => scroll.appendChild(s));
+    main.appendChild(section);
+
+    // Kakao에서 각 명소 개별 검색 (병렬)
+    Promise.allSettled(featuredNames.map(name =>
+      keywordSearch(`${region.label} ${name}`, { size: 1 })
+    )).then(results => {
+      scroll.innerHTML = '';
+      const places = [];
+      results.forEach((r, i) => {
+        if (r.status === 'fulfilled' && r.value.length > 0) {
+          places.push({ curatedName: featuredNames[i], place: normalizeKakaoPlace(r.value[0]) });
+        }
+      });
+      cachePlaces(places.map(x => x.place));
+
+      if (places.length === 0) {
+        scroll.appendChild(
+          h('div', { className: 'w-full p-6 text-center text-onSurfaceVariant font-body text-sm' },
+            '대표 명소 정보를 불러오지 못했어요.'
+          )
+        );
+        return;
+      }
+
+      places.forEach(({ curatedName, place: p }) => {
+        const card = h('a', {
+          href: `#/place?id=${encodeURIComponent(p.id)}&from=${encodeURIComponent('region:' + id)}`,
+          className: 'group flex-none w-64 h-40 relative rounded-2xl overflow-hidden snap-start bg-primaryContainer/40 transition-all hover:-translate-y-0.5 hover:shadow-[0px_10px_24px_rgba(45,51,53,0.14)]'
+        },
+          h('div', {
+            className: 'absolute inset-0 bg-gradient-to-br from-primary/40 via-primary/25 to-primary-dim/30'
+          }),
+          h('div', { className: 'absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent' }),
+          h('div', { className: 'absolute top-3 left-3' },
+            h('span', { className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/90 text-primary' },
+              h('span', { className: 'material-symbols-outlined text-[14px]' }, 'star'),
+              '대표'
+            )
+          ),
+          h('div', { className: 'absolute inset-x-0 bottom-0 p-4 text-white' },
+            h('h3', { className: 'font-headline font-bold text-base leading-tight drop-shadow truncate' }, curatedName),
+            h('p', { className: 'font-label text-[11px] text-white/85 truncate mt-0.5' }, p.address || '')
+          )
+        );
+        scroll.appendChild(card);
+      });
+    }).catch(e => {
+      console.error('[Featured]', e);
+    });
+  }
 
   // Top bar
   main.appendChild(

@@ -145,7 +145,8 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
 const SEARCH_KEYWORDS = {
   food: ['맛집'],
   cafe: ['카페'],
-  attraction: ['관광', '명소', '박물관', '미술관', '공원', '전시관', '랜드마크', '가볼만한곳']
+  attraction: ['관광', '명소', '박물관', '미술관', '공원', '전시관', '랜드마크', '가볼만한곳'],
+  lodging: ['호텔', '펜션', '게스트하우스']
 };
 
 function buildQueriesForArea(regionL, subL, subregion) {
@@ -314,7 +315,8 @@ export function ResultsView({ router, params }) {
     { id: 'all',  label: '전체',     icon: 'apps',        match: null   },
     { id: 'FD6',  label: '맛집',     icon: 'restaurant',  match: 'FD6'  },
     { id: 'CE7',  label: '카페',     icon: 'local_cafe',  match: 'CE7'  },
-    { id: 'AT4',  label: '즐길거리', icon: 'attractions', match: 'AT4'  }
+    { id: 'AT4',  label: '즐길거리', icon: 'attractions', match: 'AT4'  },
+    { id: 'AD5',  label: '숙소',     icon: 'hotel',       match: 'AD5'  }
   ];
 
   // 맛집(FD6) 서브 분류. Kakao category_name 2번째 세그먼트 기반.
