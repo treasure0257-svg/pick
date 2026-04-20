@@ -43,12 +43,15 @@ export function LoginView({ router }) {
     h('h1', {
       className: 'font-headline text-[2rem] leading-tight tracking-tight font-extrabold text-onSurface text-center'
     },
-      '다시 오신 걸 ',
-      h('span', { className: 'text-primary' }, '환영해요.')
+      '간편하게 ',
+      h('span', { className: 'text-primary' }, '시작하세요.')
     ),
     h('p', {
-      className: 'font-body text-sm text-onSurfaceVariant text-center mt-2 mb-8'
-    }, '소셜 계정 하나로 간편하게 시작하세요.'),
+      className: 'font-body text-sm text-onSurfaceVariant text-center mt-2 mb-8 leading-relaxed'
+    },
+      h('span', { className: 'block' }, '소셜 계정 하나로 간편하게 시작하세요.'),
+      h('span', { className: 'block' }, '몇 번의 선택으로 오늘 갈 곳이 정해집니다.')
+    ),
 
     h('div', { className: 'flex flex-col gap-3' },
       h('button', {
@@ -65,7 +68,7 @@ export function LoginView({ router }) {
         onClick: guard(loginKakao, 'Kakao'),
         className: 'w-full flex items-center justify-center gap-3 bg-[#FEE500] hover:brightness-95 transition text-[#191919] font-body font-medium py-3.5 px-4 rounded-xl'
       },
-        h('span', { className: 'material-symbols-outlined text-[20px]' }, 'chat_bubble'),
+        h('img', { src: '/kakao-icon.svg', alt: 'Kakao', className: 'w-5 h-5' }),
         '카카오로 계속하기'
       ),
       h('button', {
