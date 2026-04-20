@@ -64,12 +64,14 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
   let currentlyHighlighted = null;
 
   function styleFor(subId, isHot) {
-    if (!subId) {
-      return { color: '#94A3B8', weight: 1, fillColor: '#E2E8F0', fillOpacity: 0.35 };
+    // 서브에 매칭된 구/군 (데이터 분포 대상)
+    if (subId) {
+      return isHot
+        ? { color: '#FFFFFF', weight: 2, fillColor: '#7C3AED', fillOpacity: 0.95 }
+        : { color: '#FFFFFF', weight: 1.5, fillColor: '#2563EB', fillOpacity: 0.88 };
     }
-    return isHot
-      ? { color: '#7C3AED', weight: 2.5, fillColor: '#A78BFA', fillOpacity: 0.65 }
-      : { color: '#7C3AED', weight: 1, fillColor: '#C4B5FD', fillOpacity: 0.35 };
+    // 매칭 안 되는 구/군은 한 톤 약한 파란색
+    return { color: '#FFFFFF', weight: 1.5, fillColor: '#60A5FA', fillOpacity: 0.72 };
   }
 
   function paint(subId, isHot) {
@@ -114,27 +116,18 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
         return;
       }
 
+      // 타일 없는 정적 테마 지도 (배경은 컨테이너 색)
       const map = L.map(mapEl, {
         zoomControl: false,
         scrollWheelZoom: false,
-        dragging: true,
+        dragging: false,
         doubleClickZoom: false,
+        touchZoom: false,
+        boxZoom: false,
         keyboard: false,
         attributionControl: false,
-        zoomSnap: 0.25 // fractional zoom 허용해서 추가 확대 단계를 미세조정
+        zoomSnap: 0.25
       });
-
-      // 2-layer: 회색 베이스 (라벨 없음) + 표준 OSM (한국어 라벨 오버레이)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-        subdomains: 'abcd',
-        maxZoom: 19,
-        opacity: 0.55
-      }).addTo(map);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        subdomains: 'abc',
-        maxZoom: 19,
-        opacity: 0.5
-      }).addTo(map);
 
       const geoLayer = L.geoJSON({ type: 'FeatureCollection', features }, {
         style: (feature) => {
@@ -156,36 +149,24 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
               api.clearHighlight();
               onSubHover?.(null);
             });
-          } else {
-            // 매칭 안된 구/군은 짧은 호버 툴팁 (이름만)
-            layer.bindTooltip(feature.properties.name, {
-              direction: 'top', offset: [0, -4], className: 'region-map-tooltip'
-            });
           }
         }
       }).addTo(map);
 
-      // 해당 시·도 전체가 한눈에 들어오게 맞춤 (패딩으로 살짝 여유)
-      map.fitBounds(geoLayer.getBounds(), { padding: [16, 16] });
+      // 해당 시·도 전체가 한눈에 들어오게 맞춤
+      map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] });
 
-      // 각 sub별로 그룹 중심에 영구 라벨 마커 추가
-      subLayers.forEach((layers, subId) => {
-        const sub = subregions.find(s => s.id === subId);
-        if (!sub || layers.length === 0) return;
-        const bounds = layers.reduce((acc, l) => {
-          const b = l.getBounds();
-          return acc ? acc.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
-        }, null);
-        if (!bounds) return;
-        const center = bounds.getCenter();
-
+      // 각 구/군별로 이름 라벨을 중심에 영구 표시
+      features.forEach(feature => {
+        const center = L.geoJSON(feature).getBounds().getCenter();
+        const name = feature.properties?.name || '';
+        if (!name) return;
         const labelIcon = L.divIcon({
-          className: 'region-sub-label-wrap',
-          html: `<span class="region-sub-label">${sub.label}</span>`,
+          className: 'region-feature-label-wrap',
+          html: `<span class="region-feature-label">${name}</span>`,
           iconSize: [0, 0]
         });
-        const marker = L.marker(center, { icon: labelIcon, interactive: false, keyboard: false });
-        marker.addTo(map);
+        L.marker(center, { icon: labelIcon, interactive: false, keyboard: false }).addTo(map);
       });
 
       loadingEl.classList.add('hidden');

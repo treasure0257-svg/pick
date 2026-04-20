@@ -69,22 +69,25 @@
 }
 .leaflet-container { font-family: 'Inter', sans-serif; }
 
-/* Sub-region permanent label markers (divIcon) */
-.region-sub-label-wrap { background: transparent; border: none; pointer-events: none; }
-.region-sub-label {
+/* Per-feature (구/군) permanent label markers (divIcon) */
+.region-feature-label-wrap { background: transparent; border: none; pointer-events: none; }
+.region-feature-label {
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: 9999px;
   font-family: 'Inter', sans-serif;
   font-size: 11px;
-  font-weight: 700;
-  color: #4C1D95;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(124, 58, 237, 0.35);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  font-weight: 600;
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
   white-space: nowrap;
   transform: translate(-50%, -50%);
+  letter-spacing: -0.2px;
 }
+
+/* 정적 테마 지도 배경 (타일 없음) */
+.leaflet-container {
+  background: #F7F6F3;
+}
+
 .region-map-tooltip {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid #E1E2E4;
