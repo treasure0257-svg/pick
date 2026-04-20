@@ -155,30 +155,43 @@ export function HomeView({ router }) {
     Header(router),
     h('div', { className: 'bg-surfaceContainer h-[1px] w-full' }),
 
-    h('main', { className: 'flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 pb-32 md:pb-16' },
-
-      h('section', { className: 'text-center mb-10 md:mb-14' },
-        h('span', { className: 'inline-block bg-secondaryContainer text-onSecondaryContainer text-xs font-medium px-3 py-1 rounded-full mb-4' },
-          '바쁜 현대인을 위한 정보집합소'
+    // Full-width hanok hero
+    h('section', {
+      className: 'relative w-full overflow-hidden',
+      style: { minHeight: '480px' }
+    },
+      h('img', {
+        src: '/hero-hanok.jpg',
+        alt: '한옥 전경',
+        className: 'absolute inset-0 w-full h-full object-cover'
+      }),
+      h('div', { className: 'absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60' }),
+      h('div', { className: 'relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 md:pt-20 pb-10 md:pb-16' },
+        h('div', { className: 'text-center text-white' },
+          h('span', { className: 'inline-block bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-3 py-1 rounded-full mb-4 border border-white/20' },
+            '바쁜 현대인을 위한 정보집합소'
+          ),
+          h('h1', { className: 'font-headline text-[2.75rem] md:text-[3.5rem] leading-[1.05] tracking-[-0.02em] font-extrabold whitespace-nowrap drop-shadow-lg' },
+            h('span', { className: 'text-[#C4B5FD]' }, '어디로'), ' 갈까요?'
+          ),
+          h('p', { className: 'font-body text-base md:text-lg text-white/90 mt-4 max-w-md mx-auto leading-relaxed drop-shadow' },
+            h('span', { className: 'block' }, '지역을 고르거나 장소·키워드로 검색하세요.'),
+            h('span', { className: 'block' }, '당신의 소중한 하루가 결정됩니다.')
+          )
         ),
-        h('h1', { className: 'font-headline text-[2.75rem] md:text-[3.5rem] leading-[1.05] tracking-[-0.02em] font-extrabold text-onSurface whitespace-nowrap' },
-          h('span', { className: 'text-primary' }, '어디로'), ' 갈까요?'
-        ),
-        h('p', { className: 'font-body text-base md:text-lg text-onSurfaceVariant mt-4 max-w-md mx-auto leading-relaxed' },
-          h('span', { className: 'block' }, '지역을 고르거나 장소·키워드로 검색하세요.'),
-          h('span', { className: 'block' }, '당신의 소중한 하루가 결정됩니다.')
+        h('div', { className: 'mt-8 md:mt-10 max-w-3xl mx-auto' },
+          h('div', {
+            className: 'relative flex items-center bg-white rounded-[2rem] shadow-[0px_12px_32px_rgba(0,0,0,0.2)] pl-6 pr-2 focus-within:ring-2 focus-within:ring-primary/40'
+          },
+            h('span', { className: 'material-symbols-outlined text-onSurfaceVariant text-2xl flex-none' }, 'search'),
+            searchInput
+          ),
+          searchResults
         )
-      ),
+      )
+    ),
 
-      h('section', { className: 'mb-10 md:mb-14' },
-        h('div', {
-          className: 'relative flex items-center bg-surfaceContainerLowest rounded-[2rem] shadow-[0px_8px_24px_rgba(45,51,53,0.06)] pl-6 pr-2 focus-within:ring-2 focus-within:ring-primary/30'
-        },
-          h('span', { className: 'material-symbols-outlined text-onSurfaceVariant text-2xl flex-none' }, 'search'),
-          searchInput
-        ),
-        searchResults
-      ),
+    h('main', { className: 'flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 pb-32 md:pb-16' },
 
       h('section', { className: 'mb-12 md:mb-16' },
         h('div', { className: 'flex items-end justify-between mb-5' },
