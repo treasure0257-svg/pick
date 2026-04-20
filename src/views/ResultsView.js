@@ -140,6 +140,14 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
   return card;
 }
 
+// 카테고리별 확장 키워드 — Kakao Local 키워드 검색에서 다양한 결과 확보용.
+// 관광 명소가 부족한 게 가장 큰 불만이라 즐길거리 쪽 키워드를 대폭 늘림.
+const SEARCH_KEYWORDS = {
+  food: ['맛집'],
+  cafe: ['카페'],
+  attraction: ['관광', '명소', '박물관', '미술관', '공원', '전시관', '랜드마크', '가볼만한곳']
+};
+
 function buildQueriesForArea(regionL, subL, subregion) {
   const queries = new Set();
   const areaTerms = [subL];
@@ -148,13 +156,19 @@ function buildQueriesForArea(regionL, subL, subregion) {
     if (first && !areaTerms.includes(first)) areaTerms.push(first);
   }
   for (const a of areaTerms) {
-    for (const c of ['맛집', '카페', '명소']) queries.add(`${a} ${c}`);
+    for (const group of Object.values(SEARCH_KEYWORDS)) {
+      for (const kw of group) queries.add(`${a} ${kw}`);
+    }
   }
   return Array.from(queries);
 }
 
 function buildQueriesForRegion(regionL) {
-  return ['맛집', '카페', '명소'].map(c => `${regionL} ${c}`);
+  const queries = [];
+  for (const group of Object.values(SEARCH_KEYWORDS)) {
+    for (const kw of group) queries.push(`${regionL} ${kw}`);
+  }
+  return queries;
 }
 
 export function ResultsView({ router, params }) {
@@ -498,8 +512,9 @@ export function ResultsView({ router, params }) {
         } else {
           queries = buildQueriesForRegion(regionL);
         }
-        const raw = await multiKeywordSearch(queries, { size: 10 });
-        const allPlaces = raw.slice(0, 30).map(normalizeKakaoPlace);
+        const raw = await multiKeywordSearch(queries, { size: 15 });
+        // 더 많은 결과 허용 (이전 30 → 80). 카테고리별로 풍부하게.
+        const allPlaces = raw.slice(0, 80).map(normalizeKakaoPlace);
         cachePlaces(allPlaces);
 
         // Side map (starts with all places)
