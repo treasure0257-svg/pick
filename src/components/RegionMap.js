@@ -165,10 +165,8 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
         }
       }).addTo(map);
 
-      // 타이트하게 맞춘 뒤 더 확대해서 영역 디테일 가시성 확보
-      map.fitBounds(geoLayer.getBounds(), { padding: [2, 2] });
-      const targetZoom = Math.min(map.getZoom() + 2, 16);
-      map.setZoom(targetZoom);
+      // 해당 시·도 전체가 한눈에 들어오게 맞춤 (패딩으로 살짝 여유)
+      map.fitBounds(geoLayer.getBounds(), { padding: [16, 16] });
 
       // 각 sub별로 그룹 중심에 영구 라벨 마커 추가
       subLayers.forEach((layers, subId) => {
