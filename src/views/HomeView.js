@@ -44,11 +44,10 @@ export function HomeView({ router }) {
       const count = counts[r.id] || 0;
       const isEmpty = count === 0;
       const tile = h('a', {
-        href: isEmpty ? '#' : `#/results?region=${r.id}`,
-        onClick: isEmpty ? (e) => { e.preventDefault(); router.showToast(`${r.label}은(는) 준비 중입니다.`, 'info'); } : null,
+        href: `#/region?id=${r.id}`,
         className: `group relative block aspect-square rounded-2xl overflow-hidden transition-all ${
           isEmpty
-            ? 'opacity-55 cursor-default'
+            ? 'opacity-70'
             : 'hover:-translate-y-0.5 hover:shadow-[0px_12px_28px_rgba(45,51,53,0.12)]'
         }`
       },
@@ -113,8 +112,7 @@ export function HomeView({ router }) {
       regionMatches.forEach(r => {
         const count = counts[r.id] || 0;
         const row = h('a', {
-          href: count > 0 ? `#/results?region=${r.id}` : '#',
-          onClick: count === 0 ? (e) => { e.preventDefault(); router.showToast(`${r.label}은(는) 준비 중입니다.`, 'info'); } : null,
+          href: `#/region?id=${r.id}`,
           className: 'flex items-center gap-3 px-5 py-3 hover:bg-surfaceContainerLow transition-colors'
         },
           h('span', { className: 'material-symbols-outlined text-primary' }, r.icon),

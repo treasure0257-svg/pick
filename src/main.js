@@ -5,12 +5,14 @@ import { PreferencesView } from './views/PreferencesView.js';
 import { ResultsView } from './views/ResultsView.js';
 import { SavedView } from './views/SavedView.js';
 import { LoginView } from './views/LoginView.js';
+import { RegionView } from './views/RegionView.js';
 import { initAuth, logout } from './firebase-setup.js';
 import { h } from './utils/dom.js';
 
 const routes = [
   { path: '#/', component: HomeView },
   { path: '#/preferences', component: PreferencesView },
+  { path: '#/region', component: RegionView },
   { path: '#/results', component: ResultsView },
   { path: '#/saved', component: SavedView },
   { path: '#/login', component: LoginView }
