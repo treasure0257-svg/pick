@@ -46,7 +46,8 @@ pick/
 │   ├── hero-hanok.jpg      # 홈 히어로 배경 (경복궁 전경)
 │   ├── kakao-icon.svg      # 카카오 로그인 버튼 브랜드 아이콘
 │   └── data/
-│       └── korea-municipalities.topo.json  # 시·군·구 경계 TopoJSON (RegionMap용)
+│       ├── korea-municipalities.topo.json  # 시·군·구 경계 TopoJSON (RegionMap용)
+│       └── regions/{id}.jpg                # 17개 시·도 랜드마크 사진 (1280px, 자체 호스팅)
 ├── src/
 │   ├── main.js             # 엔트리, 라우터 초기화, 인증 UI
 │   ├── App.js              # AppState + scorePlace + recommend 로직
