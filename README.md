@@ -47,7 +47,8 @@ pick/
 │   ├── kakao-icon.svg      # 카카오 로그인 버튼 브랜드 아이콘
 │   └── data/
 │       ├── korea-municipalities.topo.json  # 시·군·구 경계 TopoJSON (RegionMap용)
-│       └── regions/{id}.jpg                # 17개 시·도 랜드마크 사진 (1280px, 자체 호스팅)
+│       ├── regions/{id}.jpg                # 17개 시·도 랜드마크 사진 (1280px, 자체 호스팅)
+│       └── featured/{region}_{i}.jpg       # 지역별 대표 명소 사진 (640×400, 85개 큐레이션)
 ├── src/
 │   ├── main.js             # 엔트리, 라우터 초기화, 인증 UI
 │   ├── App.js              # AppState + scorePlace + recommend 로직
@@ -82,8 +83,9 @@ pick/
 ├── .firebaserc             # Firebase 프로젝트 별칭
 ├── .github/workflows/      # build + deploy 자동화
 └── scripts/                # 유틸리티
-    ├── fetch-region-photos.mjs      # Wikipedia API로 페이지 썸네일 URL 조회 (레퍼런스)
-    └── download-region-photos.mjs   # 원본 다운로드 + sharp 1280px 리사이즈 → public/data/regions/
+    ├── fetch-region-photos.mjs       # Wikipedia API로 페이지 썸네일 URL 조회 (레퍼런스)
+    ├── download-region-photos.mjs    # 원본 → sharp 1280px → public/data/regions/
+    └── download-featured-photos.mjs  # 대표 명소 85개 Wikipedia → sharp 640×400 → public/data/featured/
 ```
 
 ## 로컬 개발
