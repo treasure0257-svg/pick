@@ -18,7 +18,9 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 // --- Multi-provider unified state ---
-const KAKAO_SDK = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js';
+// Kakao SDK v2.x removed Kakao.Auth.login() (popup implicit-grant). v1 keeps it and is
+// still hosted by Kakao for legacy apps — use that until we migrate to authorize() redirect flow.
+const KAKAO_SDK = 'https://t1.kakaocdn.net/kakao_js_sdk/v1/kakao.min.js';
 const NAVER_SDK = 'https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js';
 const KAKAO_STORAGE = 'pick.kakaoUser';
 const NAVER_STORAGE = 'pick.naverUser';
