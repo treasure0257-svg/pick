@@ -41,28 +41,20 @@ export function HomeView({ router }) {
       : REGIONS;
 
     visible.forEach(r => {
-      const count = counts[r.id] || 0;
-      const isEmpty = count === 0;
       const tile = h('a', {
         href: `#/region?id=${r.id}`,
-        className: `group relative block aspect-square rounded-2xl overflow-hidden transition-all ${
-          isEmpty
-            ? 'opacity-70'
-            : 'hover:-translate-y-0.5 hover:shadow-[0px_12px_28px_rgba(45,51,53,0.12)]'
-        }`
+        className: 'group relative block aspect-square rounded-2xl overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-[0px_12px_28px_rgba(45,51,53,0.12)]'
       },
         h('img', {
           src: r.image,
           alt: r.label,
           loading: 'lazy',
-          className: `absolute inset-0 w-full h-full object-cover ${isEmpty ? 'grayscale' : 'group-hover:scale-105 transition-transform duration-700'}`
+          className: 'absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700'
         }),
         h('div', { className: 'absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent' }),
         h('div', { className: 'absolute inset-x-0 bottom-0 p-3 md:p-4 flex flex-col gap-0.5 text-white' },
           h('span', { className: 'font-headline font-bold text-base md:text-lg leading-tight drop-shadow' }, r.label),
-          h('span', { className: 'font-label text-[11px] text-white/80 truncate' },
-            isEmpty ? '준비 중' : `${count}곳 · ${r.hint}`
-          )
+          h('span', { className: 'font-label text-[11px] text-white/80 truncate' }, r.hint)
         )
       );
       regionGrid.appendChild(tile);
@@ -110,16 +102,13 @@ export function HomeView({ router }) {
         h('div', { className: 'px-5 pt-4 pb-2 font-label text-xs text-onSurfaceVariant uppercase tracking-widest' }, '지역')
       );
       regionMatches.forEach(r => {
-        const count = counts[r.id] || 0;
         const row = h('a', {
           href: `#/region?id=${r.id}`,
           className: 'flex items-center gap-3 px-5 py-3 hover:bg-surfaceContainerLow transition-colors'
         },
           h('span', { className: 'material-symbols-outlined text-primary' }, r.icon),
           h('span', { className: 'font-body font-medium text-onSurface flex-grow' }, r.label),
-          h('span', { className: 'font-label text-xs text-onSurfaceVariant' },
-            count > 0 ? `${count}곳` : '준비 중'
-          )
+          h('span', { className: 'font-label text-xs text-onSurfaceVariant' }, r.hint)
         );
         searchResults.appendChild(row);
       });
