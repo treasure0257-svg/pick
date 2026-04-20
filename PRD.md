@@ -1,6 +1,6 @@
 # Pick — The Concierge · PRD
 
-> Product Requirements Document  ·  v0.2 (2026-04-20)
+> Product Requirements Document  ·  v0.2.1 (2026-04-20)
 
 ## 1. 제품 개요
 
@@ -51,7 +51,7 @@ SPA 구조 (hash 라우팅).
 ```
 
 ### 3.3 로그인
-홈·헤더 우측의 **Google 로그인** 버튼(Firebase Auth 팝업)으로 즉시 로그인. 로그인된 상태에서 `AppState.set()`은 Firestore `users/{uid}` 문서에 merge 저장되어 기기 간 동기화.
+헤더 우측 **로그인** 버튼 → `#/login` 라우트 → Google / Kakao / Naver 중 선택. Google은 Firebase Auth 팝업 + Firestore `users/{uid}` 문서에 merge 저장으로 기기 간 동기화. Kakao/Naver는 JS SDK로 로그인 후 localStorage에만 저장 (커스텀 토큰 경유 Firestore 통합은 v2.0 예정).
 
 ## 4. 기능 명세
 
@@ -62,8 +62,11 @@ SPA 구조 (hash 라우팅).
 - [x] ResultsView — `scorePlace()` 기반 랭킹
 - [x] TournamentView — setup · match · result 3단계
 - [x] SavedView — 저장된 장소 목록
+- [x] LoginView — 3-way OAuth (Google / Kakao / Naver) on `#/login`
 - [x] Google 로그인 via Firebase Auth
-- [x] Firestore 동기화 — 로그인 시 preferences·saved가 클라우드에 merge 저장
+- [x] Kakao 로그인 via Kakao JS SDK (JS 키 등록 완료, 팝업 플로우)
+- [x] Naver 로그인 UI (Client ID 미등록 — 클릭 시 명시적 안내, 등록되면 즉시 활성)
+- [x] Firestore 동기화 — Google 로그인 시 preferences·saved가 클라우드에 merge 저장
 - [x] PWA 기반 — manifest + 서비스워커 등록
 - [x] GitHub Actions CI/CD — `npm ci` → `vite build` → Firebase Hosting 배포
 - [x] `.env` 기반 Firebase 설정 주입 (빌드 타임, 로컬/CI 모두)
@@ -77,7 +80,7 @@ SPA 구조 (hash 라우팅).
 - [ ] 추천 랭킹 알고리즘 세부 튜닝
 
 ### 4.3 v2.0 (아이디어)
-- [ ] Kakao/Naver 로그인 재추가 — Cloud Functions 기반 커스텀 토큰 교환 포함
+- [ ] Kakao/Naver → Firebase 커스텀 토큰 통합 (Cloud Functions 경유, Firestore 동기화 연계)
 - [ ] 친구 초대 → 공동 토너먼트 (Firestore 실시간)
 - [ ] 방문 후기 · 평점 투고
 - [ ] 알림: 금요일 자동 추천 푸시 (서비스워커 + FCM)
@@ -91,8 +94,10 @@ SPA 구조 (hash 라우팅).
 - 커스텀 도메인: v1.0에서 연결
 
 ### 5.2 인증
-- Firebase Auth: Google 제공자만 활성. Authorized domains: `localhost`, `pick-concierge.firebaseapp.com`, `pick-concierge.web.app`
-- Kakao/Naver는 v0.1 구조에서 제거됨 (v2.0에 Cloud Functions 경유로 재도입 예정)
+- **Firebase Auth (Google)**: Authorized domains에 `localhost`, `pick-concierge.firebaseapp.com`, `pick-concierge.web.app` 등록. 로그인 시 Firestore 동기화까지 연계
+- **Kakao JS SDK**: JavaScript 키 기반 팝업 로그인, 프로필 정보를 localStorage에 저장. 이메일 스코프는 비즈 앱 검수 필요해서 제외
+- **Naver ID Login SDK**: Client ID 기반 리다이렉트 로그인(URL hash access_token으로 복귀). 현재 Client ID 미등록 — 버튼만 보이고 클릭 시 안내
+- Kakao/Naver → Firebase 통합(Custom Token 발급)은 v2.0 Cloud Functions로 처리 예정
 
 ### 5.3 데이터
 - **샘플**: `src/data.js`의 `PICK_DATA.places` 하드코딩 (MVP 한정)
@@ -100,9 +105,9 @@ SPA 구조 (hash 라우팅).
 - v1.0: 외부 지도 API 프록시 + App Check 필수
 
 ### 5.4 빌드·배포
-- 빌드: `vite build` → `dist/` 산출 (현재 JS 383KB / CSS 23KB, gzip 기준 117KB / 5KB)
+- 빌드: `vite build` → `dist/` 산출 (현재 JS ~389KB / CSS ~24KB, gzip 기준 ~119KB / 5KB)
 - 배포: main 푸시 시 GitHub Actions가 빌드 + Firebase Hosting 업로드
-- 필요한 GitHub Secrets: `FIREBASE_SERVICE_ACCOUNT_PICK_CONCIERGE` + `VITE_FIREBASE_*` 6개
+- 필요한 GitHub Secrets: `FIREBASE_SERVICE_ACCOUNT_PICK_CONCIERGE` + `VITE_FIREBASE_*` 6개 + `VITE_KAKAO_JS_KEY` + `VITE_NAVER_CLIENT_ID` = 총 9개
 
 ### 5.5 성능 목표
 - LCP < 2.5s (모바일 3G 기준)
@@ -136,5 +141,6 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
-| 2026-04-20 | v0.2 | Vite + Firestore SPA로 아키텍처 전환. Kakao/Naver 로그인 제거, Google만 유지. PWA 기반 추가. GitHub Actions에 빌드 스텝 추가 |
+| 2026-04-20 | v0.2.1 | 서비스워커 network-first로 교체(cache-first 버그 수정). Kakao/Naver 로그인 재복구(LoginView + `#/login` 라우트, SDK on-demand 로드). GitHub Secrets 9개로 확장 |
+| 2026-04-20 | v0.2 | Vite + Firestore SPA로 아키텍처 전환. Google 단일 provider로 일시 축소. PWA 기반 추가. GitHub Actions에 빌드 스텝 추가 |
 | 2026-04-20 | v0.1 | 초기 문서, 바닐라 HTML + Tailwind CDN MVP 완성, Firebase Hosting 배포 파이프라인 구축 |
