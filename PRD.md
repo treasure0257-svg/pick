@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.5 (2026-04-20)
+> Product Requirements Document  ·  v0.3.6 (2026-04-20)
 
 ## 1. 제품 개요
 
@@ -67,6 +67,7 @@ SPA 구조 (hash 라우팅).
 - [x] 지역 drill-down — `#/region?id=<id>` 세부 권역 grid + 해당 시·도 행정구역 정적 thematic 지도 (Leaflet + TopoJSON), tile ↔ polygon 양방향 호버
 - [x] 지역 기반 결과 — `#/results?region=<id>` 또는 `?region=<id>&area=<sub>` 진입 시 Kakao Local API 실시간 검색 (맛집·카페·명소 키워드 병렬 호출, 중복 제거)
 - [x] 결과 UX — 카테고리 탭(전체/맛집/카페/즐길거리) 건수 배지, 2-컬럼 목록+지도, 카드 호버 ↔ 지도 핀 연동, geolocation 기반 "나로부터 N km" 거리, 도로명+지번 주소
+- [x] 맛집 서브 분류 — Kakao `category_name` 2번째 세그먼트 파싱(한식/고기·구이/일식·회/중식/양식/아시안/치킨·분식/술집/기타), 결과에 없는 서브는 자동 숨김
 - [x] 하루 코스 추천 — 맛집→카페→즐길거리 순 1곳씩 셔플 카드
 - [x] 장소 상세 — `#/place?id=<id>` 히어로·액션·지도·카카오 CTA·"이 근처 가볼만한 곳"(반경 1.5km Kakao categorySearch 병합)
 - [x] 검색 드롭다운 — 입력 시 region/place 매칭 미리보기
@@ -156,6 +157,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-20 | v0.3.6 | 맛집 서브 탭(요리 유형별) 추가 — Kakao `category_name` 2번째 세그먼트로 한식/고기·구이/일식·회/중식/양식/아시안/치킨·분식/술집 자동 분류, 맛집 메인탭 활성 시만 빨간 톤 2번째 row 노출. 시·도/세부 지역 타일의 정적 샘플 기준 count·"준비 중" 표시 제거 — 모든 타일 항상 클릭 가능, 실제 Kakao 실시간 검색이 전국 커버 |
 | 2026-04-20 | v0.3.5 | 결과 화면 UX 전면 강화: 카테고리 탭(전체/맛집/카페/즐길거리 건수 배지, 목록+지도 동시 필터링), 2-컬럼 sticky 지도(카테고리별 색상 핀, 카드 호버 연동), 카드 정보 확장(도로명+지번·거리·카테고리 풀패스). "하루 코스 추천" 배너(맛집→카페→즐길거리 셔플). 장소 상세 뷰(`#/place?id=`) 신설 — 히어로·지도·카카오 CTA·주변 1.5km fetchers. `src/components/PlacesMap.js`, `src/views/PlaceDetailView.js`, `src/utils/place-ui.js` 분리 |
 | 2026-04-20 | v0.3.4 | **Kakao Local API 실시간 연동** — OPEN_MAP_AND_LOCAL 서비스 활성화 후 `src/services/kakaoLocal.js` 신설(Kakao Maps services SDK 동적 로드 + keywordSearch). ResultsView가 region/area 진입 시 "맛집·카페·명소" 키워드 병렬 검색해 실제 장소 카드 렌더. 홈 지도 제거하고 RegionView에 정적 thematic 지도(행정구역 경계·구별 라벨·양방향 호버) 적용, TopoJSON(`public/data/korea-municipalities.topo.json`) + `topojson-client` 사용 |
 | 2026-04-20 | v0.3.3 | 지역 drill-down 도입 — RegionView + `#/region?id=<id>` 라우트, regions.js에 subregions[] (Seoul 8개 실데이터 매칭 + 기타 시·도 3-8개 stub), ResultsView `?area=` 필터. 홈에 Leaflet 한국 지도(17개 시·도 핀) 추가 — 처음엔 Kakao Maps로 시도했으나 앱 OPEN_MAP_AND_LOCAL 미활성으로 Leaflet+OSM으로 교체, 한국어 라벨을 위해 CartoDB nolabels 베이스 + OSM 오버레이 2-layer 구성 |
