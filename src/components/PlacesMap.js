@@ -1,11 +1,20 @@
-// Kakao Map에 장소 여러 개를 번호 핀으로 표시. list ↔ map 연동용 메서드 제공.
+// Kakao Map에 장소 여러 개를 카테고리 색상 핀으로 표시. list ↔ map 연동용 메서드 제공.
 //
 // const map = PlacesMap({ places });
-// map.panTo(placeId); map.highlight(placeId);
+// map.panTo(placeId); map.highlight(placeId); map.setPlaces(newPlaces);
 // container.appendChild(map.el);
 
 import { h } from '../utils/dom.js';
 import { ensureKakaoServices } from '../services/kakaoLocal.js';
+
+const CATEGORY_COLORS = {
+  FD6: '#EF4444', // 맛집 red
+  CE7: '#B45309', // 카페 brown
+  AT4: '#10B981', // 명소 green
+  CT1: '#8B5CF6', // 문화 purple
+  AD5: '#0EA5E9', // 숙박 blue
+  DEFAULT: '#6366F1'
+};
 
 export function PlacesMap({ places = [] } = {}) {
   const mapEl = h('div', { className: 'w-full h-full', style: { minHeight: '420px' } });
@@ -20,8 +29,50 @@ export function PlacesMap({ places = [] } = {}) {
   }, mapEl, loading);
 
   let map = null;
+  const overlays = []; // [{ placeId, el, overlay, position }]
   const overlaysById = new Map();
   let currentHighlight = null;
+  let sdkReady = null;
+
+  function clearOverlays() {
+    overlays.forEach(({ overlay }) => overlay.setMap(null));
+    overlays.length = 0;
+    overlaysById.clear();
+  }
+
+  function addPlaces(list) {
+    if (!map) return;
+    const kakao = window.kakao;
+    const valid = list.filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lng));
+    const bounds = new kakao.maps.LatLngBounds();
+
+    valid.forEach(p => {
+      const position = new kakao.maps.LatLng(p.lat, p.lng);
+      bounds.extend(position);
+
+      const color = CATEGORY_COLORS[p.category] || CATEGORY_COLORS.DEFAULT;
+      const icon = p.category === 'FD6' ? 'restaurant'
+                 : p.category === 'CE7' ? 'local_cafe'
+                 : p.category === 'AT4' ? 'attractions'
+                 : p.category === 'CT1' ? 'theater_comedy'
+                 : p.category === 'AD5' ? 'hotel'
+                 : 'place';
+
+      const badge = document.createElement('div');
+      badge.className = 'places-map-pin';
+      badge.style.background = color;
+      badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px;">${icon}</span>`;
+      badge.title = p.name;
+
+      const overlay = new kakao.maps.CustomOverlay({
+        map, position, content: badge, yAnchor: 1, xAnchor: 0.5
+      });
+      overlays.push({ placeId: p.id, el: badge, overlay, position });
+      overlaysById.set(p.id, { el: badge, position });
+    });
+
+    if (valid.length > 0) map.setBounds(bounds, 40, 40, 40, 40);
+  }
 
   const api = {
     el: wrapper,
@@ -42,46 +93,31 @@ export function PlacesMap({ places = [] } = {}) {
       }
       currentHighlight = placeId || null;
     },
-    clearHighlight() { api.highlight(null); }
+    clearHighlight() { api.highlight(null); },
+    setPlaces(list) {
+      if (!sdkReady) return;
+      sdkReady.then(() => {
+        clearOverlays();
+        addPlaces(list);
+      });
+    }
   };
 
-  (async () => {
+  sdkReady = (async () => {
     try {
       await ensureKakaoServices();
       const kakao = window.kakao;
 
-      const valid = places.filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lng));
-      if (valid.length === 0) {
-        loading.textContent = '표시할 장소 좌표가 없어요';
+      if (places.length === 0) {
+        loading.textContent = '표시할 장소가 없어요';
         return;
       }
 
-      const firstLatLng = new kakao.maps.LatLng(valid[0].lat, valid[0].lng);
-      map = new kakao.maps.Map(mapEl, { center: firstLatLng, level: 5 });
+      const first = places.find(p => Number.isFinite(p.lat) && Number.isFinite(p.lng));
+      const center = first ? new kakao.maps.LatLng(first.lat, first.lng) : new kakao.maps.LatLng(36.3, 127.8);
+      map = new kakao.maps.Map(mapEl, { center, level: 5 });
 
-      const bounds = new kakao.maps.LatLngBounds();
-
-      valid.forEach((p, idx) => {
-        const position = new kakao.maps.LatLng(p.lat, p.lng);
-        bounds.extend(position);
-
-        const badge = document.createElement('div');
-        badge.className = 'places-map-pin';
-        badge.textContent = String(idx + 1);
-        badge.title = p.name;
-
-        new kakao.maps.CustomOverlay({
-          map,
-          position,
-          content: badge,
-          yAnchor: 1,
-          xAnchor: 0.5
-        });
-
-        overlaysById.set(p.id, { el: badge, position });
-      });
-
-      map.setBounds(bounds, 40, 40, 40, 40);
+      addPlaces(places);
       loading.classList.add('hidden');
     } catch (e) {
       console.error('[PlacesMap]', e);

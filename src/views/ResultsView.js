@@ -246,7 +246,10 @@ export function ResultsView({ router, params }) {
     h('h2', { className: 'font-headline text-lg font-bold text-onSurface' }, '장소'),
     h('span', { className: 'font-label text-xs text-onSurfaceVariant' }, '맛집 · 카페 · 명소')
   );
+  // Category tabs (populated after Kakao results come in)
+  const tabsBar = h('div', { className: 'flex items-center gap-2 mb-3 flex-wrap' });
   listSection.appendChild(listHeader);
+  listSection.appendChild(tabsBar);
 
   const resultList = h('div', { className: 'flex flex-col gap-3' });
   listSection.appendChild(resultList);
@@ -257,6 +260,10 @@ export function ResultsView({ router, params }) {
     listSection, mapCol
   );
   main.appendChild(grid);
+
+  // One-day course banner (아래에 고정, Kakao flow만 노출)
+  const courseSlot = h('section', { className: 'mt-10 md:mt-14' });
+  main.appendChild(courseSlot);
 
   let userCoord = null;
   if (isKakaoFlow && 'geolocation' in navigator) {
@@ -298,6 +305,127 @@ export function ResultsView({ router, params }) {
     );
   }
 
+  const TABS = [
+    { id: 'all',  label: '전체',     icon: 'apps',        match: null   },
+    { id: 'FD6',  label: '맛집',     icon: 'restaurant',  match: 'FD6'  },
+    { id: 'CE7',  label: '카페',     icon: 'local_cafe',  match: 'CE7'  },
+    { id: 'AT4',  label: '즐길거리', icon: 'attractions', match: 'AT4'  }
+  ];
+
+  function renderTabs(allPlaces, activeId, onSelect) {
+    tabsBar.innerHTML = '';
+    TABS.forEach(t => {
+      const count = t.match
+        ? allPlaces.filter(p => p.category === t.match).length
+        : allPlaces.length;
+      const isActive = t.id === activeId;
+      const btn = h('button', {
+        className: `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-body font-medium transition-colors ${
+          isActive
+            ? 'bg-primary text-onPrimary'
+            : 'bg-surfaceContainerLowest text-onSurface hover:bg-surfaceContainer'
+        }`,
+        onClick: () => onSelect(t.id)
+      },
+        h('span', { className: 'material-symbols-outlined text-[16px]' }, t.icon),
+        t.label,
+        h('span', {
+          className: `font-label text-[10px] ${isActive ? 'text-onPrimary/80' : 'text-onSurfaceVariant'}`
+        }, String(count))
+      );
+      tabsBar.appendChild(btn);
+    });
+  }
+
+  function pickOneFromCategory(list, catCode) {
+    const pool = list.filter(p => p.category === catCode);
+    if (pool.length === 0) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function renderCourse(allPlaces) {
+    let course = {
+      FD6: pickOneFromCategory(allPlaces, 'FD6'),
+      CE7: pickOneFromCategory(allPlaces, 'CE7'),
+      AT4: pickOneFromCategory(allPlaces, 'AT4')
+    };
+
+    function renderSlot(p, fallback, kind) {
+      const kindMeta = {
+        FD6: { icon: 'restaurant',  label: '밥',       color: 'bg-red-100 text-red-700' },
+        CE7: { icon: 'local_cafe',  label: '카페',     color: 'bg-amber-100 text-amber-800' },
+        AT4: { icon: 'attractions', label: '즐길거리', color: 'bg-emerald-100 text-emerald-800' }
+      }[kind];
+      if (!p) {
+        return h('div', {
+          className: 'flex-1 p-5 rounded-2xl bg-surfaceContainerLowest border border-dashed border-surfaceContainerHighest text-center'
+        },
+          h('div', { className: `inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold mb-2 ${kindMeta.color}` },
+            h('span', { className: 'material-symbols-outlined text-[14px]' }, kindMeta.icon),
+            kindMeta.label
+          ),
+          h('p', { className: 'font-body text-sm text-onSurfaceVariant' }, fallback)
+        );
+      }
+      return h('a', {
+        href: p.placeUrl || '#',
+        target: p.placeUrl ? '_blank' : undefined,
+        rel: 'noopener',
+        className: 'flex-1 block p-5 rounded-2xl bg-surfaceContainerLowest hover:-translate-y-0.5 hover:shadow-[0px_8px_20px_rgba(45,51,53,0.08)] transition-all'
+      },
+        h('div', { className: `inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold mb-2 ${kindMeta.color}` },
+          h('span', { className: 'material-symbols-outlined text-[14px]' }, kindMeta.icon),
+          kindMeta.label
+        ),
+        h('h4', { className: 'font-headline font-bold text-base text-onSurface truncate' }, p.name),
+        h('p', { className: 'font-body text-xs text-onSurfaceVariant mt-1 truncate' }, p.address || '')
+      );
+    }
+
+    function paint() {
+      courseSlot.innerHTML = '';
+      const wrap = h('div', { className: 'bg-gradient-to-br from-primary-dim/10 to-secondaryContainer/30 rounded-[2rem] p-6 md:p-8' });
+
+      wrap.appendChild(
+        h('div', { className: 'flex items-center justify-between mb-5 gap-3 flex-wrap' },
+          h('div', {},
+            h('span', { className: 'font-label text-xs text-primary uppercase tracking-widest' }, '하루 코스 추천'),
+            h('h3', { className: 'font-headline text-xl md:text-2xl font-extrabold text-onSurface mt-1' }, '밥 → 카페 → 즐길거리')
+          ),
+          h('button', {
+            className: 'inline-flex items-center gap-1 bg-surfaceContainerLowest hover:bg-surfaceContainer transition text-onSurface font-body text-sm font-medium py-2 px-4 rounded-full',
+            onClick: () => {
+              course = {
+                FD6: pickOneFromCategory(allPlaces, 'FD6'),
+                CE7: pickOneFromCategory(allPlaces, 'CE7'),
+                AT4: pickOneFromCategory(allPlaces, 'AT4')
+              };
+              paint();
+            }
+          },
+            h('span', { className: 'material-symbols-outlined text-[18px]' }, 'shuffle'),
+            '다른 조합'
+          )
+        )
+      );
+
+      const row = h('div', { className: 'flex flex-col md:flex-row items-stretch gap-3 md:gap-4' });
+      row.appendChild(renderSlot(course.FD6, '이 지역에 맛집이 아직 없어요.', 'FD6'));
+      row.appendChild(h('div', { className: 'flex md:flex-none items-center justify-center text-primary' },
+        h('span', { className: 'material-symbols-outlined text-2xl md:rotate-0 rotate-90' }, 'east')
+      ));
+      row.appendChild(renderSlot(course.CE7, '이 지역에 카페가 아직 없어요.', 'CE7'));
+      row.appendChild(h('div', { className: 'flex md:flex-none items-center justify-center text-primary' },
+        h('span', { className: 'material-symbols-outlined text-2xl md:rotate-0 rotate-90' }, 'east')
+      ));
+      row.appendChild(renderSlot(course.AT4, '이 지역에 즐길거리가 아직 없어요.', 'AT4'));
+
+      wrap.appendChild(row);
+      courseSlot.appendChild(wrap);
+    }
+    paint();
+  }
+
   if (isKakaoFlow) {
     renderLoading();
     (async () => {
@@ -312,14 +440,26 @@ export function ResultsView({ router, params }) {
           queries = buildQueriesForRegion(regionL);
         }
         const raw = await multiKeywordSearch(queries, { size: 10 });
-        const places = raw.slice(0, 30).map(normalizeKakaoPlace);
+        const allPlaces = raw.slice(0, 30).map(normalizeKakaoPlace);
 
-        // Side map
-        const mapApi = PlacesMap({ places });
+        // Side map (starts with all places)
+        const mapApi = PlacesMap({ places: allPlaces });
         mapCol.innerHTML = '';
         mapCol.appendChild(mapApi.el);
 
-        renderPlaces(places, mapApi);
+        // Tab state → filters list + map
+        let activeTab = 'all';
+        function applyTab() {
+          const tab = TABS.find(t => t.id === activeTab);
+          const filtered = tab.match ? allPlaces.filter(p => p.category === tab.match) : allPlaces;
+          renderTabs(allPlaces, activeTab, (id) => { activeTab = id; applyTab(); });
+          renderPlaces(filtered, mapApi);
+          mapApi.setPlaces(filtered);
+        }
+        applyTab();
+
+        // One-day course always from full set
+        renderCourse(allPlaces);
       } catch (e) {
         console.error('[ResultsView Kakao]', e);
         resultList.innerHTML = '';

@@ -99,7 +99,7 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 }
 
-/* PlacesMap 번호 핀 */
+/* PlacesMap 카테고리별 색상 핀 */
 .places-map-pin {
   display: inline-flex;
   align-items: center;
@@ -107,19 +107,18 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #7C3AED;
+  background: #6366F1;
   color: #FFFFFF;
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(124,58,237,0.45), 0 0 0 2px #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25), 0 0 0 2px #FFFFFF;
   transform: translateY(-4px);
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: transform 0.15s ease, filter 0.15s ease;
   cursor: pointer;
 }
 .places-map-pin.is-hot {
-  background: #4C1D95;
-  transform: translateY(-6px) scale(1.2);
+  transform: translateY(-8px) scale(1.25);
+  filter: brightness(0.85);
   z-index: 10;
 }
-/* Place card hover 시 매칭되는 핀 강조는 JS에서 is-hot 클래스 토글로 처리 */
