@@ -1,9 +1,10 @@
 // 17개 광역 시·도 목록 + 주소 문자열에서 region id를 뽑아내는 헬퍼.
 // places.address 첫 토큰이 시·도 prefix와 일치하는지로 판정 (예: "서울 중구 …" → "seoul").
 
-// 각 지역의 실제 랜드마크 사진 (Wikipedia Commons 썸네일).
-// 소스 페이지는 scripts/fetch-region-photos.mjs 의 TARGETS 참조.
-// 330px는 Wikimedia가 API 호출 때 pre-generate하는 표준 썸네일 사이즈라 rate limit 걸리지 않음.
+// 각 지역의 실제 랜드마크 사진.
+// 원본: Wikipedia Commons (scripts/fetch-region-photos.mjs 의 TARGETS 참조).
+// 원본을 scripts/download-region-photos.mjs 로 다운받아 1280px JPEG로 리사이즈해
+// public/data/regions/*.jpg 에 보관. Firebase Hosting 자체 CDN으로 서빙 → Wikimedia rate-limit 영향 없음.
 // hint 필드는 검색·접근성용 대표 랜드마크 문자열.
 //
 // subregions: 광역 시·도 아래 주요 권역 리스트 (drill-down 용).
@@ -12,7 +13,7 @@
 
 export const REGIONS = [
   { id: 'seoul', label: '서울', hint: 'N서울타워·한강', icon: 'location_city',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Seoul_Tower_%284394893276%29.jpg/330px-Seoul_Tower_%284394893276%29.jpg',
+    image: '/data/regions/seoul.jpg',
     subregions: [
       { id: 'gangnam',   label: '강남·서초',    hint: '강남역·신사·가로수길',   keywords: ['강남구', '서초구', '신사동', '가로수길'] },
       { id: 'hongdae',   label: '홍대·마포',    hint: '홍대·연남·망원',          keywords: ['마포구', '홍대', '서교동', '연남동', '망원동', '합정'] },
@@ -25,7 +26,7 @@ export const REGIONS = [
     ]
   },
   { id: 'gyeonggi', label: '경기', hint: '수원 화성·양평', icon: 'domain',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Bifyu_8.jpg/330px-Bifyu_8.jpg',
+    image: '/data/regions/gyeonggi.jpg',
     subregions: [
       { id: 'suwon',     label: '수원·화성',    hint: '수원 화성·행궁동',       keywords: ['수원시', '화성시', '행궁동'] },
       { id: 'bundang',   label: '성남·분당',    hint: '분당·판교·서현',         keywords: ['성남시', '분당구', '판교', '서현동'] },
@@ -36,7 +37,7 @@ export const REGIONS = [
     ]
   },
   { id: 'incheon', label: '인천', hint: '송도·인천대교', icon: 'anchor',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Incheon_Grand_Bridge.jpg/330px-Incheon_Grand_Bridge.jpg',
+    image: '/data/regions/incheon.jpg',
     subregions: [
       { id: 'songdo',    label: '송도',          hint: '센트럴파크·국제도시',   keywords: ['송도', '연수구'] },
       { id: 'wolmi',     label: '월미도·차이나타운', hint: '개항장·월미도',      keywords: ['중구', '월미도', '차이나타운'] },
@@ -45,7 +46,7 @@ export const REGIONS = [
     ]
   },
   { id: 'busan', label: '부산', hint: '해운대·광안대교', icon: 'sailing',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Haeundae_Beach_in_Busan.jpg/330px-Haeundae_Beach_in_Busan.jpg',
+    image: '/data/regions/busan.jpg',
     subregions: [
       { id: 'haeundae',  label: '해운대·마린시티', hint: '해운대·블루라인파크', keywords: ['해운대구', '해운대'] },
       { id: 'gwangalli', label: '광안리·수영',     hint: '광안대교·민락',       keywords: ['수영구', '광안리', '민락동'] },
@@ -55,7 +56,7 @@ export const REGIONS = [
     ]
   },
   { id: 'daegu', label: '대구', hint: '팔공산·동성로', icon: 'park',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/%ED%8C%94%EA%B3%B5%EC%82%B0_%EA%B4%80%EB%B4%89_%EA%B2%BD%EC%B9%98%28%EA%B2%BD%EC%82%B0%EC%8B%9C_%EB%B0%A9%ED%96%A5%29.jpg/330px-%ED%8C%94%EA%B3%B5%EC%82%B0_%EA%B4%80%EB%B4%89_%EA%B2%BD%EC%B9%98%28%EA%B2%BD%EC%82%B0%EC%8B%9C_%EB%B0%A9%ED%96%A5%29.jpg',
+    image: '/data/regions/daegu.jpg',
     subregions: [
       { id: 'dongseongro', label: '동성로·반월당', hint: '도심 상권',          keywords: ['중구', '동성로', '반월당'] },
       { id: 'suseong',   label: '수성못·범어',     hint: '수성못·들안길',        keywords: ['수성구', '수성못', '범어동'] },
@@ -64,7 +65,7 @@ export const REGIONS = [
     ]
   },
   { id: 'gwangju', label: '광주', hint: '무등산·아시아문화전당', icon: 'yard',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Gwangju_Mudeungsan.jpg/330px-Gwangju_Mudeungsan.jpg',
+    image: '/data/regions/gwangju.jpg',
     subregions: [
       { id: 'chungjangno', label: '충장로·금남로', hint: '도심 쇼핑거리',        keywords: ['동구', '충장로', '금남로'] },
       { id: 'mudeung',   label: '무등산',           hint: '등산·의재미술관',      keywords: ['무등산', '동구'] },
@@ -73,7 +74,7 @@ export const REGIONS = [
     ]
   },
   { id: 'daejeon', label: '대전', hint: '엑스포·한빛탑', icon: 'science',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Gate%2C_bridge%2C_and_tower_at_Daejeon_Expo_Science_Park.jpg/330px-Gate%2C_bridge%2C_and_tower_at_Daejeon_Expo_Science_Park.jpg',
+    image: '/data/regions/daejeon.jpg',
     subregions: [
       { id: 'dunsan',    label: '둔산·타임월드',   hint: '대전 중심 상권',       keywords: ['서구', '둔산동', '타임월드'] },
       { id: 'yuseong',   label: '유성·온천',       hint: '온천·카이스트 근처',   keywords: ['유성구', '유성온천'] },
@@ -82,7 +83,7 @@ export const REGIONS = [
     ]
   },
   { id: 'ulsan', label: '울산', hint: '태화강·대왕암', icon: 'factory',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/KU-Dwa2.jpg/330px-KU-Dwa2.jpg',
+    image: '/data/regions/ulsan.jpg',
     subregions: [
       { id: 'taehwa',    label: '태화강·십리대숲', hint: '국가정원·대숲',        keywords: ['중구', '태화강', '태화동'] },
       { id: 'daewangam', label: '대왕암·일산해수욕장', hint: '동해 해안',          keywords: ['동구', '대왕암', '일산동'] },
@@ -91,7 +92,7 @@ export const REGIONS = [
     ]
   },
   { id: 'sejong', label: '세종', hint: '정부청사·호수공원', icon: 'account_balance',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Sejong_Area_1.jpg/330px-Sejong_Area_1.jpg',
+    image: '/data/regions/sejong.jpg',
     subregions: [
       { id: 'sejong_lake',   label: '호수공원·중앙공원', hint: '세종호수공원',     keywords: ['호수공원', '중앙공원'] },
       { id: 'sejong_center', label: '정부청사·신도심',   hint: '어진동·나성동',    keywords: ['어진동', '나성동', '보람동'] },
@@ -99,7 +100,7 @@ export const REGIONS = [
     ]
   },
   { id: 'gangwon', label: '강원', hint: '설악산·속초·강릉', icon: 'terrain',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Korea_Seoraksan.jpg/330px-Korea_Seoraksan.jpg',
+    image: '/data/regions/gangwon.jpg',
     subregions: [
       { id: 'sokcho',    label: '속초·설악',       hint: '설악산·중앙시장',      keywords: ['속초시'] },
       { id: 'gangneung', label: '강릉',            hint: '경포·안목 커피거리',   keywords: ['강릉시'] },
@@ -110,7 +111,7 @@ export const REGIONS = [
     ]
   },
   { id: 'chungbuk', label: '충북', hint: '청주·단양', icon: 'landscape',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/%EC%B2%AD%EB%82%A8%EB%8C%80_%EB%B3%B8%EA%B4%80_%282%29.JPG/330px-%EC%B2%AD%EB%82%A8%EB%8C%80_%EB%B3%B8%EA%B4%80_%282%29.JPG',
+    image: '/data/regions/chungbuk.jpg',
     subregions: [
       { id: 'cheongju',  label: '청주',            hint: '성안길·수암골',         keywords: ['청주시'] },
       { id: 'danyang',   label: '단양',            hint: '도담삼봉·만천하',       keywords: ['단양군'] },
@@ -119,7 +120,7 @@ export const REGIONS = [
     ]
   },
   { id: 'chungnam', label: '충남', hint: '공주·부여·태안', icon: 'landscape',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Buyeo_198.JPG/330px-Buyeo_198.JPG',
+    image: '/data/regions/chungnam.jpg',
     subregions: [
       { id: 'gongju',    label: '공주',            hint: '공산성·한옥마을',        keywords: ['공주시'] },
       { id: 'buyeo',     label: '부여',            hint: '부소산성·백제문화',      keywords: ['부여군'] },
@@ -129,7 +130,7 @@ export const REGIONS = [
     ]
   },
   { id: 'jeonbuk', label: '전북', hint: '전주 한옥마을·군산', icon: 'rice_bowl',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/%EC%A0%84%EC%A3%BC%ED%95%9C%EC%98%A5%EB%A7%88%EC%9D%84_%EC%A0%84%EA%B2%BD.JPG/330px-%EC%A0%84%EC%A3%BC%ED%95%9C%EC%98%A5%EB%A7%88%EC%9D%84_%EC%A0%84%EA%B2%BD.JPG',
+    image: '/data/regions/jeonbuk.jpg',
     subregions: [
       { id: 'jeonju',    label: '전주 한옥마을',   hint: '경기전·한옥마을',        keywords: ['전주시'] },
       { id: 'gunsan',    label: '군산',            hint: '경암동·근대건축',        keywords: ['군산시'] },
@@ -138,7 +139,7 @@ export const REGIONS = [
     ]
   },
   { id: 'jeonnam', label: '전남', hint: '순천만·여수·담양', icon: 'temple_buddhist',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/20181231_Suncheon_Bay_002.jpg/330px-20181231_Suncheon_Bay_002.jpg',
+    image: '/data/regions/jeonnam.jpg',
     subregions: [
       { id: 'yeosu',     label: '여수',            hint: '돌산대교·낭만포차',     keywords: ['여수시'] },
       { id: 'suncheon',  label: '순천',            hint: '순천만·드라마세트장',   keywords: ['순천시'] },
@@ -148,7 +149,7 @@ export const REGIONS = [
     ]
   },
   { id: 'gyeongbuk', label: '경북', hint: '경주·안동 하회마을', icon: 'temple_hindu',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Lotus_Flower_Bridge_and_Seven_Treasure_Bridge_at_Bulguksa_in_Gyeongju%2C_Korea.jpg/330px-Lotus_Flower_Bridge_and_Seven_Treasure_Bridge_at_Bulguksa_in_Gyeongju%2C_Korea.jpg',
+    image: '/data/regions/gyeongbuk.jpg',
     subregions: [
       { id: 'gyeongju',  label: '경주',            hint: '불국사·보문단지',       keywords: ['경주시'] },
       { id: 'andong',    label: '안동',            hint: '하회마을·월영교',       keywords: ['안동시'] },
@@ -157,7 +158,7 @@ export const REGIONS = [
     ]
   },
   { id: 'gyeongnam', label: '경남', hint: '통영·거제·진주', icon: 'fort',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Korea-Tongyeong-Collage-01.jpg/330px-Korea-Tongyeong-Collage-01.jpg',
+    image: '/data/regions/gyeongnam.jpg',
     subregions: [
       { id: 'tongyeong', label: '통영',            hint: '동피랑·케이블카',        keywords: ['통영시'] },
       { id: 'geoje',     label: '거제·남해',       hint: '외도·바람의언덕',        keywords: ['거제시', '남해군'] },
@@ -166,7 +167,7 @@ export const REGIONS = [
     ]
   },
   { id: 'jeju', label: '제주', hint: '성산일출봉·한라산', icon: 'beach_access',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/%EC%84%B1%EC%82%B0%EC%9D%BC%EC%B6%9C%EB%B4%89_%EC%B2%9C%EC%97%B0%EB%B3%B4%ED%98%B8%EA%B5%AC%EC%97%AD_2019%EB%85%84_%EC%B4%AC%EC%98%81%28%EC%B6%9C%EC%B2%98_%EB%AC%B8%ED%99%94%EC%9E%AC%EC%B2%AD_%EB%8C%80%EB%B3%80%EC%9D%B8%EC%8B%A4%29.jpg/330px-%EC%84%B1%EC%82%B0%EC%9D%BC%EC%B6%9C%EB%B4%89_%EC%B2%9C%EC%97%B0%EB%B3%B4%ED%98%B8%EA%B5%AC%EC%97%AD_2019%EB%85%84_%EC%B4%AC%EC%98%81%28%EC%B6%9C%EC%B2%98_%EB%AC%B8%ED%99%94%EC%9E%AC%EC%B2%AD_%EB%8C%80%EB%B3%80%EC%9D%B8%EC%8B%A4%29.jpg',
+    image: '/data/regions/jeju.jpg',
     subregions: [
       { id: 'jeju_city', label: '제주시',          hint: '공항·연동·노형',         keywords: ['제주시'] },
       { id: 'seogwipo',  label: '서귀포',          hint: '천지연·이중섭거리',      keywords: ['서귀포시'] },
