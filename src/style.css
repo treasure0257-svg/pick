@@ -25,3 +25,46 @@
     @apply bg-surface/80 backdrop-blur-md;
   }
 }
+
+/* Leaflet 지도 마커 (KoreaMap.js 에서 divIcon 으로 주입) */
+.pick-pin-wrap { background: transparent; border: none; }
+.pick-pin {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  transition: transform 0.15s ease;
+  cursor: pointer;
+}
+.pick-pin:hover { transform: translate(-50%, calc(-50% - 2px)); }
+.pick-pin--active {
+  background: #7C3AED;
+  color: #FFFFFF;
+  border: 1px solid rgba(255,255,255,0.4);
+}
+.pick-pin--empty {
+  background: rgba(255,255,255,0.92);
+  color: #444749;
+  border: 1px solid #E1E2E4;
+}
+.pick-pin__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: #FFFFFF;
+  color: #7C3AED;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.leaflet-container { font-family: 'Inter', sans-serif; }
