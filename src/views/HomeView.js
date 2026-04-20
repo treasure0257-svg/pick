@@ -3,7 +3,6 @@ import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
 import { PICK_DATA } from '../data.js';
 import { REGIONS, countPlacesByRegion, regionFromAddress } from '../regions.js';
-import { KoreaMap } from '../components/KoreaMap.js';
 
 export function HomeView({ router }) {
   const counts = countPlacesByRegion(PICK_DATA.places);
@@ -191,14 +190,6 @@ export function HomeView({ router }) {
     ),
 
     h('main', { className: 'flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 pb-32 md:pb-16' },
-
-      h('section', { className: 'mb-12 md:mb-16' },
-        h('div', { className: 'flex items-end justify-between mb-5' },
-          h('h2', { className: 'font-headline text-xl md:text-2xl font-extrabold text-onSurface tracking-tight' }, '지도로 보기'),
-          h('span', { className: 'font-label text-xs text-onSurfaceVariant' }, '핀을 눌러 해당 지역 세부로 이동')
-        ),
-        h('div', { style: { height: '420px' } }, KoreaMap({ router }))
-      ),
 
       h('section', { className: 'mb-12 md:mb-16' },
         h('div', { className: 'flex items-end justify-between mb-5' },
