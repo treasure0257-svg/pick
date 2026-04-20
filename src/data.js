@@ -1,6 +1,4 @@
-// Sample places dataset for MVP recommendations.
-// Replace with API-driven data later.
-window.PICK_DATA = {
+export const PICK_DATA = {
   categories: [
     { id: "food",      label: "맛집",    icon: "restaurant" },
     { id: "cafe",      label: "카페",    icon: "local_cafe" },
@@ -40,214 +38,109 @@ window.PICK_DATA = {
   ],
   places: [
     {
-      id: "p1",
-      name: "북한산 둘레길 산책",
-      category: "outdoor",
-      moods: ["active", "nature", "solo", "friends"],
-      budget: "low",
-      duration: "half",
+      id: "p1", name: "북한산 둘레길 산책", category: "outdoor",
+      moods: ["active", "nature", "solo", "friends"], budget: "low", duration: "half", drinks: "dry",
       blurb: "도심에서 30분이면 닿는 자연, 초록빛 숨고르기.",
       image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=70",
-      lat: 37.6587, lng: 126.9770,
-      address: "서울 강북구 우이동",
-      rating: 4.7,
-      drinks: "dry"
+      lat: 37.6587, lng: 126.9770, address: "서울 강북구 우이동", rating: 4.7
     },
     {
-      id: "p2",
-      name: "성수동 로스터리 투어",
-      category: "cafe",
-      moods: ["relaxing", "city", "foodie", "couple", "friends"],
-      budget: "mid",
-      duration: "half",
+      id: "p2", name: "성수동 로스터리 투어", category: "cafe",
+      moods: ["relaxing", "city", "foodie", "couple", "friends"], budget: "mid", duration: "half", drinks: "dry",
       blurb: "세 곳의 로스터리를 잇는 도시형 카페 크롤.",
       image: "https://images.unsplash.com/photo-1507133750040-4a8f57021571?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5446, lng: 127.0557,
-      address: "서울 성동구 성수동",
-      rating: 4.6,
-      drinks: "dry"
+      lat: 37.5446, lng: 127.0557, address: "서울 성동구 성수동", rating: 4.6
     },
     {
-      id: "p3",
-      name: "한강 피크닉 + 야경",
-      category: "date",
-      moods: ["relaxing", "nature", "couple", "friends"],
-      budget: "low",
-      duration: "half",
+      id: "p3", name: "한강 피크닉 + 야경", category: "date",
+      moods: ["relaxing", "nature", "couple", "friends"], budget: "low", duration: "half", drinks: "optional",
       blurb: "돗자리, 과일 한 팩, 해질녘 광진교의 고요함. 캔맥 하나 더해도 좋고.",
       image: "https://images.unsplash.com/photo-1580977251946-91e5a7ff1e59?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5273, lng: 126.9326,
-      address: "서울 영등포구 여의도",
-      rating: 4.8,
-      drinks: "optional"
+      lat: 37.5273, lng: 126.9326, address: "서울 영등포구 여의도", rating: 4.8
     },
     {
-      id: "p4",
-      name: "을지로 힙 맛집 크롤",
-      category: "food",
-      moods: ["city", "foodie", "friends", "couple"],
-      budget: "mid",
-      duration: "short",
+      id: "p4", name: "을지로 힙 맛집 크롤", category: "food",
+      moods: ["city", "foodie", "friends", "couple"], budget: "mid", duration: "short", drinks: "optional",
       blurb: "오래된 골목, 새로 생긴 맛집. 미식 탐험과 반주 한잔.",
       image: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5663, lng: 126.9911,
-      address: "서울 중구 을지로",
-      rating: 4.5,
-      drinks: "optional"
+      lat: 37.5663, lng: 126.9911, address: "서울 중구 을지로", rating: 4.5
     },
     {
-      id: "p5",
-      name: "국립현대미술관 서울관",
-      category: "culture",
-      moods: ["relaxing", "city", "solo", "couple"],
-      budget: "low",
-      duration: "half",
+      id: "p5", name: "국립현대미술관 서울관", category: "culture",
+      moods: ["relaxing", "city", "solo", "couple"], budget: "low", duration: "half", drinks: "dry",
       blurb: "경복궁 옆 모던 건축, 큐레이션된 침묵의 시간.",
       image: "https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5788, lng: 126.9803,
-      address: "서울 종로구 삼청로",
-      rating: 4.7,
-      drinks: "dry"
+      lat: 37.5788, lng: 126.9803, address: "서울 종로구 삼청로", rating: 4.7
     },
     {
-      id: "p6",
-      name: "양평 서종 드라이브",
-      category: "travel",
-      moods: ["nature", "couple", "friends"],
-      budget: "mid",
-      duration: "full",
+      id: "p6", name: "양평 서종 드라이브", category: "travel",
+      moods: ["nature", "couple", "friends"], budget: "mid", duration: "full", drinks: "dry",
       blurb: "북한강을 따라가는 여유로운 하루 드라이브 코스.",
       image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5646, lng: 127.4269,
-      address: "경기 양평군 서종면",
-      rating: 4.6,
-      drinks: "dry"
+      lat: 37.5646, lng: 127.4269, address: "경기 양평군 서종면", rating: 4.6
     },
     {
-      id: "p7",
-      name: "클라이밍 짐 체험",
-      category: "active",
-      moods: ["active", "city", "solo", "friends"],
-      budget: "mid",
-      duration: "short",
+      id: "p7", name: "클라이밍 짐 체험", category: "active",
+      moods: ["active", "city", "solo", "friends"], budget: "mid", duration: "short", drinks: "dry",
       blurb: "몸이 무거운 주말에 필요한 건 한 번의 완등.",
       image: "https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5058, lng: 127.0535,
-      address: "서울 강남구 삼성동",
-      rating: 4.4,
-      drinks: "dry"
+      lat: 37.5058, lng: 127.0535, address: "서울 강남구 삼성동", rating: 4.4
     },
     {
-      id: "p8",
-      name: "연희동 동네책방 루프",
-      category: "culture",
-      moods: ["relaxing", "city", "solo", "couple"],
-      budget: "low",
-      duration: "short",
+      id: "p8", name: "연희동 동네책방 루프", category: "culture",
+      moods: ["relaxing", "city", "solo", "couple"], budget: "low", duration: "short", drinks: "dry",
       blurb: "작은 책방 세 곳, 각자 다른 세계의 큐레이션.",
       image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5703, lng: 126.9263,
-      address: "서울 서대문구 연희동",
-      rating: 4.6,
-      drinks: "dry"
+      lat: 37.5703, lng: 126.9263, address: "서울 서대문구 연희동", rating: 4.6
     },
     {
-      id: "p9",
-      name: "춘천 의암호 자전거",
-      category: "active",
-      moods: ["active", "nature", "friends", "couple"],
-      budget: "mid",
-      duration: "full",
+      id: "p9", name: "춘천 의암호 자전거", category: "active",
+      moods: ["active", "nature", "friends", "couple"], budget: "mid", duration: "full", drinks: "dry",
       blurb: "호수 한 바퀴, 바람 소리와 페달 리듬.",
       image: "https://images.unsplash.com/photo-1488841714725-bb4c32d1ac94?auto=format&fit=crop&w=800&q=70",
-      lat: 37.8813, lng: 127.7298,
-      address: "강원 춘천시 의암로",
-      rating: 4.7,
-      drinks: "dry"
+      lat: 37.8813, lng: 127.7298, address: "강원 춘천시 의암로", rating: 4.7
     },
     {
-      id: "p10",
-      name: "남산타워 야경 데이트",
-      category: "date",
-      moods: ["relaxing", "city", "couple"],
-      budget: "mid",
-      duration: "short",
+      id: "p10", name: "남산타워 야경 데이트", category: "date",
+      moods: ["relaxing", "city", "couple"], budget: "mid", duration: "short", drinks: "optional",
       blurb: "서울의 불빛을 통째로 보는, 뻔하지만 확실한 선택.",
       image: "https://images.unsplash.com/photo-1538485399081-7c8ed7ac21a4?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5512, lng: 126.9882,
-      address: "서울 용산구 남산공원길",
-      rating: 4.6,
-      drinks: "optional"
+      lat: 37.5512, lng: 126.9882, address: "서울 용산구 남산공원길", rating: 4.6
     },
     {
-      id: "p11",
-      name: "익선동 한옥 브런치",
-      category: "food",
-      moods: ["relaxing", "city", "foodie", "couple"],
-      budget: "mid",
-      duration: "short",
+      id: "p11", name: "익선동 한옥 브런치", category: "food",
+      moods: ["relaxing", "city", "foodie", "couple"], budget: "mid", duration: "short", drinks: "dry",
       blurb: "기와 아래, 느릿한 토요일 오전의 리추얼.",
       image: "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5736, lng: 126.9890,
-      address: "서울 종로구 익선동",
-      rating: 4.5,
-      drinks: "dry"
+      lat: 37.5736, lng: 126.9890, address: "서울 종로구 익선동", rating: 4.5
     },
     {
-      id: "p12",
-      name: "강원도 양양 서핑",
-      category: "travel",
-      moods: ["active", "nature", "friends"],
-      budget: "high",
-      duration: "trip",
+      id: "p12", name: "강원도 양양 서핑", category: "travel",
+      moods: ["active", "nature", "friends"], budget: "high", duration: "trip", drinks: "optional",
       blurb: "초심자 보드, 오후 햇살, 그리고 체력의 재발견.",
       image: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=800&q=70",
-      lat: 38.0754, lng: 128.6264,
-      address: "강원 양양군 현남면",
-      rating: 4.8,
-      drinks: "optional"
+      lat: 38.0754, lng: 128.6264, address: "강원 양양군 현남면", rating: 4.8
     },
     {
-      id: "p13",
-      name: "한남동 루프탑 와인바",
-      category: "date",
-      moods: ["relaxing", "city", "couple", "friends"],
-      budget: "high",
-      duration: "short",
+      id: "p13", name: "한남동 루프탑 와인바", category: "date",
+      moods: ["relaxing", "city", "couple", "friends"], budget: "high", duration: "short", drinks: "party",
       blurb: "도시의 실루엣 너머, 글라스 위로 부서지는 네온.",
       image: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5347, lng: 127.0046,
-      address: "서울 용산구 한남동",
-      rating: 4.7,
-      drinks: "party"
+      lat: 37.5347, lng: 127.0046, address: "서울 용산구 한남동", rating: 4.7
     },
     {
-      id: "p14",
-      name: "을지로 노포 이자카야",
-      category: "food",
-      moods: ["city", "foodie", "friends", "couple"],
-      budget: "mid",
-      duration: "short",
+      id: "p14", name: "을지로 노포 이자카야", category: "food",
+      moods: ["city", "foodie", "friends", "couple"], budget: "mid", duration: "short", drinks: "party",
       blurb: "퇴근길처럼 편한 조명, 꼬치와 하이볼의 정석.",
       image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5660, lng: 126.9907,
-      address: "서울 중구 을지로3가",
-      rating: 4.6,
-      drinks: "party"
+      lat: 37.5660, lng: 126.9907, address: "서울 중구 을지로3가", rating: 4.6
     },
     {
-      id: "p15",
-      name: "망원 한강 피크닉 + 수제맥주",
-      category: "outdoor",
-      moods: ["relaxing", "nature", "friends", "couple"],
-      budget: "low",
-      duration: "half",
+      id: "p15", name: "망원 한강 피크닉 + 수제맥주", category: "outdoor",
+      moods: ["relaxing", "nature", "friends", "couple"], budget: "low", duration: "half", drinks: "party",
       blurb: "잔디, 돗자리, 로컬 크래프트 한 캔. 노을까지 완벽.",
       image: "https://images.unsplash.com/photo-1566633806327-68e152aaf26d?auto=format&fit=crop&w=800&q=70",
-      lat: 37.5563, lng: 126.9010,
-      address: "서울 마포구 망원동",
-      rating: 4.7,
-      drinks: "party"
+      lat: 37.5563, lng: 126.9010, address: "서울 마포구 망원동", rating: 4.7
     }
   ]
 };

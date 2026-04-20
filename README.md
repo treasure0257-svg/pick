@@ -2,96 +2,130 @@
 
 > "뭐하지?"를 끝내는 곳. 결정장애를 위한 디지털 컨시어지.
 
-매주 검색에 허비하는 시간을 줄이는 정적 웹 앱. 취향 기반 추천과 이상형 월드컵 두 가지 방식으로 "오늘 뭘 할지"를 대신 좁혀줍니다.
+매주 검색에 허비하는 시간을 줄이는 SPA(Single Page App). 취향 기반 추천과 이상형 월드컵 두 가지 방식으로 "오늘 뭘 할지"를 대신 좁혀줍니다.
 
 - **라이브**: https://pick-concierge.web.app
 - **백업 도메인**: https://pick-concierge.firebaseapp.com
 
 ## 두 가지 사용 흐름
 
-| 모드 | 경로 | 동작 |
+| 모드 | 라우트 | 동작 |
 |---|---|---|
-| 취향 기반 추천 | `preferences.html` → `results.html` | 카테고리/무드/예산/기간/음주 유무로 필터링 후 개인화 랭킹 |
-| 이상형 월드컵 | `tournament.html` | A/B 이미지 대결로 점진적으로 좁혀서 최종 1위 도출 |
+| 취향 기반 추천 | `#/preferences` → `#/results` | 카테고리/무드/예산/기간/음주 유무 선택 후 `scorePlace()`로 랭킹 |
+| 이상형 월드컵 | `#/tournament` | A/B 이미지 대결로 점진적으로 좁혀 최종 1위 도출 |
 
-로그인 없이도 체험 가능. 로그인하면 결과를 `saved.html`에 영구 저장.
+로그인 없이 체험 가능. Google 계정으로 로그인하면 취향·저장 목록이 Firestore에 동기화되어 기기 간 유지됩니다.
 
 ## 기술 스택
 
-- **프론트**: 바닐라 JS + Tailwind CDN + Material Symbols, 빌드 과정 없음
-- **인증**: Firebase Auth (Google) + Kakao JS SDK + Naver ID Login SDK
-- **호스팅**: Firebase Hosting
-- **자동배포**: GitHub Actions → Firebase Hosting (main 푸시 시)
-- **데이터**: `assets/js/data.js` 하드코딩 샘플 (추후 API로 대체 예정)
-- **백엔드**: 없음. Firebase 세션과 localStorage로 상태 관리
+- **빌드**: Vite 8 (ESM, Rolldown)
+- **스타일**: Tailwind CSS 3 + PostCSS + Autoprefixer
+- **라우팅**: hash 기반 self-rolled SPA 라우터 (`src/router.js`)
+- **DOM**: `h()` 헬퍼(`src/utils/dom.js`)로 가상 DOM 없이 직접 생성
+- **인증**: Firebase Auth (Google provider만 활성)
+- **데이터**: Firestore (`users/{uid}` 문서에 preferences·saved 저장, localStorage 동기화)
+- **PWA**: `public/manifest.json` + `public/sw.js` 서비스워커
+- **호스팅**: Firebase Hosting (`dist/` 산출물)
+- **CI/CD**: GitHub Actions → Vite build → Firebase Hosting 자동배포
 
 ## 폴더 구조
 
 ```
 pick/
-├── index.html              # 랜딩
-├── login.html              # 3-way OAuth (Google / Kakao / Naver)
-├── preferences.html        # 취향 설정
-├── results.html            # 추천 결과
-├── tournament.html         # 이상형 월드컵
-├── saved.html              # 저장된 장소
-├── profile.html            # 사용자 프로필
-├── assets/
-│   ├── css/app.css
-│   └── js/
-│       ├── config.js           # 전역 설정
-│       ├── data.js             # 샘플 장소 데이터
-│       ├── app.js              # 공통 앱 로직
-│       ├── auth.js             # PickAuth 통합 모듈
-│       ├── auth-header.js      # 헤더 로그인 UI
-│       └── firebase-config.js  # 🔑 API 키 (SETUP.md 참고)
-├── design/                 # 디자인 레퍼런스 (배포 제외)
-├── firebase.json           # Hosting 설정
-├── .firebaserc             # 프로젝트 별칭
-├── .github/workflows/      # GitHub Actions (merge 배포 + PR 프리뷰)
-├── SETUP.md                # 인증 키 세팅 가이드
-└── PRD.md                  # 프로덕트 요구사항 문서
+├── index.html              # Vite entry (SPA 루트)
+├── public/
+│   ├── manifest.json       # PWA 매니페스트
+│   └── sw.js               # 서비스워커
+├── src/
+│   ├── main.js             # 엔트리, 라우터 초기화, 인증 UI
+│   ├── App.js              # AppState + scorePlace + recommend 로직
+│   ├── router.js           # hash 라우터 + 토스트
+│   ├── firebase-setup.js   # Firebase 초기화 + Firestore 동기화
+│   ├── data.js             # 샘플 장소 데이터 (PICK_DATA)
+│   ├── style.css           # Tailwind 엔트리
+│   ├── components/
+│   │   ├── Header.js
+│   │   └── BottomNav.js
+│   ├── views/
+│   │   ├── HomeView.js
+│   │   ├── PreferencesView.js
+│   │   ├── TournamentView.js
+│   │   ├── ResultsView.js
+│   │   └── SavedView.js
+│   └── utils/dom.js        # h() 엘리먼트 헬퍼
+├── vite.config.js
+├── tailwind.config.js
+├── postcss.config.js
+├── firebase.json           # Hosting 설정 (public: dist)
+├── .firebaserc             # Firebase 프로젝트 별칭
+└── .github/workflows/      # build + deploy 자동화
 ```
 
 ## 로컬 개발
 
-정적 서버 아무거나 띄우면 됩니다:
+### 1) 의존성 설치
 
 ```bash
-# Python
-python -m http.server 8765
-
-# Node (npx serve)
-npx serve -l 8765 .
-
-# Firebase Emulator (로컬에서 배포 환경 재현)
-firebase emulators:start --only hosting
+npm install
 ```
 
-접속: <http://localhost:8765>
+### 2) 환경변수 설정
 
-> ⚠ Naver SDK는 로그인 후 Callback URL로 리다이렉트하므로 개발 중에는 Naver Developers에서 `http://localhost:8765/login.html`을 Callback으로 등록해두세요.
+프로젝트 루트에 `.env` 파일을 만들고 Firebase 웹 앱 설정값을 넣습니다(Firebase Console → 프로젝트 설정 → 내 앱 → SDK 설정 및 구성):
+
+```bash
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=pick-concierge.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=pick-concierge
+VITE_FIREBASE_STORAGE_BUCKET=pick-concierge.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
+```
+
+`.env`는 `.gitignore`에 포함되어 커밋되지 않습니다.
+
+### 3) 개발 서버
+
+```bash
+npm run dev     # http://localhost:3000
+```
+
+Vite HMR이 붙어 있어 파일 저장 시 즉시 반영됩니다.
+
+### 4) 프로덕션 빌드 확인
+
+```bash
+npm run build           # dist/로 출력
+npm run preview         # 빌드 결과 로컬 프리뷰
+```
 
 ## 배포
 
-`main` 브랜치에 푸시하면 끝입니다:
+`main` 브랜치에 푸시하면 GitHub Actions가 자동으로:
 
-```bash
-git add .
-git commit -m "변경 내용"
-git push origin main
-```
+1. `npm ci` — 락파일 기반 의존성 설치
+2. `npm run build` — `VITE_FIREBASE_*` 시크릿을 빌드에 주입
+3. `FirebaseExtended/action-hosting-deploy` — `dist/`를 Firebase Hosting에 배포
 
-- GitHub Actions가 `.github/workflows/firebase-hosting-merge.yml` 실행 → Firebase Hosting에 자동 배포
-- 풀 리퀘스트를 올리면 `firebase-hosting-pull-request.yml`이 임시 프리뷰 URL 생성
+PR을 올리면 `firebase-hosting-pull-request.yml`이 프리뷰 URL을 생성합니다.
 
-수동 배포는 `firebase deploy --only hosting`.
+### 필요한 GitHub Secrets
 
-## 인증 키 채우기
+리포 **Settings → Secrets and variables → Actions**에 다음 7개가 등록되어 있어야 합니다:
 
-로그인을 실제 동작시키려면 Firebase / Kakao / Naver 콘솔에서 키를 받아와 `assets/js/firebase-config.js` 에 채워야 합니다. 상세 절차는 [SETUP.md](SETUP.md) 참고.
+| 이름 | 용도 |
+|---|---|
+| `FIREBASE_SERVICE_ACCOUNT_PICK_CONCIERGE` | Firebase 배포용 서비스 계정 JSON |
+| `VITE_FIREBASE_API_KEY` | 빌드 타임 주입 — Firebase Web API 키 |
+| `VITE_FIREBASE_AUTH_DOMAIN` | `pick-concierge.firebaseapp.com` |
+| `VITE_FIREBASE_PROJECT_ID` | `pick-concierge` |
+| `VITE_FIREBASE_STORAGE_BUCKET` | `pick-concierge.firebasestorage.app` |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | 프로젝트 번호 |
+| `VITE_FIREBASE_APP_ID` | Web 앱 ID |
+
+수동 배포는 로컬에서 `.env` 설정 후 `npm run build && firebase deploy --only hosting`.
 
 ## 문서
 
-- [SETUP.md](SETUP.md) — 인증 설정 가이드 (Firebase/Kakao/Naver)
 - [PRD.md](PRD.md) — 프로덕트 요구사항 문서
+- [SETUP.md](SETUP.md) — 과거 3-way OAuth 시절 세팅 가이드 (현재는 Google 단일 제공자, 참고용 보관)

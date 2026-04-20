@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-onBackground font-body antialiased min-h-screen flex flex-col;
+  }
+}
+
+@layer utilities {
+  .card-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/40;
+  }
+  .chip {
+    @apply bg-surfaceContainerLow text-onSurfaceVariant border border-surfaceContainerHighest hover:bg-surfaceContainer transition-colors;
+  }
+  .chip.is-selected {
+    @apply bg-primaryContainer text-onPrimaryContainer border-primaryContainer font-semibold;
+  }
+  .frosted {
+    @apply bg-surface/80 backdrop-blur-md;
+  }
+}
