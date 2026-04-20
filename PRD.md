@@ -80,7 +80,7 @@ SPA 구조 (hash 라우팅).
 
 ### 4.3 v2.0 (아이디어)
 - [ ] Kakao/Naver → Firebase 커스텀 토큰 통합 (Cloud Functions 경유, Firestore 동기화 연계)
-- [ ] 친구 초대 → 공동 토너먼트 (Firestore 실시간)
+- [ ] 친구와 함께 결정 — 공동 세션 (Firestore 실시간 동기화)
 - [ ] 방문 후기 · 평점 투고
 - [ ] 알림: 금요일 자동 추천 푸시 (서비스워커 + FCM)
 - [ ] 날씨·계절 반영 동적 추천
@@ -100,7 +100,7 @@ SPA 구조 (hash 라우팅).
 
 ### 5.3 데이터
 - **샘플**: `src/data.js`의 `PICK_DATA.places` 하드코딩 (MVP 한정)
-- **사용자 데이터**: Firestore `users/{uid}` 문서에 `{ preferences, saved }` 저장. 로컬은 `localStorage` 키 `pick.preferences` / `pick.saved` / `pick.tournament`
+- **사용자 데이터**: Firestore `users/{uid}` 문서에 `{ preferences, saved }` 저장. 로컬은 `localStorage` 키 `pick.preferences` / `pick.saved`
 - v1.0: 외부 지도 API 프록시 + App Check 필수
 
 ### 5.4 빌드·배포
@@ -124,7 +124,7 @@ SPA 구조 (hash 라우팅).
 
 - **활성 사용자**: 주간 활성 사용자 (WAU)
 - **결정 완료율**: 추천 페이지 진입 대비 "저장" 또는 "지도 열기" 전환율
-- **토너먼트 완주율**: 시작한 토너먼트 중 최종 1위까지 간 비율
+- **지역 탐색 깊이**: 홈 진입 대비 지역 타일 클릭 비율
 - **로그인 전환율**: 비로그인 사용자 중 Google 로그인 완료 비율
 - **Firestore 쓰기 빈도**: 사용자당 일일 쓰기 수 (비용 모니터링)
 
