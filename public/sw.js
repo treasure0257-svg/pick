@@ -1,26 +1,35 @@
-const CACHE_NAME = 'pick-cache-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  'https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap',
-  'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap'
-];
+// Network-first with cache fallback. Safe for rapid iteration.
+// Bumping CACHE_NAME forces old caches to be purged on next activate.
+const CACHE_NAME = 'pick-cache-v2';
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+    Promise.all([
+      self.clients.claim(),
+      caches.keys().then(names =>
+        Promise.all(names.filter(n => n !== CACHE_NAME).map(n => caches.delete(n)))
+      )
+    ])
   );
 });
 
 self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request)
+    fetch(req)
       .then(response => {
-        if (response) {
-          return response;
+        if (response && response.ok && response.type === 'basic') {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
         }
-        return fetch(event.request);
+        return response;
       })
+      .catch(() => caches.match(req).then(hit => hit || caches.match('/index.html')))
   );
 });
