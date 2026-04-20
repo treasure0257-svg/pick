@@ -103,15 +103,34 @@ export function RegionView({ router, params }) {
         return;
       }
 
-      places.forEach(({ curatedName, place: p }) => {
+      places.forEach(({ curatedName, place: p }, cardIdx) => {
+        // cardIdx는 성공한 것만 누적이라 큐레이션 원본 index와 다를 수 있음. 원본 index를 찾는다.
+        const origIdx = featuredNames.indexOf(curatedName);
+        const photoPath = origIdx >= 0 ? `/data/featured/${id}_${origIdx}.jpg` : null;
+
+        // Background layer: gradient fallback이 항상 깔려있고 img가 그 위에 overlay.
+        // img 로드 실패 시 onerror 로 self-hide → 그라데이션이 보이게 됨.
+        const photoImg = photoPath
+          ? h('img', {
+              src: photoPath,
+              alt: curatedName,
+              loading: 'lazy',
+              className: 'absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105',
+              onError: (e) => { e.target.style.display = 'none'; }
+            })
+          : null;
+
         const card = h('a', {
           href: `#/place?id=${encodeURIComponent(p.id)}&from=${encodeURIComponent('region:' + id)}`,
           className: 'group flex-none w-64 h-40 relative rounded-2xl overflow-hidden snap-start bg-primaryContainer/40 transition-all hover:-translate-y-0.5 hover:shadow-[0px_10px_24px_rgba(45,51,53,0.14)]'
         },
+          // Fallback gradient (always rendered, visible if img fails)
           h('div', {
-            className: 'absolute inset-0 bg-gradient-to-br from-primary/40 via-primary/25 to-primary-dim/30'
+            className: 'absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/30 to-primary-dim/40'
           }),
-          h('div', { className: 'absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent' }),
+          photoImg,
+          // Darkening overlay on top (for text readability)
+          h('div', { className: 'absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent' }),
           h('div', { className: 'absolute top-3 left-3' },
             h('span', { className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/90 text-primary' },
               h('span', { className: 'material-symbols-outlined text-[14px]' }, 'star'),
