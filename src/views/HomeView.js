@@ -164,8 +164,9 @@ export function HomeView({ router }) {
         h('h1', { className: 'font-headline text-[2.75rem] md:text-[3.5rem] leading-[1.05] tracking-[-0.02em] font-extrabold text-onSurface whitespace-nowrap' },
           h('span', { className: 'text-primary' }, '어디로'), ' 갈까요?'
         ),
-        h('p', { className: 'font-body text-base md:text-lg text-onSurfaceVariant mt-4 max-w-xl mx-auto leading-relaxed' },
-          '지역을 고르거나, 장소·키워드로 검색하세요. 당신의 소중한 하루가 결정됩니다.'
+        h('p', { className: 'font-body text-base md:text-lg text-onSurfaceVariant mt-4 max-w-md mx-auto leading-relaxed' },
+          h('span', { className: 'block' }, '지역을 고르거나 장소·키워드로 검색하세요.'),
+          h('span', { className: 'block' }, '당신의 소중한 하루가 결정됩니다.')
         )
       ),
 
