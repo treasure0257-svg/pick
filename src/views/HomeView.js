@@ -46,16 +46,24 @@ export function HomeView({ router }) {
       const tile = h('a', {
         href: isEmpty ? '#' : `#/results?region=${r.id}`,
         onClick: isEmpty ? (e) => { e.preventDefault(); router.showToast(`${r.label}은(는) 준비 중입니다.`, 'info'); } : null,
-        className: `group relative flex flex-col items-center justify-center gap-2 p-4 md:p-5 rounded-2xl transition-all ${
+        className: `group relative block aspect-square rounded-2xl overflow-hidden transition-all ${
           isEmpty
-            ? 'bg-surfaceContainerLow text-onSurfaceVariant cursor-default opacity-60'
-            : 'bg-surfaceContainerLowest text-onSurface hover:-translate-y-0.5 hover:shadow-[0px_8px_20px_rgba(45,51,53,0.08)]'
+            ? 'opacity-55 cursor-default'
+            : 'hover:-translate-y-0.5 hover:shadow-[0px_12px_28px_rgba(45,51,53,0.12)]'
         }`
       },
-        h('span', { className: 'material-symbols-outlined text-3xl md:text-4xl text-primary' }, r.icon),
-        h('span', { className: 'font-headline font-semibold text-sm md:text-base' }, r.label),
-        h('span', { className: 'font-label text-[11px] text-onSurfaceVariant' },
-          isEmpty ? '준비 중' : `${count}곳`
+        h('img', {
+          src: r.image,
+          alt: r.label,
+          loading: 'lazy',
+          className: `absolute inset-0 w-full h-full object-cover ${isEmpty ? 'grayscale' : 'group-hover:scale-105 transition-transform duration-700'}`
+        }),
+        h('div', { className: 'absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent' }),
+        h('div', { className: 'absolute inset-x-0 bottom-0 p-3 md:p-4 flex flex-col gap-0.5 text-white' },
+          h('span', { className: 'font-headline font-bold text-base md:text-lg leading-tight drop-shadow' }, r.label),
+          h('span', { className: 'font-label text-[11px] text-white/80 truncate' },
+            isEmpty ? '준비 중' : `${count}곳 · ${r.hint}`
+          )
         )
       );
       regionGrid.appendChild(tile);
