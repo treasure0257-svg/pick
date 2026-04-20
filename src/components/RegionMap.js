@@ -167,7 +167,7 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
 
       // 타이트하게 맞춘 뒤 더 확대해서 영역 디테일 가시성 확보
       map.fitBounds(geoLayer.getBounds(), { padding: [2, 2] });
-      const targetZoom = Math.min(map.getZoom() + 1, 15);
+      const targetZoom = Math.min(map.getZoom() + 2, 16);
       map.setZoom(targetZoom);
 
       // 각 sub별로 그룹 중심에 영구 라벨 마커 추가
