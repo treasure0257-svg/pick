@@ -98,3 +98,28 @@
   color: #444749;
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 }
+
+/* PlacesMap 번호 핀 */
+.places-map-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #7C3AED;
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.45), 0 0 0 2px #FFFFFF;
+  transform: translateY(-4px);
+  transition: transform 0.15s ease, background 0.15s ease;
+  cursor: pointer;
+}
+.places-map-pin.is-hot {
+  background: #4C1D95;
+  transform: translateY(-6px) scale(1.2);
+  z-index: 10;
+}
+/* Place card hover 시 매칭되는 핀 강조는 JS에서 is-hot 클래스 토글로 처리 */
