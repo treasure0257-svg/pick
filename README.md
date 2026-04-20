@@ -11,7 +11,7 @@
 
 | 진입 방식 | 라우트 | 동작 |
 |---|---|---|
-| 지역으로 찾기 | `#/region?id=<id>` → `#/results?region=<id>&area=<sub>` | 홈의 17개 시·도 타일·지도 핀·검색 → 세부 권역 grid → 장소 리스트 |
+| 지역으로 찾기 | `#/region?id=<id>` → `#/results?region=<id>&area=<sub>` → `#/place?id=<id>` | 홈 타일·지도·검색 → 세부 권역 grid → 카테고리 탭·하루 코스 → 장소 상세 |
 | 장소·키워드 검색 | 홈 검색창 | 지역명/장소명/카테고리/무드 전체 텍스트 매칭, 드롭다운에 미리보기 |
 | 취향 기반 추천 | `#/preferences` → `#/results?source=preferences` | 카테고리/무드/예산/기간/음주 선택 후 `scorePlace()`로 랭킹 |
 | 로그인 | `#/login` | Google / Kakao / Naver 3-way OAuth |
@@ -58,14 +58,19 @@ pick/
 │   ├── components/
 │   │   ├── Header.js
 │   │   ├── BottomNav.js
-│   │   └── RegionMap.js      # 시·도 행정구역 경계(정적 thematic) + 양방향 호버 API
+│   │   ├── RegionMap.js      # 시·도 행정구역 경계(정적 thematic) + 양방향 호버 API
+│   │   └── PlacesMap.js      # Kakao Maps 기반 장소 핀(카테고리 색상, setPlaces 동적 갱신)
 │   ├── services/
-│   │   └── kakaoLocal.js     # Kakao Maps services SDK 로더 + 키워드 검색 Promise 래퍼
+│   │   └── kakaoLocal.js     # Kakao Maps services SDK + keywordSearch/nearbySearch + 메모리 캐시
+│   ├── utils/
+│   │   ├── dom.js            # h() 엘리먼트 헬퍼
+│   │   └── place-ui.js       # makeSaveBtn, haversine, formatDistance, categoryMeta 공유
 │   ├── views/
 │   │   ├── HomeView.js       # 한옥 hero + 검색 + 17개 시·도 grid + 취향 CTA
 │   │   ├── PreferencesView.js
-│   │   ├── RegionView.js     # 시·도 drill-down (세부 권역 grid)
-│   │   ├── ResultsView.js    # region/area/category/place/preferences 소스 분기
+│   │   ├── RegionView.js     # 시·도 drill-down + 정적 thematic 지도 연동
+│   │   ├── ResultsView.js    # 카테고리 탭 + 2-col 목록/지도 + 하루 코스 배너
+│   │   ├── PlaceDetailView.js # 장소 상세(주소·전화·지도·Kakao CTA·주변 장소 1.5km)
 │   │   ├── SavedView.js
 │   │   └── LoginView.js      # 3-way OAuth (Google/Kakao/Naver)
 │   └── utils/dom.js        # h() 엘리먼트 헬퍼

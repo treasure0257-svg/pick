@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.4 (2026-04-20)
+> Product Requirements Document  ·  v0.3.5 (2026-04-20)
 
 ## 1. 제품 개요
 
@@ -31,14 +31,20 @@ SPA 구조 (hash 라우팅).
 ```
 #/  (HomeView)
   · 한옥 hero + 검색창: 지역·장소·무드·카테고리 전체 매칭
-  · Leaflet 한국 지도(17개 시·도 핀) + 17개 시·도 타일 grid
-  ↓ 타일 또는 핀 클릭
+  · 17개 시·도 타일 grid
+  ↓ 타일 클릭
 #/region?id=<id>  (RegionView)
-  · 해당 시·도 히어로 + 세부 권역 grid (Seoul 8개 / 기타 3-8개)
-  · "전체 N곳 보기" 단축버튼
+  · 해당 시·도 히어로 + 세부 권역 grid + 정적 thematic 지도 (구별 라벨·호버 연동)
   ↓ 세부 권역 클릭
 #/results?region=<id>&area=<sub>  (ResultsView)
-  ↓ 해당 세부 권역의 장소 리스트 / 저장
+  · 카테고리 탭(전체/맛집/카페/즐길거리) + 건수 배지
+  · 왼쪽: 장소 카드(번호·거리·주소·전화) / 오른쪽: Kakao 지도 카테고리별 색상 핀
+  · 카드 호버 ↔ 지도 핀 강조·팬
+  · 하단 "하루 코스 추천" 배너(맛집→카페→즐길거리 셔플)
+  ↓ 카드 클릭
+#/place?id=<id>&from=<region:X[:Y]>  (PlaceDetailView)
+  · 히어로 + 주소·전화·Kakao CTA + 해당 장소 단일 지도
+  · "이 근처 가볼만한 곳" (반경 1.5km, 카테고리별 fetch 병합)
 ```
 
 ### 3.2 취향 기반 추천 (심화)
@@ -60,6 +66,9 @@ SPA 구조 (hash 라우팅).
 - [x] 홈 리디자인: 한옥 풀블리드 히어로(경복궁 전경) + 중앙 검색창(지역·장소·키워드 복합) + Leaflet 한국 지도(17개 시·도 핀) + 17개 시·도 region grid(Wikipedia Commons 랜드마크 사진) + 취향 CTA
 - [x] 지역 drill-down — `#/region?id=<id>` 세부 권역 grid + 해당 시·도 행정구역 정적 thematic 지도 (Leaflet + TopoJSON), tile ↔ polygon 양방향 호버
 - [x] 지역 기반 결과 — `#/results?region=<id>` 또는 `?region=<id>&area=<sub>` 진입 시 Kakao Local API 실시간 검색 (맛집·카페·명소 키워드 병렬 호출, 중복 제거)
+- [x] 결과 UX — 카테고리 탭(전체/맛집/카페/즐길거리) 건수 배지, 2-컬럼 목록+지도, 카드 호버 ↔ 지도 핀 연동, geolocation 기반 "나로부터 N km" 거리, 도로명+지번 주소
+- [x] 하루 코스 추천 — 맛집→카페→즐길거리 순 1곳씩 셔플 카드
+- [x] 장소 상세 — `#/place?id=<id>` 히어로·액션·지도·카카오 CTA·"이 근처 가볼만한 곳"(반경 1.5km Kakao categorySearch 병합)
 - [x] 검색 드롭다운 — 입력 시 region/place 매칭 미리보기
 - [x] 토너먼트 모드 제거 (Header·BottomNav 라우트 모두 정리)
 - [x] `src/regions.js` — 17개 시·도 메타 + 주소 prefix → region id 매핑 + 카운트 헬퍼
@@ -147,6 +156,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-20 | v0.3.5 | 결과 화면 UX 전면 강화: 카테고리 탭(전체/맛집/카페/즐길거리 건수 배지, 목록+지도 동시 필터링), 2-컬럼 sticky 지도(카테고리별 색상 핀, 카드 호버 연동), 카드 정보 확장(도로명+지번·거리·카테고리 풀패스). "하루 코스 추천" 배너(맛집→카페→즐길거리 셔플). 장소 상세 뷰(`#/place?id=`) 신설 — 히어로·지도·카카오 CTA·주변 1.5km fetchers. `src/components/PlacesMap.js`, `src/views/PlaceDetailView.js`, `src/utils/place-ui.js` 분리 |
 | 2026-04-20 | v0.3.4 | **Kakao Local API 실시간 연동** — OPEN_MAP_AND_LOCAL 서비스 활성화 후 `src/services/kakaoLocal.js` 신설(Kakao Maps services SDK 동적 로드 + keywordSearch). ResultsView가 region/area 진입 시 "맛집·카페·명소" 키워드 병렬 검색해 실제 장소 카드 렌더. 홈 지도 제거하고 RegionView에 정적 thematic 지도(행정구역 경계·구별 라벨·양방향 호버) 적용, TopoJSON(`public/data/korea-municipalities.topo.json`) + `topojson-client` 사용 |
 | 2026-04-20 | v0.3.3 | 지역 drill-down 도입 — RegionView + `#/region?id=<id>` 라우트, regions.js에 subregions[] (Seoul 8개 실데이터 매칭 + 기타 시·도 3-8개 stub), ResultsView `?area=` 필터. 홈에 Leaflet 한국 지도(17개 시·도 핀) 추가 — 처음엔 Kakao Maps로 시도했으나 앱 OPEN_MAP_AND_LOCAL 미활성으로 Leaflet+OSM으로 교체, 한국어 라벨을 위해 CartoDB nolabels 베이스 + OSM 오버레이 2-layer 구성 |
 | 2026-04-20 | v0.3.2 | 홈 hero에 한옥 풀블리드 배경(`public/hero-hanok.jpg` 경복궁 전경, Wikipedia Commons 1280×853) 적용 — 여기어때 레퍼런스 기반. 어두운 그라데이션 오버레이 + 흰 텍스트. 로그인 화면 카피 업데이트("간편하게 시작하세요" + 2줄 서브카피). 카카오 버튼에 KakaoTalk 브랜드 SVG 아이콘(`public/kakao-icon.svg`) 적용 |
