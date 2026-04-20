@@ -161,8 +161,8 @@ export function HomeView({ router }) {
         h('span', { className: 'inline-block bg-secondaryContainer text-onSecondaryContainer text-xs font-medium px-3 py-1 rounded-full mb-4' },
           '바쁜 현대인을 위한 정보집합소'
         ),
-        h('h1', { className: 'font-headline text-[2.5rem] md:text-[3.25rem] leading-[1.05] tracking-[-0.02em] font-extrabold text-onSurface' },
-          h('span', { className: 'text-primary' }, '어디로'), ' 갈지 고민 중이신가요?'
+        h('h1', { className: 'font-headline text-[2.75rem] md:text-[3.5rem] leading-[1.05] tracking-[-0.02em] font-extrabold text-onSurface whitespace-nowrap' },
+          h('span', { className: 'text-primary' }, '어디로'), ' 갈까요?'
         ),
         h('p', { className: 'font-body text-base md:text-lg text-onSurfaceVariant mt-4 max-w-xl mx-auto leading-relaxed' },
           '지역을 고르거나, 장소·키워드로 검색하세요. 당신의 소중한 하루가 결정됩니다.'
