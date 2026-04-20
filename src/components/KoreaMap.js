@@ -50,11 +50,19 @@ export function KoreaMap({ router } = {}) {
         attributionControl: true
       });
 
-      // 부드러운 톤의 OSM 타일 (CartoDB Positron)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      // 회색 톤 베이스 (CartoDB Positron, 라벨 제외) + 한국어 라벨 오버레이 (표준 OSM)
+      // CartoDB 영문 라벨 대신 OSM 원본 라벨(현지 언어=한국어)을 얹는 방식
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap, &copy; CARTO',
         subdomains: 'abcd',
         maxZoom: 19
+      }).addTo(map);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        subdomains: 'abc',
+        maxZoom: 19,
+        opacity: 0.55
       }).addTo(map);
 
       const counts = countPlacesByRegion(PICK_DATA.places);
