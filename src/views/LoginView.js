@@ -38,9 +38,7 @@ export function LoginView({ router }) {
     className: 'w-full max-w-md bg-surfaceContainerLowest rounded-[2rem] p-8 md:p-10 shadow-[0px_12px_32px_rgba(45,51,53,0.06)]'
   },
     h('div', { className: 'flex justify-center mb-6' },
-      h('div', { className: 'w-14 h-14 rounded-2xl bg-primaryFixed flex items-center justify-center' },
-        h('span', { className: 'material-symbols-outlined text-primary text-3xl' }, 'pin_drop')
-      )
+      h('img', { src: '/logo.png', alt: '정해줘', className: 'w-14 h-14 rounded-2xl' })
     ),
     h('h1', {
       className: 'font-headline text-[2rem] leading-tight tracking-tight font-extrabold text-onSurface text-center'

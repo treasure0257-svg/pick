@@ -11,7 +11,7 @@ export function Header(router) {
 
   return h('header', { className: 'bg-surface text-primary font-headline font-semibold tracking-tight sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4' },
     h('a', { href: '#/', className: 'flex items-center gap-3' },
-      h('span', { className: 'material-symbols-outlined text-2xl' }, 'pin_drop'),
+      h('img', { src: '/logo.png', alt: '정해줘', className: 'w-9 h-9 rounded-xl' }),
       h('span', { className: 'text-xl font-bold tracking-tight' }, '정해줘')
     ),
     h('nav', { className: 'hidden md:flex items-center gap-6' },

@@ -1,21 +1,17 @@
 {
-  "name": "The Concierge",
-  "short_name": "Concierge",
-  "description": "결정장애를 위한 디지털 컨시어지",
+  "name": "정해줘",
+  "short_name": "정해줘",
+  "description": "바쁜 현대인을 위한 정보집합소",
   "start_url": "/#/",
   "display": "standalone",
   "background_color": "#FAF9F6",
-  "theme_color": "#436B53",
+  "theme_color": "#7C3AED",
   "icons": [
     {
-      "src": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/spa/default/192px.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/spa/default/512px.svg",
+      "src": "/logo.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
