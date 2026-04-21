@@ -6,6 +6,7 @@ import { PICK_DATA } from '../data.js';
 import { AppState, STORAGE_KEYS, recommend, savePlace, isSaved } from '../App.js';
 import { regionLabel, subregionLabel, REGIONS } from '../regions.js';
 import { multiKeywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
+import { naverLocalSearch, normalizeNaverPlace, getPlaceImage } from '../services/naverLocal.js';
 
 const KAKAO_CAT_BADGE = {
   FD6: { icon: 'restaurant',     label: '맛집' },
@@ -76,13 +77,31 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
     className: 'card-lift block bg-surfaceContainerLowest rounded-2xl p-4 md:p-5 transition-all hover:shadow-[0px_8px_20px_rgba(45,51,53,0.08)]'
   },
     h('div', { className: 'flex gap-4' },
-      // Left: numbered badge over icon
-      h('div', { className: 'flex-none w-14 md:w-16 flex flex-col items-center gap-2' },
-        h('span', { className: 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-onPrimary font-headline text-sm font-bold' }, String(index + 1)),
-        h('div', { className: 'w-12 h-12 md:w-14 md:h-14 rounded-xl bg-primaryContainer/50 flex items-center justify-center text-primary' },
-          h('span', { className: 'material-symbols-outlined text-[28px]' }, iconName)
-        )
-      ),
+      // Left: numbered badge over thumbnail (Naver image lazy-loaded)
+      (function () {
+        const thumb = h('div', {
+          className: 'w-16 h-16 md:w-20 md:h-20 rounded-xl bg-primaryContainer/40 flex items-center justify-center text-primary relative overflow-hidden'
+        },
+          h('span', { className: 'material-symbols-outlined text-[28px] absolute z-0' }, iconName)
+        );
+        // 장소 이름으로 Naver 이미지 1장 fetch → 성공 시 아이콘 위에 overlay
+        getPlaceImage(p.name).then(url => {
+          if (!url) return;
+          const img = h('img', {
+            src: url,
+            alt: p.name,
+            loading: 'lazy',
+            referrerPolicy: 'no-referrer',
+            className: 'absolute inset-0 w-full h-full object-cover z-10',
+            onError: (e) => { e.target.remove(); }
+          });
+          thumb.appendChild(img);
+        }).catch(() => {});
+        return h('div', { className: 'flex-none w-16 md:w-20 flex flex-col items-center gap-2' },
+          h('span', { className: 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-onPrimary font-headline text-sm font-bold' }, String(index + 1)),
+          thumb
+        );
+      })(),
       // Right: all place info
       h('div', { className: 'flex-grow min-w-0' },
         h('div', { className: 'flex items-center gap-2 flex-wrap' },
@@ -514,9 +533,25 @@ export function ResultsView({ router, params }) {
         } else {
           queries = buildQueriesForRegion(regionL);
         }
-        const raw = await multiKeywordSearch(queries, { size: 15 });
-        // 더 많은 결과 허용 (이전 30 → 80). 카테고리별로 풍부하게.
-        const allPlaces = raw.slice(0, 80).map(normalizeKakaoPlace);
+        // Kakao + Naver 병렬 호출
+        const [kakaoRaw, naverRaw] = await Promise.all([
+          multiKeywordSearch(queries, { size: 15 }),
+          Promise.allSettled(queries.map(q => naverLocalSearch(q, 5)))
+            .then(rs => rs.filter(r => r.status === 'fulfilled').flatMap(r => r.value))
+        ]);
+
+        // 정규화 + 이름 기반 dedupe (Kakao가 authoritative, 이미 있으면 skip)
+        const kakaoPlaces = kakaoRaw.map(normalizeKakaoPlace);
+        const naverPlaces = naverRaw.map(normalizeNaverPlace);
+        const normKey = (s) => (s || '').replace(/\s/g, '').toLowerCase();
+        const seen = new Set(kakaoPlaces.map(p => normKey(p.name)));
+        const uniqueNaver = naverPlaces.filter(p => {
+          const k = normKey(p.name);
+          if (seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        });
+        const allPlaces = [...kakaoPlaces, ...uniqueNaver].slice(0, 120);
         cachePlaces(allPlaces);
 
         // Side map (starts with all places)
