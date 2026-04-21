@@ -85,7 +85,8 @@ pick/
 └── scripts/                # 유틸리티
     ├── fetch-region-photos.mjs       # Wikipedia API로 페이지 썸네일 URL 조회 (레퍼런스)
     ├── download-region-photos.mjs    # 원본 → sharp 1280px → public/data/regions/
-    └── download-featured-photos.mjs  # 대표 명소 85개 Wikipedia → sharp 640×400 → public/data/featured/
+    ├── download-featured-photos.mjs  # 대표 명소 85개 Wikipedia → sharp 640×400 → public/data/featured/
+    └── fill-missing-featured.mjs     # Wikipedia 실패 슬롯을 Korean-themed Unsplash으로 채움
 ```
 
 ## 로컬 개발

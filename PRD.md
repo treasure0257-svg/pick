@@ -67,7 +67,7 @@ SPA 구조 (hash 라우팅).
 - [x] 지역 drill-down — `#/region?id=<id>` 세부 권역 grid + 해당 시·도 행정구역 정적 thematic 지도 (Leaflet + TopoJSON), tile ↔ polygon 양방향 호버
 - [x] 지역 기반 결과 — `#/results?region=<id>` 또는 `?region=<id>&area=<sub>` 진입 시 Kakao Local API 실시간 검색 (맛집·카페 + 즐길거리 8종 키워드(관광/명소/박물관/미술관/공원/전시관/랜드마크/가볼만한곳) 병렬 호출, 최대 80곳 중복 제거)
 - [x] 결과 UX — 카테고리 탭(전체/맛집/카페/즐길거리/숙소) 건수 배지, 2-컬럼 목록+지도, 카드 호버 ↔ 지도 핀 연동, geolocation 기반 "나로부터 N km" 거리, 도로명+지번 주소
-- [x] 대표 명소 큐레이션 — RegionView 상단 "✨ 이 지역 대표 명소" 가로 스크롤 (17×5=85개 큐레이션, Kakao 실시간 매칭, Wikipedia 사진 640×400 자체 호스팅)
+- [x] 대표 명소 큐레이션 — RegionView 상단 "✨ 이 지역 대표 명소" 가로 스크롤 (17×5=85개 큐레이션, Kakao 실시간 매칭, 38개는 Wikipedia 실제 사진 + 47개는 Unsplash 카테고리 매칭 폴백, 모두 640×400 자체 호스팅)
 - [x] 맛집 서브 분류 — Kakao `category_name` 2번째 세그먼트 파싱(한식/고기·구이/일식·회/중식/양식/아시안/치킨·분식/술집/기타), 결과에 없는 서브는 자동 숨김
 - [x] 하루 코스 추천 — 맛집→카페→즐길거리 순 1곳씩 셔플 카드
 - [x] 장소 상세 — `#/place?id=<id>` 히어로·액션·지도·카카오 CTA·"이 근처 가볼만한 곳"(반경 1.5km Kakao categorySearch 병합)
