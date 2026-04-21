@@ -3,6 +3,9 @@ import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
 import { PICK_DATA } from '../data.js';
 import { AppState, STORAGE_KEYS, unsavePlace } from '../App.js';
+import { auth } from '../firebase-setup.js';
+import { getCachedPlace } from '../services/kakaoLocal.js';
+import { categoryMeta, makeSaveBtn } from '../utils/place-ui.js';
 
 export function SavedView({ router }) {
   const container = h('div', { className: 'flex flex-col min-h-screen' },
@@ -24,59 +27,114 @@ export function SavedView({ router }) {
   );
 
   const savedIds = AppState.get(STORAGE_KEYS.saved, []);
-  const savedPlaces = savedIds.map(id => PICK_DATA.places.find(p => p.id === id)).filter(Boolean);
+  // 정적 PICK_DATA + Kakao/Naver 캐시에서 조회 (최근 방문한 장소는 캐시에 있음)
+  const savedPlaces = savedIds
+    .map(id => {
+      const cached = getCachedPlace(id);
+      if (cached) return cached;
+      const local = PICK_DATA.places.find(p => p.id === id);
+      if (local) {
+        return {
+          id: local.id, name: local.name, address: local.address || '',
+          category: null, categoryLabel: '', image: local.image || null,
+          phone: '', placeUrl: null, lat: local.lat, lng: local.lng,
+          blurb: local.blurb || ''
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
 
-  const grid = h('div', { className: 'grid sm:grid-cols-2 lg:grid-cols-3 gap-6' });
+  const isLoggedIn = Boolean(auth?.currentUser);
 
   if (savedPlaces.length === 0) {
     main.appendChild(
-      h('div', { className: 'text-center py-20 bg-surfaceContainerLowest rounded-3xl border border-dashed border-surfaceContainerHighest' },
-        h('span', { className: 'material-symbols-outlined text-5xl text-onSurfaceVariant mb-4' }, 'bookmark_border'),
-        h('h3', { className: 'font-headline text-xl font-bold text-onSurface' }, '저장된 장소가 없어요'),
-        h('p', { className: 'font-body text-onSurfaceVariant mt-2 max-w-sm mx-auto' }, '마음에 드는 장소를 발견하면 북마크 아이콘을 눌러 이곳에 저장해보세요.'),
-        h('a', { href: '#/', className: 'inline-flex items-center gap-2 mt-6 bg-secondaryContainer text-onSecondaryContainer font-body font-semibold py-3 px-6 rounded-xl hover:bg-secondaryFixedDim transition-colors' },
-          '추천 받으러 가기'
-        )
+      h('div', { className: 'text-center py-16 md:py-24 bg-surfaceContainerLowest rounded-3xl border border-dashed border-surfaceContainerHighest px-6' },
+        // 큰 일러스트 느낌
+        h('div', { className: 'relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-6' },
+          h('div', { className: 'absolute inset-0 bg-gradient-to-br from-primary-dim/20 to-primaryContainer/40 rounded-full blur-xl' }),
+          h('div', { className: 'relative w-full h-full rounded-full bg-gradient-to-br from-primaryContainer to-primary-dim/40 flex items-center justify-center text-primary shadow-inner' },
+            h('span', { className: 'material-symbols-outlined text-[56px] md:text-[72px]' }, 'bookmark')
+          )
+        ),
+        h('h3', { className: 'font-headline text-2xl md:text-3xl font-extrabold text-onSurface' }, '저장된 핫플이 없어요 텅~'),
+        h('p', { className: 'font-body text-onSurfaceVariant mt-3 max-w-md mx-auto leading-relaxed' },
+          '마음에 드는 장소를 발견하면 카드의 ',
+          h('span', { className: 'inline-flex items-center gap-0.5 mx-1 px-1.5 py-0.5 rounded-md bg-surfaceContainer text-primary font-semibold text-xs' },
+            h('span', { className: 'material-symbols-outlined text-[14px]' }, 'bookmark_add'), '저장'
+          ),
+          '버튼을 눌러 나만의 컬렉션을 만들어보세요.'
+        ),
+
+        isLoggedIn
+          ? h('a', {
+              href: '#/',
+              className: 'inline-flex items-center gap-2 mt-8 bg-primary text-onPrimary font-body font-semibold py-3 px-8 rounded-full hover:shadow-md transition-all'
+            },
+              h('span', { className: 'material-symbols-outlined' }, 'explore'),
+              '추천 장소 둘러보기'
+            )
+          : h('div', { className: 'mt-8 flex flex-col items-center gap-2' },
+              h('a', {
+                href: '#/login',
+                className: 'inline-flex items-center gap-2 bg-primary text-onPrimary font-body font-semibold py-3 px-8 rounded-full hover:shadow-md transition-all'
+              },
+                h('span', { className: 'material-symbols-outlined' }, 'login'),
+                '1초 만에 로그인하고 나만의 컬렉션 만들기'
+              ),
+              h('p', { className: 'font-label text-xs text-onSurfaceVariant' },
+                '로그인 없이도 저장 가능하지만, 로그인하면 기기 간 동기화됩니다.'
+              )
+            )
       )
     );
-  } else {
-    savedPlaces.forEach(p => {
-      const catLabel = PICK_DATA.categories.find(c => c.id === p.category)?.label || '';
-      
-      const card = h('article', { className: 'card-lift bg-surfaceContainerLowest rounded-2xl overflow-hidden flex flex-col group relative' },
-        h('div', { className: 'relative h-48 overflow-hidden' },
-          h('img', { src: p.image, loading: 'lazy', className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' }),
-          h('button', { 
-            className: 'absolute top-4 right-4 w-10 h-10 rounded-full bg-surface/80 backdrop-blur flex items-center justify-center text-primary shadow-sm hover:scale-110 transition-transform',
-            title: '저장 취소',
-            onClick: () => {
-              unsavePlace(p.id);
-              card.remove();
-              router.showToast('저장 취소되었습니다.');
-              // Check if empty
-              if (grid.children.length === 0) {
-                router.navigate('#/saved'); // reload view to show empty state
-              }
-            }
-          }, h('span', { className: 'material-symbols-outlined', style: { fontVariationSettings: "'FILL' 1" } }, 'bookmark'))
-        ),
-        h('div', { className: 'p-6 flex-grow flex flex-col' },
-          h('span', { className: 'font-label text-xs text-primary uppercase tracking-widest' }, catLabel),
-          h('h3', { className: 'font-headline text-xl font-bold text-onSurface mt-1' }, p.name),
-          h('p', { className: 'font-body text-sm text-onSurfaceVariant mt-2 line-clamp-2 flex-grow' }, p.blurb),
-          h('div', { className: 'mt-4 pt-4 border-t border-surfaceContainer' },
-            h('a', { 
-              href: `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`,
-              target: '_blank',
-              className: 'text-onSurfaceVariant hover:text-primary transition-colors inline-flex items-center gap-2 text-sm font-medium w-full justify-center'
-            }, h('span', { className: 'material-symbols-outlined text-[18px]' }, 'map'), '길찾기')
-          )
-        )
-      );
-      grid.appendChild(card);
-    });
-    main.appendChild(grid);
+    return container;
   }
+
+  // 저장된 장소 그리드
+  const grid = h('div', { className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6' });
+
+  savedPlaces.forEach(p => {
+    const cat = categoryMeta(p.category);
+    const card = h('article', {
+      className: 'card-lift bg-surfaceContainerLowest rounded-2xl overflow-hidden flex flex-col group relative'
+    },
+      h('div', { className: 'relative h-40 md:h-48 overflow-hidden bg-gradient-to-br from-primaryContainer/60 via-primaryContainer/30 to-primary-dim/30 flex items-center justify-center text-primary' },
+        p.image
+          ? h('img', { src: p.image, loading: 'lazy', className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' })
+          : h('span', { className: 'material-symbols-outlined text-[48px] opacity-70' }, cat.icon),
+        h('button', {
+          className: 'absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-primary shadow-sm hover:scale-110 transition-transform',
+          title: '저장 취소',
+          onClick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            unsavePlace(p.id);
+            card.remove();
+            router.showToast('저장 취소되었습니다.');
+            if (grid.children.length === 0) router.navigate('#/saved');
+          }
+        },
+          h('span', { className: 'material-symbols-outlined', style: { fontVariationSettings: "'FILL' 1" } }, 'bookmark')
+        )
+      ),
+      h('a', {
+        href: `#/place?id=${encodeURIComponent(p.id)}`,
+        className: 'p-5 flex-grow flex flex-col'
+      },
+        h('span', {
+          className: `inline-flex self-start items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${cat.accent} mb-2`
+        },
+          h('span', { className: 'material-symbols-outlined text-[13px]' }, cat.icon),
+          p.categoryLabel || cat.label
+        ),
+        h('h3', { className: 'font-headline text-lg font-bold text-onSurface truncate' }, p.name),
+        h('p', { className: 'font-body text-xs text-onSurfaceVariant mt-1 truncate' }, p.address || p.blurb || '')
+      )
+    );
+    grid.appendChild(card);
+  });
+  main.appendChild(grid);
 
   return container;
 }

@@ -77,27 +77,38 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
     className: 'card-lift block bg-surfaceContainerLowest rounded-2xl p-4 md:p-5 transition-all hover:shadow-[0px_8px_20px_rgba(45,51,53,0.08)]'
   },
     h('div', { className: 'flex gap-4' },
-      // Left: numbered badge over thumbnail (Naver image lazy-loaded)
+      // Left: numbered badge over thumbnail (skeleton → Naver image 또는 아이콘 fallback)
       (function () {
+        const shimmer = h('div', {
+          className: 'absolute inset-0 z-20 pick-shimmer'
+        });
         const thumb = h('div', {
-          className: 'w-16 h-16 md:w-20 md:h-20 rounded-xl bg-primaryContainer/40 flex items-center justify-center text-primary relative overflow-hidden'
+          className: 'w-20 h-20 md:w-24 md:h-24 rounded-xl bg-gradient-to-br from-primaryContainer/60 via-primaryContainer/30 to-primary-dim/20 flex items-center justify-center text-primary relative overflow-hidden'
         },
-          h('span', { className: 'material-symbols-outlined text-[28px] absolute z-0' }, iconName)
+          h('span', { className: 'material-symbols-outlined text-[32px] z-0 opacity-70' }, iconName),
+          shimmer
         );
-        // 장소 이름으로 Naver 이미지 1장 fetch → 성공 시 아이콘 위에 overlay
-        getPlaceImage(p.name).then(url => {
-          if (!url) return;
-          const img = h('img', {
-            src: url,
-            alt: p.name,
-            loading: 'lazy',
-            referrerPolicy: 'no-referrer',
-            className: 'absolute inset-0 w-full h-full object-cover z-10',
-            onError: (e) => { e.target.remove(); }
-          });
-          thumb.appendChild(img);
-        }).catch(() => {});
-        return h('div', { className: 'flex-none w-16 md:w-20 flex flex-col items-center gap-2' },
+        // Naver 이미지 fetch → 성공/실패에 따라 shimmer 제거 + img overlay
+        getPlaceImage(p.name)
+          .then(url => {
+            if (url) {
+              const img = h('img', {
+                src: url,
+                alt: p.name,
+                loading: 'lazy',
+                referrerPolicy: 'no-referrer',
+                className: 'absolute inset-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-300',
+                onLoad: (e) => { e.target.style.opacity = '1'; shimmer.remove(); },
+                onError: (e) => { e.target.remove(); shimmer.remove(); }
+              });
+              thumb.appendChild(img);
+            } else {
+              shimmer.remove();
+            }
+          })
+          .catch(() => shimmer.remove());
+
+        return h('div', { className: 'flex-none w-20 md:w-24 flex flex-col items-center gap-2' },
           h('span', { className: 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-onPrimary font-headline text-sm font-bold' }, String(index + 1)),
           thumb
         );
@@ -274,12 +285,13 @@ export function ResultsView({ router, params }) {
   listSection.appendChild(listHeader);
   listSection.appendChild(tabsBar);
 
-  const resultList = h('div', { className: 'flex flex-col gap-3' });
+  // Desktop에서 grid (md이상), mobile에서 세로 single column
+  const resultList = h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-3' });
   listSection.appendChild(resultList);
 
-  const mapCol = h('aside', { className: 'md:sticky md:top-[88px] md:self-start' });
+  const mapCol = h('aside', { className: 'hidden md:block md:sticky md:top-[88px] md:self-start' });
 
-  const grid = h('div', { className: 'grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-5 md:gap-7' },
+  const grid = h('div', { className: 'grid md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-5 md:gap-7' },
     listSection, mapCol
   );
   main.appendChild(grid);
@@ -287,6 +299,39 @@ export function ResultsView({ router, params }) {
   // One-day course banner (아래에 고정, Kakao flow만 노출)
   const courseSlot = h('section', { className: 'mt-10 md:mt-14' });
   main.appendChild(courseSlot);
+
+  // Mobile FAB — 리스트 ↔ 지도 전환 (모바일 전용)
+  let mobileMapOverlay = null;
+  function openMobileMap(mapApi) {
+    if (mobileMapOverlay) return;
+    const closeBtn = h('button', {
+      className: 'absolute top-4 left-4 z-20 bg-white text-onSurface font-body text-sm font-medium py-2 px-4 rounded-full shadow-md inline-flex items-center gap-1.5',
+      onClick: () => closeMobileMap()
+    },
+      h('span', { className: 'material-symbols-outlined text-[18px]' }, 'arrow_back'),
+      '목록으로'
+    );
+    const mapClone = mapApi ? PlacesMap({ places: mapApi._places || [] }) : null;
+    const mapEl = mapClone ? mapClone.el : h('div', { className: 'p-10 text-center' }, '지도 데이터 없음');
+    mobileMapOverlay = h('div', {
+      className: 'md:hidden fixed inset-0 z-[90] bg-background flex flex-col'
+    },
+      closeBtn,
+      h('div', { className: 'flex-grow relative' }, mapEl)
+    );
+    document.body.appendChild(mobileMapOverlay);
+  }
+  function closeMobileMap() {
+    if (mobileMapOverlay) { mobileMapOverlay.remove(); mobileMapOverlay = null; }
+  }
+  const fab = h('button', {
+    className: 'md:hidden fixed bottom-24 right-5 z-40 w-14 h-14 rounded-full bg-primary text-onPrimary shadow-[0px_6px_20px_rgba(124,58,237,0.35)] flex items-center justify-center hover:scale-105 transition-transform',
+    title: '지도 보기',
+    style: { display: 'none' }
+  },
+    h('span', { className: 'material-symbols-outlined' }, 'map')
+  );
+  container.appendChild(fab);
 
   let userCoord = null;
   if (isKakaoFlow && 'geolocation' in navigator) {
@@ -556,8 +601,13 @@ export function ResultsView({ router, params }) {
 
         // Side map (starts with all places)
         const mapApi = PlacesMap({ places: allPlaces });
+        mapApi._places = allPlaces; // mobile clone 용으로 places 보관
         mapCol.innerHTML = '';
         mapCol.appendChild(mapApi.el);
+
+        // FAB 노출 + 핸들러 바인딩
+        fab.style.display = 'flex';
+        fab.onclick = () => openMobileMap(mapApi);
 
         // Tab state → filters list + map
         let activeTab = 'all';
@@ -577,6 +627,7 @@ export function ResultsView({ router, params }) {
           );
           renderPlaces(filtered, mapApi);
           mapApi.setPlaces(filtered);
+          mapApi._places = filtered;
         }
         applyTab();
 

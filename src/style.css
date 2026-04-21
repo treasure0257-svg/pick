@@ -69,6 +69,16 @@
 }
 .leaflet-container { font-family: 'Inter', sans-serif; }
 
+/* 썸네일 스켈레톤 shimmer 애니메이션 */
+.pick-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0) 100%);
+  animation: pick-shimmer-move 1.2s ease-in-out infinite;
+}
+@keyframes pick-shimmer-move {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 /* Per-feature (구/군) permanent label markers (divIcon) */
 .region-feature-label-wrap { background: transparent; border: none; pointer-events: none; }
 .region-feature-label {
