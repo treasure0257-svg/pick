@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.9 (2026-04-21)
+> Product Requirements Document  ·  v0.3.10 (2026-04-20)
 
 ## 1. 제품 개요
 
@@ -116,6 +116,7 @@ SPA 구조 (hash 라우팅).
 
 ### 5.3 데이터
 - **장소 (동적)**: Kakao Local API 실시간 검색 — 지역·세부 권역 레이블 × {맛집, 카페, 명소} 키워드 조합 병렬 호출, place_url/lat/lng/category 사용
+- **장소 사진 보강**: Naver Image Search API — Cloudflare Worker 프록시(`VITE_NAVER_PROXY_URL`)로 CORS 우회 후 localStorage 24h 캐시. 대표 명소·결과 카드 썸네일에 적용
 - **장소 (샘플)**: `src/data.js`의 `PICK_DATA.places` 하드코딩 — preferences 기반 추천 플로우 및 fallback에 사용
 - **행정구역 경계**: `public/data/korea-municipalities.topo.json` (southkorea/southkorea-maps 2018 simple, 553KB) — RegionMap에서 TopoJSON → GeoJSON 변환해 polygon 렌더
 - **사용자 데이터**: Firestore `users/{uid}` 문서에 `{ preferences, saved }` 저장. 로컬은 `localStorage` 키 `pick.preferences` / `pick.saved`
@@ -124,7 +125,7 @@ SPA 구조 (hash 라우팅).
 ### 5.4 빌드·배포
 - 빌드: `vite build` → `dist/` 산출 (현재 JS ~389KB / CSS ~24KB, gzip 기준 ~119KB / 5KB)
 - 배포: main 푸시 시 GitHub Actions가 빌드 + Firebase Hosting 업로드
-- 필요한 GitHub Secrets: `FIREBASE_SERVICE_ACCOUNT_PICK_CONCIERGE` + `VITE_FIREBASE_*` 6개 + `VITE_KAKAO_JS_KEY` + `VITE_NAVER_CLIENT_ID` = 총 9개
+- 필요한 GitHub Secrets: `FIREBASE_SERVICE_ACCOUNT_PICK_CONCIERGE` + `VITE_FIREBASE_*` 6개 + `VITE_KAKAO_JS_KEY` + `VITE_NAVER_CLIENT_ID` + `VITE_NAVER_PROXY_URL` = 총 10개
 
 ### 5.5 성능 목표
 - LCP < 2.5s (모바일 3G 기준)
@@ -158,6 +159,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-20 | v0.3.10 | Naver Local/Image API 연동 — `src/services/naverLocal.js` 신설, Cloudflare Worker 프록시(`VITE_NAVER_PROXY_URL`)로 CORS 우회, Naver Image Search 결과를 결과 카드·대표 명소 썸네일에 lazy-load + localStorage 24h 캐시. OG/Twitter 메타 태그 + `public/og-image.jpg` (1200×630, 경복궁 hero + 정해줘 브랜드) 추가로 카톡·트위터 공유 미리보기 개선. `scripts/generate-og-image.mjs` 생성기 추가. SavedView 빈 상태 전면 개편(큰 글로우 아이콘 + 로그인 유도 CTA 분기). ResultsView 모바일 FAB로 리스트↔지도 전환. GitHub Secrets 9개 → 10개로 확장 |
 | 2026-04-21 | v0.3.9 | 여행 사이트화 1차 — 지역별 대표 명소 큐레이션(FEATURED_ATTRACTIONS, 17×5=85개), RegionView에 "✨ 이 지역 대표 명소" 가로 스크롤 섹션. 숙소(AD5) 탭 추가, SEARCH_KEYWORDS 에 lodging 그룹(호텔·펜션·게스트하우스). `scripts/download-featured-photos.mjs` 로 Wikipedia originalimage → sharp 640×400 JPEG → `public/data/featured/{region}_{i}.jpg`, RegionView 카드는 `<img>` + onerror 그라데이션 fallback |
 | 2026-04-20 | v0.3.8 | 관광 명소 선택지 확장 — `SEARCH_KEYWORDS` 맵 도입, 즐길거리 키워드 `명소` 1개 → 8개(관광/명소/박물관/미술관/공원/전시관/랜드마크/가볼만한곳). Kakao keywordSearch size 10 → 15(최대치), 결과 cap 30 → 80. 세부 지역당 호출 수 6 → 20, 예상 결과 3-5배 증가 |
 | 2026-04-20 | v0.3.7 | 지역 히어로 이미지 자체 호스팅으로 전환 — 기존 Wikimedia /thumb/ 330px 썸네일은 확대 시 픽셀화, 고해상도 버전은 429 rate limit. `scripts/download-region-photos.mjs` 로 원본(6000px급) 받아 sharp 1280px JPEG(quality 82, mozjpeg)로 리사이즈해 `public/data/regions/{id}.jpg` 에 보관, Firebase Hosting CDN 서빙. 이미지 총 ~3MB, lazy-load |
