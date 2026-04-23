@@ -65,9 +65,22 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
   // 풀 카테고리 패스 정리 (예: "음식점 > 카페 > 전문점 > 커피전문점")
   const categoryPath = (p.categoryFull || '').split('>').map(s => s.trim()).filter(Boolean).join(' › ');
 
-  const distanceText = userCoord && Number.isFinite(p.lat) && Number.isFinite(p.lng)
-    ? `나로부터 ${formatDistance(haversineKm(userCoord.lat, userCoord.lng, p.lat, p.lng))}`
-    : '';
+  const distanceKm = userCoord && Number.isFinite(p.lat) && Number.isFinite(p.lng)
+    ? haversineKm(userCoord.lat, userCoord.lng, p.lat, p.lng)
+    : null;
+  const distanceText = distanceKm != null ? `나로부터 ${formatDistance(distanceKm)}` : '';
+
+  // 랭크/태그 산정 — 번호 대신 직관적 시그널
+  // · index 0~2 → 🥇🥈🥉 (Kakao 관련도 정렬 기준 상위)
+  // · 500m 이내 → 📍 근처
+  // · index 3~9 → 🔥 인기
+  // · 그 외 → 뱃지 없음
+  let rankBadge = null;
+  if (index === 0)      rankBadge = { emoji: '🥇', label: '1위', cls: 'bg-amber-100 text-amber-800 ring-1 ring-amber-300' };
+  else if (index === 1) rankBadge = { emoji: '🥈', label: '2위', cls: 'bg-slate-100 text-slate-700 ring-1 ring-slate-300' };
+  else if (index === 2) rankBadge = { emoji: '🥉', label: '3위', cls: 'bg-orange-100 text-orange-800 ring-1 ring-orange-300' };
+  else if (distanceKm != null && distanceKm < 0.5) rankBadge = { emoji: '📍', label: '근처', cls: 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300' };
+  else if (index < 10)  rankBadge = { emoji: '🔥', label: '인기', cls: 'bg-rose-100 text-rose-800 ring-1 ring-rose-300' };
 
   const saveBtn = makeSaveBtn(p, router);
 
@@ -109,7 +122,15 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
           .catch(() => shimmer.remove());
 
         return h('div', { className: 'flex-none w-20 md:w-24 flex flex-col items-center gap-2' },
-          h('span', { className: 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-onPrimary font-headline text-sm font-bold' }, String(index + 1)),
+          rankBadge
+            ? h('span', {
+                className: `inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-headline font-bold ${rankBadge.cls}`,
+                title: rankBadge.label
+              },
+                h('span', {}, rankBadge.emoji),
+                h('span', {}, rankBadge.label)
+              )
+            : h('span', { className: 'h-[22px]' }), // spacer (정렬 일관성)
           thumb
         );
       })(),
@@ -146,9 +167,23 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
               )
             : null
         ),
-        // Action row: save + "자세히" chevron (카드 전체가 디테일 링크라서 외부 링크는 디테일에서)
-        h('div', { className: 'flex items-center gap-3 mt-3 flex-wrap' },
+        // Action row: save + 카카오맵 별점/후기 link + "자세히" chevron
+        h('div', { className: 'flex items-center gap-2 mt-3 flex-wrap' },
           saveBtn,
+          p.placeUrl
+            ? h('button', {
+                className: 'inline-flex items-center gap-0.5 text-[11px] font-medium text-amber-800 bg-amber-50 px-2 py-1 rounded-full hover:bg-amber-100 transition-colors',
+                title: '카카오맵에서 별점·후기 보기',
+                onClick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.open(p.placeUrl, '_blank', 'noopener,noreferrer');
+                }
+              },
+                h('span', { className: 'material-symbols-outlined text-[13px]', style: { fontVariationSettings: "'FILL' 1" } }, 'star'),
+                '별점·후기'
+              )
+            : null,
           h('span', { className: 'ml-auto inline-flex items-center gap-0.5 text-xs font-medium text-primary' },
             '자세히',
             h('span', { className: 'material-symbols-outlined text-[16px]' }, 'chevron_right')
