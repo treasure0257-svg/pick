@@ -42,7 +42,7 @@ export function Footer() {
       h('p', { className: 'font-headline text-base md:text-lg text-onSurface flex items-center gap-3 mt-2' },
         h('span', { className: 'font-extrabold' }, '정해줘'),
         h('span', { className: 'text-onSurfaceVariant/40' }, '|'),
-        h('a', { href: '#/', className: 'hover:text-primary transition-colors' }, '오늘의 동선 추천')
+        h('a', { href: '#/', className: 'hover:text-primary transition-colors' }, '가까운 핫플 찾기')
       ),
       h('p', { className: 'font-label text-xs text-onSurfaceVariant/70 mt-4' },
         `© ${year} Neotis · 정해줘 · pick-concierge.web.app`
