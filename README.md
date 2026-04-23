@@ -46,6 +46,8 @@ pick/
 │   ├── og-image.jpg        # Open Graph 공유 미리보기 (1200×630, 경복궁 + 브랜드)
 │   ├── hero-hanok.jpg      # 홈 히어로 배경 (경복궁 전경)
 │   ├── kakao-icon.svg      # 카카오 로그인 버튼 브랜드 아이콘
+│   ├── robots.txt          # 검색 엔진 크롤링 허용 + sitemap 위치
+│   ├── sitemap.xml         # 루트 + 주요 라우트 sitemap (SEO)
 │   └── data/
 │       ├── korea-municipalities.topo.json  # 시·군·구 경계 TopoJSON (RegionMap용)
 │       ├── regions/{id}.jpg                # 17개 시·도 랜드마크 사진 (1280px, 자체 호스팅)

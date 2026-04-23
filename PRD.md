@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.13 (2026-04-23)
+> Product Requirements Document  ·  v0.3.14 (2026-04-23)
 
 ## 1. 제품 개요
 
@@ -159,6 +159,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-23 | v0.3.14 | **랜드마크 반경 검색 필터** 추가 — ResultsView 카테고리 탭 위에 입력창("어디에 계신가요? 현재 눈 앞에 보이는 것을 검색해보세요!"). 사용자가 건물명 입력 시 Kakao keywordSearch로 좌표 확보 → haversine 1km 반경으로 카드/지도 동시 필터링, 활성 chip(📍 X 주변 1km)에 × 해제. **SEO 보강 패키지** — index.html에 JSON-LD WebApplication schema(SearchAction 포함, 구글 사이트 내 검색창 노출 가능) + canonical URL + meta keywords/author/robots/googlebot 추가. `public/robots.txt` 신설(전체 허용 + sw.js 제외 + sitemap 링크). `public/sitemap.xml` 신설(루트 + 주요 hash 라우트 4개). 검색엔진 verification 토큰은 placeholder 주석으로만 보존. ResultsView 간격 5단계 조정(헤더·input·칩·탭·카드 gap 확대 — 빽빽함 해소) |
 | 2026-04-23 | v0.3.13 | RegionMap을 **Leaflet thematic → Kakao Map 실타일 + TopoJSON polygon overlay**로 전환 — 도로·랜드마크가 보이는 실제 지도 위에 시·도 행정구역 polygon(blue 38%, hover purple 70%)으로 강조, 드래그·줌 활성화. ResultsView 카드 **번호 뱃지 → 랭크/태그 시그널**(🥇🥈🥉 1-3위, 📍근처 500m이내, 🔥인기 4-10위). 카드에 **카카오맵 별점·후기 deep-link 버튼**(amber chip, place_url 새 탭)으로 평점 데이터 무료 확보. **Naver 블로그 후기 수 chip** 추가(emerald, "블로그 1.2k건"), Cloudflare Worker `type=blog` 엔드포인트 추가 필요(openapi.naver.com/v1/search/blog.json), `naverLocal.js` getBlogCount + 24h localStorage 캐시. OG 이미지 우상단 작은 로고 배지 제거(카톡 미리보기에서 비대칭 인상 → 클린업) |
 | 2026-04-23 | v0.3.12 | subregions 대폭 확장(56 → 83개, +27개) — **서울** 8 → 18개(잠실·송파/강동·천호/노원·중랑/동대문·청량리/강서·마곡/관악·사당/구로·가산/양천·목동/동작·노량진 추가, 25개 구 거의 전체 커버), **경기** 6 → 11개(용인·수지/하남·남양주/의정부·양주/평택·안성/안산·시흥), **인천** 4 → 6개(부평·계양/구월·논현), **부산** 5 → 8개(동래·온천장/사상·구포/남구·용호), **대구** 4 → 7개(달서·성서/북구·칠곡/달성·화원), **광주** 4 → 5개(상무지구·첨단), **대전** 4 → 5개(도안·관저), **강원** 6 → 7개(원주·횡성), **전북** 4 → 5개(익산·정읍), **전남** 5 → 7개(나주·장성/보성·고흥), **경북** 4 → 5개(구미·김천), **경남** 4 → 6개(양산·밀양/하동·산청) |
 | 2026-04-23 | v0.3.11 | 권역별 데이터 커버리지 극대화 — `SEARCH_KEYWORDS` 대폭 확장: food 1 → 25개(한식/한정식/고기/삼겹살/갈비/일식/초밥/라멘/회/중식/양식/파스타/피자/아시안/쌀국수/치킨/분식/떡볶이/족발/국밥/냉면/술집/이자카야/포차 등), cafe 1 → 7개(디저트·베이커리·브런치·와플·케이크·커피), attraction 8 → 15개(체험관·테마파크·수족관·동물원·한옥마을·전통시장·전망대 추가), lodging 3 → 8개(리조트·한옥스테이·풀빌라·글램핑·모텔). `buildQueriesForArea`가 subregion의 **모든 키워드**(구·동·랜드마크 등 6-8개)를 area term으로 순회하도록 변경 — 기존 첫 키워드 1개만 사용 → 3-4배 확장. 결과 slice cap 120 → 1000 까지 상향. 권역 1회 로드에 Kakao/Naver 병렬 200-400 개 쿼리로 실질 수백 개 유니크 장소 수집 가능 |
