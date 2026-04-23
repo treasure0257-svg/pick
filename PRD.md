@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.12 (2026-04-23)
+> Product Requirements Document  ·  v0.3.13 (2026-04-23)
 
 ## 1. 제품 개요
 
@@ -64,7 +64,7 @@ SPA 구조 (hash 라우팅).
 
 ### 4.1 v0.3 (현재, 2026-04-20)
 - [x] 홈 리디자인: 한옥 풀블리드 히어로(경복궁 전경) + 중앙 검색창(지역·장소·키워드 복합) + Leaflet 한국 지도(17개 시·도 핀) + 17개 시·도 region grid(Wikipedia Commons 랜드마크 사진) + 취향 CTA
-- [x] 지역 drill-down — `#/region?id=<id>` 세부 권역 grid + 해당 시·도 행정구역 정적 thematic 지도 (Leaflet + TopoJSON), tile ↔ polygon 양방향 호버
+- [x] 지역 drill-down — `#/region?id=<id>` 세부 권역 grid + 해당 시·도 행정구역 지도 (Kakao Map 실타일 + TopoJSON polygon overlay, v0.3.13에서 Leaflet → Kakao 전환), tile ↔ polygon 양방향 호버
 - [x] 지역 기반 결과 — `#/results?region=<id>` 또는 `?region=<id>&area=<sub>` 진입 시 Kakao Local API 실시간 검색 (맛집·카페 + 즐길거리 8종 키워드(관광/명소/박물관/미술관/공원/전시관/랜드마크/가볼만한곳) 병렬 호출, 최대 80곳 중복 제거)
 - [x] 결과 UX — 카테고리 탭(전체/맛집/카페/즐길거리/숙소) 건수 배지, 2-컬럼 목록+지도, 카드 호버 ↔ 지도 핀 연동, geolocation 기반 "나로부터 N km" 거리, 도로명+지번 주소
 - [x] 대표 명소 큐레이션 — RegionView 상단 "✨ 이 지역 대표 명소" 가로 스크롤 (17×5=85개 큐레이션, Kakao 실시간 매칭, 38개는 Wikipedia 실제 사진 + 47개는 Unsplash 카테고리 매칭 폴백, 모두 640×400 자체 호스팅)
@@ -159,6 +159,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-23 | v0.3.13 | RegionMap을 **Leaflet thematic → Kakao Map 실타일 + TopoJSON polygon overlay**로 전환 — 도로·랜드마크가 보이는 실제 지도 위에 시·도 행정구역 polygon(blue 38%, hover purple 70%)으로 강조, 드래그·줌 활성화. ResultsView 카드 **번호 뱃지 → 랭크/태그 시그널**(🥇🥈🥉 1-3위, 📍근처 500m이내, 🔥인기 4-10위). 카드에 **카카오맵 별점·후기 deep-link 버튼**(amber chip, place_url 새 탭)으로 평점 데이터 무료 확보. **Naver 블로그 후기 수 chip** 추가(emerald, "블로그 1.2k건"), Cloudflare Worker `type=blog` 엔드포인트 추가 필요(openapi.naver.com/v1/search/blog.json), `naverLocal.js` getBlogCount + 24h localStorage 캐시. OG 이미지 우상단 작은 로고 배지 제거(카톡 미리보기에서 비대칭 인상 → 클린업) |
 | 2026-04-23 | v0.3.12 | subregions 대폭 확장(56 → 83개, +27개) — **서울** 8 → 18개(잠실·송파/강동·천호/노원·중랑/동대문·청량리/강서·마곡/관악·사당/구로·가산/양천·목동/동작·노량진 추가, 25개 구 거의 전체 커버), **경기** 6 → 11개(용인·수지/하남·남양주/의정부·양주/평택·안성/안산·시흥), **인천** 4 → 6개(부평·계양/구월·논현), **부산** 5 → 8개(동래·온천장/사상·구포/남구·용호), **대구** 4 → 7개(달서·성서/북구·칠곡/달성·화원), **광주** 4 → 5개(상무지구·첨단), **대전** 4 → 5개(도안·관저), **강원** 6 → 7개(원주·횡성), **전북** 4 → 5개(익산·정읍), **전남** 5 → 7개(나주·장성/보성·고흥), **경북** 4 → 5개(구미·김천), **경남** 4 → 6개(양산·밀양/하동·산청) |
 | 2026-04-23 | v0.3.11 | 권역별 데이터 커버리지 극대화 — `SEARCH_KEYWORDS` 대폭 확장: food 1 → 25개(한식/한정식/고기/삼겹살/갈비/일식/초밥/라멘/회/중식/양식/파스타/피자/아시안/쌀국수/치킨/분식/떡볶이/족발/국밥/냉면/술집/이자카야/포차 등), cafe 1 → 7개(디저트·베이커리·브런치·와플·케이크·커피), attraction 8 → 15개(체험관·테마파크·수족관·동물원·한옥마을·전통시장·전망대 추가), lodging 3 → 8개(리조트·한옥스테이·풀빌라·글램핑·모텔). `buildQueriesForArea`가 subregion의 **모든 키워드**(구·동·랜드마크 등 6-8개)를 area term으로 순회하도록 변경 — 기존 첫 키워드 1개만 사용 → 3-4배 확장. 결과 slice cap 120 → 1000 까지 상향. 권역 1회 로드에 Kakao/Naver 병렬 200-400 개 쿼리로 실질 수백 개 유니크 장소 수집 가능 |
 | 2026-04-20 | v0.3.10 | Naver Local/Image API 연동 — `src/services/naverLocal.js` 신설, Cloudflare Worker 프록시(`VITE_NAVER_PROXY_URL`)로 CORS 우회, Naver Image Search 결과를 결과 카드·대표 명소 썸네일에 lazy-load + localStorage 24h 캐시. OG/Twitter 메타 태그 + `public/og-image.jpg` (1200×630, 경복궁 hero + 정해줘 브랜드) 추가로 카톡·트위터 공유 미리보기 개선. `scripts/generate-og-image.mjs` 생성기 추가. SavedView 빈 상태 전면 개편(큰 글로우 아이콘 + 로그인 유도 CTA 분기). ResultsView 모바일 FAB로 리스트↔지도 전환. GitHub Secrets 9개 → 10개로 확장 |

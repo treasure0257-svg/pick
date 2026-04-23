@@ -26,8 +26,8 @@
 - **스타일**: Tailwind CSS 3 + PostCSS + Autoprefixer
 - **라우팅**: hash 기반 self-rolled SPA 라우터 (`src/router.js`)
 - **DOM**: `h()` 헬퍼(`src/utils/dom.js`)로 가상 DOM 없이 직접 생성
-- **지도**: Leaflet + TopoJSON (행정구역 경계, 정적 thematic 스타일)
-- **장소 데이터**: Kakao Local API (실시간 맛집·카페·명소 검색, Kakao Maps services SDK 경유)
+- **지도**: Kakao Maps (실타일) + TopoJSON 행정구역 polygon overlay (RegionMap·PlacesMap 모두 Kakao SDK 사용)
+- **장소 데이터**: Kakao Local API (실시간 맛집·카페·명소 검색) + Naver Local/Image/Blog (Cloudflare Worker 프록시 경유, 사진·블로그 후기 수 보강)
 - **인증**: Firebase Auth (Google) + Kakao JS SDK + Naver ID Login SDK — SDK는 on-demand 동적 로드
 - **데이터**: Firestore (`users/{uid}` 문서에 preferences·saved 저장, localStorage 동기화)
 - **PWA**: `public/manifest.json` + `public/sw.js` 서비스워커
@@ -61,11 +61,11 @@ pick/
 │   ├── components/
 │   │   ├── Header.js
 │   │   ├── BottomNav.js
-│   │   ├── RegionMap.js      # 시·도 행정구역 경계(정적 thematic) + 양방향 호버 API
+│   │   ├── RegionMap.js      # Kakao Map 타일 + TopoJSON polygon overlay + 양방향 호버 API
 │   │   └── PlacesMap.js      # Kakao Maps 기반 장소 핀(카테고리 색상, setPlaces 동적 갱신)
 │   ├── services/
 │   │   ├── kakaoLocal.js     # Kakao Maps services SDK + keywordSearch/nearbySearch + 메모리 캐시
-│   │   └── naverLocal.js     # Naver Local/Image API (Cloudflare Worker 프록시 경유, CORS 우회)
+│   │   └── naverLocal.js     # Naver Local/Image/Blog API (Cloudflare Worker 프록시 경유, CORS 우회 + getBlogCount 24h 캐시)
 │   ├── utils/
 │   │   ├── dom.js            # h() 엘리먼트 헬퍼
 │   │   └── place-ui.js       # makeSaveBtn, haversine, formatDistance, categoryMeta 공유
