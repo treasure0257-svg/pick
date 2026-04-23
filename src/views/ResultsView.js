@@ -5,7 +5,7 @@ import { PlacesMap } from '../components/PlacesMap.js';
 import { PICK_DATA } from '../data.js';
 import { AppState, STORAGE_KEYS, recommend, savePlace, isSaved } from '../App.js';
 import { regionLabel, subregionLabel, REGIONS } from '../regions.js';
-import { multiKeywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
+import { multiKeywordSearch, keywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
 import { naverLocalSearch, normalizeNaverPlace, getPlaceImage, getBlogCount } from '../services/naverLocal.js';
 
 const KAKAO_CAT_BADGE = {
@@ -348,9 +348,26 @@ export function ResultsView({ router, params }) {
     h('h2', { className: 'font-headline text-lg font-bold text-onSurface' }, '장소'),
     h('span', { className: 'font-label text-xs text-onSurfaceVariant' }, '맛집 · 카페 · 명소')
   );
+  // Landmark filter — 사용자가 현재 보이는 건물명을 검색해 그 주변만 필터링
+  const landmarkChipSlot = h('div', { className: 'flex flex-wrap gap-2 mb-2 empty:hidden' });
+  const landmarkInput = h('input', {
+    type: 'text',
+    placeholder: '어디에 계신가요? 현재 보이는것은 검색해보세요!',
+    className: 'flex-grow min-w-0 px-4 py-2.5 rounded-xl border border-surfaceContainerHighest bg-surfaceContainerLowest text-sm font-body text-onSurface placeholder:text-onSurfaceVariant focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors'
+  });
+  const landmarkBtn = h('button', {
+    type: 'submit',
+    className: 'flex-none inline-flex items-center gap-1 px-4 py-2.5 rounded-xl bg-primary text-onPrimary text-sm font-body font-semibold hover:opacity-90 transition-opacity disabled:opacity-50'
+  },
+    h('span', { className: 'material-symbols-outlined text-[18px]' }, 'near_me'),
+    '주변 보기'
+  );
+  const landmarkForm = h('form', { className: 'flex gap-2' }, landmarkInput, landmarkBtn);
   // Category tabs (populated after Kakao results come in)
   const tabsBar = h('div', { className: 'flex items-center gap-2 mb-3 flex-wrap' });
   listSection.appendChild(listHeader);
+  listSection.appendChild(landmarkForm);
+  listSection.appendChild(landmarkChipSlot);
   listSection.appendChild(tabsBar);
 
   // Desktop에서 grid (md이상), mobile에서 세로 single column
@@ -680,11 +697,39 @@ export function ResultsView({ router, params }) {
         // Tab state → filters list + map
         let activeTab = 'all';
         let activeCuisine = 'all';
+        let landmark = null; // { name, lat, lng, radiusKm }
+
+        function renderLandmarkChip() {
+          landmarkChipSlot.innerHTML = '';
+          if (!landmark) return;
+          landmarkChipSlot.appendChild(
+            h('span', {
+              className: 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primaryContainer text-onPrimaryContainer text-xs font-body font-medium'
+            },
+              h('span', { className: 'material-symbols-outlined text-[15px]' }, 'near_me'),
+              `${landmark.name} 주변 ${landmark.radiusKm}km`,
+              h('button', {
+                className: 'ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-onPrimaryContainer/10',
+                title: '필터 해제',
+                onClick: () => { landmark = null; landmarkInput.value = ''; applyTab(); }
+              },
+                h('span', { className: 'material-symbols-outlined text-[14px]' }, 'close')
+              )
+            )
+          );
+        }
+
         function applyTab() {
           const tab = TABS.find(t => t.id === activeTab);
           let filtered = tab.match ? allPlaces.filter(p => p.category === tab.match) : allPlaces;
           if (activeTab === 'FD6' && activeCuisine !== 'all') {
             filtered = filtered.filter(p => cuisineOf(p) === activeCuisine);
+          }
+          if (landmark) {
+            filtered = filtered.filter(p =>
+              Number.isFinite(p.lat) && Number.isFinite(p.lng) &&
+              haversineKm(landmark.lat, landmark.lng, p.lat, p.lng) <= landmark.radiusKm
+            );
           }
           renderTabs(
             allPlaces,
@@ -693,10 +738,44 @@ export function ResultsView({ router, params }) {
             activeCuisine,
             (cid) => { activeCuisine = cid; applyTab(); }
           );
+          renderLandmarkChip();
           renderPlaces(filtered, mapApi);
           mapApi.setPlaces(filtered);
           mapApi._places = filtered;
         }
+
+        // 랜드마크 검색 폼 활성화
+        landmarkForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const q = landmarkInput.value.trim();
+          if (!q) return;
+          landmarkBtn.disabled = true;
+          const orig = landmarkBtn.innerHTML;
+          landmarkBtn.innerHTML = '검색 중…';
+          try {
+            // 현재 region 한정으로 정확도 향상 (예: '서울 강남경찰서')
+            const result = await keywordSearch(`${regionLabel(region)} ${q}`, { size: 1 });
+            const first = result?.[0];
+            if (!first) {
+              router.showToast(`"${q}" 위치를 찾지 못했어요. 다른 이름으로 시도해보세요.`);
+              return;
+            }
+            landmark = {
+              name: first.place_name,
+              lat: parseFloat(first.y),
+              lng: parseFloat(first.x),
+              radiusKm: 1
+            };
+            applyTab();
+            router.showToast(`📍 ${landmark.name} 주변 1km 표시`);
+          } catch (err) {
+            router.showToast('검색 중 오류가 발생했어요.');
+            console.error(err);
+          } finally {
+            landmarkBtn.disabled = false;
+            landmarkBtn.innerHTML = orig;
+          }
+        };
         applyTab();
 
         // One-day course always from full set
