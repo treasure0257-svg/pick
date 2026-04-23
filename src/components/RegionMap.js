@@ -197,8 +197,25 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
       });
 
       // 타겟 전체가 한눈에 들어오도록 — 좌우 여백 넉넉히
+      // container 가 최초 렌더에서 0 사이즈이면 Kakao 의 setBounds 가 기본 center 에 머무름.
+      // 즉시 한 번 적용 + ResizeObserver 로 실제 사이즈가 들어왔을 때 relayout + 재fit.
       if (!overallBounds.isEmpty()) {
-        map.setBounds(overallBounds, 24, 24, 24, 24);
+        const applyFit = () => {
+          map.relayout();
+          map.setBounds(overallBounds, 24, 24, 24, 24);
+        };
+        applyFit();
+        let retried = false;
+        const ro = new ResizeObserver((entries) => {
+          if (retried) return;
+          const rect = entries[0].contentRect;
+          if (rect.width > 50 && rect.height > 50) {
+            retried = true;
+            applyFit();
+            ro.disconnect();
+          }
+        });
+        ro.observe(mapEl);
       }
 
       loadingEl.classList.add('hidden');
