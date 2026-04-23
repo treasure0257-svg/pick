@@ -6,7 +6,7 @@ import { PICK_DATA } from '../data.js';
 import { AppState, STORAGE_KEYS, recommend, savePlace, isSaved } from '../App.js';
 import { regionLabel, subregionLabel, REGIONS } from '../regions.js';
 import { multiKeywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
-import { naverLocalSearch, normalizeNaverPlace, getPlaceImage } from '../services/naverLocal.js';
+import { naverLocalSearch, normalizeNaverPlace, getPlaceImage, getBlogCount } from '../services/naverLocal.js';
 
 const KAKAO_CAT_BADGE = {
   FD6: { icon: 'restaurant',     label: '맛집' },
@@ -143,7 +143,31 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
                 h('span', { className: 'material-symbols-outlined text-[13px]' }, 'my_location'),
                 distanceText
               )
-            : null
+            : null,
+          (function () {
+            // 블로그 후기 수 chip — 비동기 로드, 0이면 자동 숨김
+            const chip = h('span', {
+              className: 'font-label text-[11px] text-emerald-700 inline-flex items-center gap-0.5 opacity-0 transition-opacity'
+            },
+              h('span', { className: 'material-symbols-outlined text-[13px]' }, 'edit_note'),
+              h('span', { 'data-blog-count': '' }, '...')
+            );
+            const blogQuery = `${p.name} ${p.address ? p.address.split(' ').slice(0, 2).join(' ') : ''}`.trim();
+            getBlogCount(blogQuery).then(n => {
+              if (n > 0) {
+                const txt = n >= 10000
+                  ? `블로그 ${(n / 10000).toFixed(1)}만건`
+                  : n >= 1000
+                    ? `블로그 ${(n / 1000).toFixed(1)}k건`
+                    : `블로그 ${n}건`;
+                chip.querySelector('[data-blog-count]').textContent = txt;
+                chip.style.opacity = '1';
+              } else {
+                chip.remove();
+              }
+            }).catch(() => chip.remove());
+            return chip;
+          })()
         ),
         h('h3', { className: 'font-headline text-base md:text-lg font-bold text-onSurface mt-1.5 truncate' }, p.name),
         categoryPath

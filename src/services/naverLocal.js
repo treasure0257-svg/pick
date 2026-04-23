@@ -34,6 +34,17 @@ export async function naverImageSearch(query, display = 1) {
   }
 }
 
+// Naver 블로그 검색 — 우리는 total(매칭 수)만 필요. display=1 로 트래픽 최소화.
+export async function naverBlogCount(query) {
+  try {
+    const data = await proxyFetch('blog', query, 1);
+    return Number(data.total || 0);
+  } catch (e) {
+    console.warn('[naverBlogCount]', e.message);
+    return 0;
+  }
+}
+
 // Naver place → 공통 스키마로 정규화
 // Naver의 <b> 태그 감싼 title 등도 정리
 function stripTags(s) { return (s || '').replace(/<\/?b>/g, ''); }
@@ -95,6 +106,49 @@ function saveImgCache(cache) {
 }
 
 const inflight = new Map(); // key → Promise
+
+// --- 블로그 후기 수 캐시 (24h TTL, 별도 키) ---
+const BLOG_CACHE_KEY = 'pick.naver.blogCountCache.v1';
+const BLOG_TTL_MS = 24 * 60 * 60 * 1000;
+
+function loadBlogCache() {
+  try {
+    const raw = localStorage.getItem(BLOG_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    const now = Date.now();
+    const cleaned = {};
+    for (const [k, v] of Object.entries(parsed)) {
+      if (v && v.t && now - v.t < BLOG_TTL_MS) cleaned[k] = v;
+    }
+    return cleaned;
+  } catch { return {}; }
+}
+
+function saveBlogCache(cache) {
+  try { localStorage.setItem(BLOG_CACHE_KEY, JSON.stringify(cache)); } catch {}
+}
+
+const blogInflight = new Map();
+
+export async function getBlogCount(query) {
+  if (!query) return 0;
+  const key = query.trim();
+  const cache = loadBlogCache();
+  if (cache[key] != null) return cache[key].n;
+
+  if (blogInflight.has(key)) return blogInflight.get(key);
+
+  const p = (async () => {
+    const n = await naverBlogCount(key);
+    const next = loadBlogCache();
+    next[key] = { n, t: Date.now() };
+    saveBlogCache(next);
+    return n;
+  })();
+  blogInflight.set(key, p);
+  try { return await p; } finally { blogInflight.delete(key); }
+}
 
 export async function getPlaceImage(placeName) {
   if (!placeName) return null;
