@@ -173,10 +173,18 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
 // 카테고리별 확장 키워드 — Kakao Local 키워드 검색에서 다양한 결과 확보용.
 // 관광 명소가 부족한 게 가장 큰 불만이라 즐길거리 쪽 키워드를 대폭 늘림.
 const SEARCH_KEYWORDS = {
-  food: ['맛집'],
-  cafe: ['카페'],
-  attraction: ['관광', '명소', '박물관', '미술관', '공원', '전시관', '랜드마크', '가볼만한곳'],
-  lodging: ['호텔', '펜션', '게스트하우스']
+  food: [
+    '맛집', '한식', '한정식', '고기', '삼겹살', '갈비',
+    '일식', '초밥', '라멘', '회', '중식', '양식', '파스타', '피자',
+    '아시안', '쌀국수', '치킨', '분식', '떡볶이', '족발',
+    '국밥', '냉면', '술집', '이자카야', '포차'
+  ],
+  cafe: ['카페', '디저트', '베이커리', '브런치', '와플', '케이크', '커피'],
+  attraction: [
+    '관광', '명소', '박물관', '미술관', '공원', '전시관', '랜드마크', '가볼만한곳',
+    '체험관', '테마파크', '수족관', '동물원', '한옥마을', '전통시장', '전망대'
+  ],
+  lodging: ['호텔', '펜션', '게스트하우스', '리조트', '한옥스테이', '풀빌라', '글램핑', '모텔']
 };
 
 function buildQueriesForArea(regionL, subL, subregion) {
@@ -596,7 +604,7 @@ export function ResultsView({ router, params }) {
           seen.add(k);
           return true;
         });
-        const allPlaces = [...kakaoPlaces, ...uniqueNaver].slice(0, 120);
+        const allPlaces = [...kakaoPlaces, ...uniqueNaver].slice(0, 400);
         cachePlaces(allPlaces);
 
         // Side map (starts with all places)

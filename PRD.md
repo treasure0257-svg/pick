@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.10 (2026-04-20)
+> Product Requirements Document  ·  v0.3.11 (2026-04-23)
 
 ## 1. 제품 개요
 
@@ -159,6 +159,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-23 | v0.3.11 | 권역별 데이터 커버리지 극대화 — `SEARCH_KEYWORDS` 대폭 확장: food 1 → 25개(한식/한정식/고기/삼겹살/갈비/일식/초밥/라멘/회/중식/양식/파스타/피자/아시안/쌀국수/치킨/분식/떡볶이/족발/국밥/냉면/술집/이자카야/포차 등), cafe 1 → 7개(디저트·베이커리·브런치·와플·케이크·커피), attraction 8 → 15개(체험관·테마파크·수족관·동물원·한옥마을·전통시장·전망대 추가), lodging 3 → 8개(리조트·한옥스테이·풀빌라·글램핑·모텔). ResultsView slice cap 120 → 400으로 상향, 권역 1회 로드에 Kakao/Naver 병렬 100여 개 키워드 쿼리로 최대 수백 개 장소 수집 |
 | 2026-04-20 | v0.3.10 | Naver Local/Image API 연동 — `src/services/naverLocal.js` 신설, Cloudflare Worker 프록시(`VITE_NAVER_PROXY_URL`)로 CORS 우회, Naver Image Search 결과를 결과 카드·대표 명소 썸네일에 lazy-load + localStorage 24h 캐시. OG/Twitter 메타 태그 + `public/og-image.jpg` (1200×630, 경복궁 hero + 정해줘 브랜드) 추가로 카톡·트위터 공유 미리보기 개선. `scripts/generate-og-image.mjs` 생성기 추가. SavedView 빈 상태 전면 개편(큰 글로우 아이콘 + 로그인 유도 CTA 분기). ResultsView 모바일 FAB로 리스트↔지도 전환. GitHub Secrets 9개 → 10개로 확장 |
 | 2026-04-21 | v0.3.9 | 여행 사이트화 1차 — 지역별 대표 명소 큐레이션(FEATURED_ATTRACTIONS, 17×5=85개), RegionView에 "✨ 이 지역 대표 명소" 가로 스크롤 섹션. 숙소(AD5) 탭 추가, SEARCH_KEYWORDS 에 lodging 그룹(호텔·펜션·게스트하우스). `scripts/download-featured-photos.mjs` 로 Wikipedia originalimage → sharp 640×400 JPEG → `public/data/featured/{region}_{i}.jpg`, RegionView 카드는 `<img>` + onerror 그라데이션 fallback |
 | 2026-04-20 | v0.3.8 | 관광 명소 선택지 확장 — `SEARCH_KEYWORDS` 맵 도입, 즐길거리 키워드 `명소` 1개 → 8개(관광/명소/박물관/미술관/공원/전시관/랜드마크/가볼만한곳). Kakao keywordSearch size 10 → 15(최대치), 결과 cap 30 → 80. 세부 지역당 호출 수 6 → 20, 예상 결과 3-5배 증가 |
