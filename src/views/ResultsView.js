@@ -339,7 +339,7 @@ export function ResultsView({ router, params }) {
           : h('a', { href: '#/', className: 'inline-flex items-center gap-2 bg-surfaceContainerLowest text-onSurface font-body text-sm font-medium py-2.5 px-4 rounded-xl hover:bg-surfaceContainer transition-colors' },
               h('span', { className: 'material-symbols-outlined text-[18px]' }, 'arrow_back'), '홈'
             ),
-        h('a', { href: '#/preferences', className: 'inline-flex items-center gap-2 bg-secondaryContainer text-onSecondaryContainer font-body text-sm font-semibold py-2.5 px-4 rounded-xl hover:bg-secondaryFixedDim transition-colors' },
+        h('a', { href: '#/mypage', className: 'inline-flex items-center gap-2 bg-secondaryContainer text-onSecondaryContainer font-body text-sm font-semibold py-2.5 px-4 rounded-xl hover:bg-secondaryFixedDim transition-colors' },
           h('span', { className: 'material-symbols-outlined text-[18px]' }, 'tune'), '취향 조정'
         )
       )
@@ -741,7 +741,7 @@ export function ResultsView({ router, params }) {
           if (activePrefSummary.length > 0) {
             landmarkChipSlot.appendChild(
               h('a', {
-                href: '#/preferences',
+                href: '#/mypage',
                 className: 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondaryContainer text-onSecondaryContainer text-xs font-body font-medium hover:opacity-80 transition-opacity'
               },
                 h('span', { className: 'material-symbols-outlined text-[15px]' }, 'tune'),

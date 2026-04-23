@@ -3,8 +3,8 @@ import { h } from '../utils/dom.js';
 export function BottomNav(router) {
   const navLinks = [
     { name: '홈', path: '#/', icon: 'home' },
-    { name: '취향', path: '#/preferences', icon: 'tune' },
-    { name: '저장됨', path: '#/saved', icon: 'bookmark' }
+    { name: '저장됨', path: '#/saved', icon: 'bookmark' },
+    { name: '마이', path: '#/mypage', icon: 'person' }
   ];
 
   const currentPath = window.location.hash || '#/';

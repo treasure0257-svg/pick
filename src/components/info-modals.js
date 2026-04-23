@@ -34,7 +34,7 @@ const STEPS = [
   { icon: 'restaurant',   title: '3. 카테고리 탭 좁히기',   desc: '맛집·카페·즐길거리·숙소 탭 클릭으로 필터링.' },
   { icon: 'near_me',      title: '4. 랜드마크 주변 검색',   desc: '"강남경찰서" 같은 건물명 → 주변 1km만 표시.' },
   { icon: 'bookmark',     title: '5. 마음에 들면 저장',     desc: '저장 버튼 → "저장됨" 메뉴에 보관 (로그인 시 동기화).' },
-  { icon: 'tune',         title: '6. 취향 설정',            desc: '카테고리·무드·예산 입력 → 점수 기반 맞춤 추천.' }
+  { icon: 'tune',         title: '6. 마이페이지에서 취향 설정', desc: '식이·매운맛·예산·카테고리·무드·동행을 카드에서 설정, 즉시 저장.' }
 ];
 
 export function renderGuideContent() {

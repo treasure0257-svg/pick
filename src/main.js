@@ -1,7 +1,6 @@
 import './style.css';
 import { Router } from './router.js';
 import { HomeView } from './views/HomeView.js';
-import { PreferencesView } from './views/PreferencesView.js';
 import { ResultsView } from './views/ResultsView.js';
 import { SavedView } from './views/SavedView.js';
 import { LoginView } from './views/LoginView.js';
@@ -17,7 +16,12 @@ import { h } from './utils/dom.js';
 
 const routes = [
   { path: '#/', component: HomeView },
-  { path: '#/preferences', component: PreferencesView },
+  // v0.4: 취향 설정 페이지는 MyPageView 안으로 흡수됨 — 외부 링크 호환 위해 redirect
+  { path: '#/preferences', component: ({ router }) => {
+      router.navigate('#/mypage');
+      return document.createElement('div');
+    }
+  },
   { path: '#/region', component: RegionView },
   { path: '#/results', component: ResultsView },
   { path: '#/place', component: PlaceDetailView },

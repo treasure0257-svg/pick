@@ -9,9 +9,17 @@ import { getCachedPlace } from '../services/kakaoLocal.js';
 import { categoryMeta } from '../utils/place-ui.js';
 
 const PROVIDER_BADGE = {
-  google: { label: 'Google',  cls: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' },
-  kakao:  { label: 'Kakao',   cls: 'bg-yellow-50 text-yellow-800 ring-1 ring-yellow-200' },
-  naver:  { label: 'Naver',   cls: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' }
+  google: { label: 'Google', cls: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' },
+  kakao:  { label: 'Kakao',  cls: 'bg-yellow-50 text-yellow-800 ring-1 ring-yellow-200' },
+  naver:  { label: 'Naver',  cls: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' }
+};
+
+// 취향 카드 액센트 (음식·라이프·무드·동행)
+const ACCENT = {
+  food:    { iconBg: 'bg-orange-100', iconColor: 'text-orange-700', chipActive: 'bg-orange-600 text-white border-orange-600' },
+  life:    { iconBg: 'bg-blue-100',   iconColor: 'text-blue-700',   chipActive: 'bg-blue-600 text-white border-blue-600' },
+  mood:    { iconBg: 'bg-purple-100', iconColor: 'text-purple-700', chipActive: 'bg-purple-600 text-white border-purple-600' },
+  comp:    { iconBg: 'bg-rose-100',   iconColor: 'text-rose-700',   chipActive: 'bg-rose-600 text-white border-rose-600' }
 };
 
 export function MyPageView({ router }) {
@@ -52,7 +60,7 @@ export function MyPageView({ router }) {
         ),
         h('h2', { className: 'font-headline text-2xl font-extrabold text-onSurface' }, '로그인이 필요해요'),
         h('p', { className: 'font-body text-onSurfaceVariant mt-2 max-w-md mx-auto' },
-          '내 활동·저장한 장소·취향 설정을 한 곳에서 관리하려면 로그인하세요.'
+          '내 활동·저장한 장소·취향을 한 곳에서 관리하려면 로그인하세요.'
         ),
         h('a', {
           href: '#/login',
@@ -67,9 +75,6 @@ export function MyPageView({ router }) {
   }
 
   const provider = PROVIDER_BADGE[user.provider] || { label: user.provider || '계정', cls: 'bg-surfaceContainer text-onSurfaceVariant' };
-  const savedIds = AppState.get(STORAGE_KEYS.saved, []);
-  const prefs = AppState.get(STORAGE_KEYS.preferences, {});
-  const hasPrefs = Object.keys(prefs || {}).length > 0;
 
   // 1) 프로필 헤더
   main.appendChild(
@@ -92,35 +97,47 @@ export function MyPageView({ router }) {
   );
 
   // 2) 활동 통계
-  main.appendChild(
-    h('section', { className: 'mt-8 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4' },
-      statCard('저장한 장소', String(savedIds.length), 'bookmark'),
-      statCard('취향 설정', hasPrefs ? '완료' : '미설정', 'tune'),
+  function statsRow() {
+    const savedCount = AppState.get(STORAGE_KEYS.saved, []).length;
+    const prefs = AppState.get(STORAGE_KEYS.preferences, {}) || {};
+    const prefSet = countSetPrefs(prefs);
+    return h('section', { className: 'mt-8 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4' },
+      statCard('저장한 장소', String(savedCount), 'bookmark'),
+      statCard('취향 설정', `${prefSet}/8`, 'tune'),
       statCard('로그인 방식', provider.label, 'shield')
-    )
-  );
+    );
+  }
+  let statsSlot = statsRow();
+  main.appendChild(statsSlot);
+  function refreshStats() {
+    const next = statsRow();
+    statsSlot.replaceWith(next);
+    statsSlot = next;
+  }
 
-  // 3) 내 취향
+  // 3) 내 취향 — 4개 확장형 카드 (음식·라이프·무드·동행)
   main.appendChild(
     h('section', { className: 'mt-10' },
-      h('div', { className: 'flex items-center justify-between mb-4' },
+      h('div', { className: 'flex items-center justify-between mb-5' },
         h('h2', { className: 'font-headline text-xl font-bold text-onSurface' }, '내 취향'),
-        h('a', { href: '#/preferences', className: 'text-sm font-body text-primary hover:underline inline-flex items-center gap-0.5' },
-          hasPrefs ? '수정' : '설정하기',
-          h('span', { className: 'material-symbols-outlined text-[16px]' }, 'chevron_right')
-        )
+        h('span', { className: 'font-label text-xs text-onSurfaceVariant' }, '클릭 즉시 저장')
       ),
-      hasPrefs
-        ? renderPrefSummary(prefs)
-        : h('div', { className: 'bg-surfaceContainerLowest rounded-2xl p-6 text-center text-onSurfaceVariant text-sm border border-dashed border-surfaceContainerHighest' },
-            '아직 취향이 없어요. 설정하면 더 정확한 추천을 받을 수 있어요.'
-          )
+      h('div', { className: 'space-y-3' },
+        prefCard({ key: 'food', icon: 'restaurant', title: '음식 취향', accent: ACCENT.food, defaultOpen: true,
+          render: () => foodPrefsContent(router, refreshStats) }),
+        prefCard({ key: 'life', icon: 'savings', title: '라이프스타일', accent: ACCENT.life,
+          render: () => lifePrefsContent(router, refreshStats) }),
+        prefCard({ key: 'mood', icon: 'palette', title: '카테고리 · 무드', accent: ACCENT.mood,
+          render: () => moodPrefsContent(router, refreshStats) }),
+        prefCard({ key: 'comp', icon: 'group', title: '동행', accent: ACCENT.comp,
+          render: () => companionPrefsContent(router, refreshStats) })
+      )
     )
   );
 
-  // 4) 저장된 장소 미리보기 (최근 3개)
+  // 4) 저장된 장소 미리보기
   main.appendChild(
-    h('section', { className: 'mt-10' },
+    h('section', { className: 'mt-12' },
       h('div', { className: 'flex items-center justify-between mb-4' },
         h('h2', { className: 'font-headline text-xl font-bold text-onSurface' }, '내 저장 장소'),
         h('a', { href: '#/saved', className: 'text-sm font-body text-primary hover:underline inline-flex items-center gap-0.5' },
@@ -128,7 +145,7 @@ export function MyPageView({ router }) {
           h('span', { className: 'material-symbols-outlined text-[16px]' }, 'chevron_right')
         )
       ),
-      renderSavedPreview(savedIds)
+      renderSavedPreview()
     )
   );
 
@@ -178,35 +195,243 @@ function statCard(label, value, icon) {
   );
 }
 
-function renderPrefSummary(prefs) {
-  const labelOf = (arr, id) => (arr.find(x => x.id === id) || {}).label || id;
-  const rows = [];
-  if (prefs.categories?.length) rows.push(['카테고리', prefs.categories.map(c => labelOf(PICK_DATA.categories, c)).join(' · ')]);
-  if (prefs.moods?.length)      rows.push(['무드',     prefs.moods.map(m => labelOf(PICK_DATA.moods, m)).join(' · ')]);
-  if (prefs.budget)             rows.push(['예산',     labelOf(PICK_DATA.budgets, prefs.budget)]);
-  if (prefs.duration)           rows.push(['기간',     labelOf(PICK_DATA.durations, prefs.duration)]);
-  if (prefs.drinks)             rows.push(['음주',     labelOf(PICK_DATA.drinks, prefs.drinks)]);
-  if (prefs.dietary?.length)    rows.push(['식이 제한', prefs.dietary.map(d => labelOf(PICK_DATA.dietary, d)).join(' · ')]);
-  if (prefs.spice)              rows.push(['매운맛',    labelOf(PICK_DATA.spiceLevels, prefs.spice)]);
-  if (prefs.companion)          rows.push(['동행',      labelOf(PICK_DATA.companions, prefs.companion)]);
+function countSetPrefs(prefs) {
+  let n = 0;
+  if (prefs.dietary?.length)    n++;
+  if (prefs.spice)              n++;
+  if (prefs.budget)             n++;
+  if (prefs.duration)           n++;
+  if (prefs.drinks)             n++;
+  if (prefs.categories?.length) n++;
+  if (prefs.moods?.length)      n++;
+  if (prefs.companion)          n++;
+  return n;
+}
 
-  if (rows.length === 0) {
-    return h('div', { className: 'bg-surfaceContainerLowest rounded-2xl p-5 text-onSurfaceVariant text-sm' },
-      '취향 데이터를 읽지 못했어요.'
-    );
+// --- 확장형 카드 ---
+function prefCard({ icon, title, accent, defaultOpen, render }) {
+  const summarySlot = h('span', { className: 'font-body text-sm text-onSurfaceVariant truncate' });
+  const chevron = h('span', { className: 'material-symbols-outlined text-onSurfaceVariant transition-transform' }, 'expand_more');
+  const body = h('div', { className: 'overflow-hidden transition-all', style: { maxHeight: '0px' } });
+  let bodyRendered = false;
+  let isOpen = false;
+
+  function refreshSummary() {
+    summarySlot.textContent = computeSummary();
+  }
+  function computeSummary() {
+    const prefs = AppState.get(STORAGE_KEYS.preferences, {}) || {};
+    return summaryFor(title, prefs);
   }
 
-  return h('div', { className: 'bg-surfaceContainerLowest rounded-2xl p-5 grid sm:grid-cols-2 gap-3' },
-    ...rows.map(([k, v]) =>
-      h('div', { className: 'flex flex-col gap-1' },
-        h('span', { className: 'font-label text-[11px] uppercase tracking-wider text-onSurfaceVariant' }, k),
-        h('span', { className: 'font-body text-sm text-onSurface' }, v)
-      )
-    )
+  function open() {
+    if (!bodyRendered) {
+      body.appendChild(render());
+      bodyRendered = true;
+    }
+    isOpen = true;
+    body.style.maxHeight = body.scrollHeight + 'px';
+    chevron.style.transform = 'rotate(180deg)';
+    // expand 후 자식 변동 (chip 클릭 시 사이즈 변경) 대응 위해 약간 딜레이 후 auto 로
+    setTimeout(() => { if (isOpen) body.style.maxHeight = 'none'; }, 250);
+  }
+  function close() {
+    isOpen = false;
+    if (body.style.maxHeight === 'none') body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+    chevron.style.transform = 'rotate(0deg)';
+  }
+
+  const header = h('button', {
+    type: 'button',
+    className: 'w-full flex items-center gap-3 p-4 md:p-5 text-left',
+    onClick: () => { isOpen ? close() : open(); }
+  },
+    h('div', { className: `flex-none w-10 h-10 rounded-xl flex items-center justify-center ${accent.iconBg} ${accent.iconColor}` },
+      h('span', { className: 'material-symbols-outlined text-[22px]' }, icon)
+    ),
+    h('div', { className: 'flex-grow min-w-0' },
+      h('h3', { className: 'font-headline font-bold text-onSurface' }, title),
+      summarySlot
+    ),
+    chevron
+  );
+
+  // body 내부 변경 시 summary 갱신을 위해 MutationObserver 대신 click 위임으로 처리
+  body.addEventListener('click', () => {
+    // 다음 tick 에 prefs 가 반영되어 있음
+    queueMicrotask(refreshSummary);
+  });
+
+  refreshSummary();
+  if (defaultOpen) queueMicrotask(open);
+
+  return h('div', { className: 'bg-surfaceContainerLowest rounded-2xl overflow-hidden' },
+    header,
+    h('div', { className: 'px-4 md:px-5' }, body)
   );
 }
 
-function renderSavedPreview(savedIds) {
+function summaryFor(title, prefs) {
+  const labelOf = (arr, id) => (arr.find(x => x.id === id) || {}).label || id;
+  if (title === '음식 취향') {
+    const parts = [];
+    if (prefs.dietary?.length) parts.push(prefs.dietary.map(d => labelOf(PICK_DATA.dietary, d)).join('·'));
+    if (prefs.spice) parts.push(labelOf(PICK_DATA.spiceLevels, prefs.spice));
+    return parts.length ? parts.join(' / ') : '아직 설정 안 함';
+  }
+  if (title === '라이프스타일') {
+    const parts = [];
+    if (prefs.budget)   parts.push(labelOf(PICK_DATA.budgets, prefs.budget));
+    if (prefs.duration) parts.push(labelOf(PICK_DATA.durations, prefs.duration));
+    if (prefs.drinks)   parts.push(labelOf(PICK_DATA.drinks, prefs.drinks));
+    return parts.length ? parts.join(' · ') : '아직 설정 안 함';
+  }
+  if (title === '카테고리 · 무드') {
+    const parts = [];
+    if (prefs.categories?.length) parts.push(prefs.categories.map(c => labelOf(PICK_DATA.categories, c)).join('·'));
+    if (prefs.moods?.length)      parts.push(prefs.moods.map(m => labelOf(PICK_DATA.moods, m)).join('·'));
+    return parts.length ? parts.join(' / ') : '아직 설정 안 함';
+  }
+  if (title === '동행') {
+    return prefs.companion ? labelOf(PICK_DATA.companions, prefs.companion) : '아직 설정 안 함';
+  }
+  return '';
+}
+
+// --- chip 그리드 helper ---
+function chipGroup({ items, value, multi, accent, onChange }) {
+  const wrap = h('div', { className: 'flex flex-wrap gap-2' });
+  function paint() {
+    wrap.innerHTML = '';
+    const current = multi ? new Set(value()) : value();
+    items.forEach(item => {
+      const selected = multi ? current.has(item.id) : current === item.id;
+      const btn = h('button', {
+        type: 'button',
+        className: `inline-flex items-center gap-1.5 py-2 px-3.5 rounded-full font-body text-sm font-medium border transition-colors ${
+          selected
+            ? `${accent.chipActive} shadow-sm`
+            : 'bg-surface text-onSurface border-surfaceContainerHighest hover:border-primary/40'
+        }`,
+        onClick: () => {
+          let next;
+          if (multi) {
+            const arr = new Set(value());
+            arr.has(item.id) ? arr.delete(item.id) : arr.add(item.id);
+            next = Array.from(arr);
+          } else {
+            next = current === item.id ? null : item.id; // 같은 거 다시 누르면 해제
+          }
+          onChange(next);
+          paint();
+        }
+      },
+        item.icon ? h('span', { className: 'material-symbols-outlined text-[16px]' }, item.icon) : null,
+        item.label
+      );
+      wrap.appendChild(btn);
+    });
+  }
+  paint();
+  return wrap;
+}
+
+function getPrefs() { return AppState.get(STORAGE_KEYS.preferences, {}) || {}; }
+function patchPrefs(patch, router, refreshStats) {
+  const next = { ...getPrefs(), ...patch };
+  AppState.set(STORAGE_KEYS.preferences, next);
+  router.showToast('저장되었습니다');
+  refreshStats?.();
+}
+
+// --- 4개 카드 컨텐츠 ---
+function foodPrefsContent(router, refreshStats) {
+  const wrap = h('div', { className: 'pb-5 space-y-4' });
+  wrap.appendChild(h('div', {},
+    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '식이 제한 · 알레르기'),
+    chipGroup({
+      items: PICK_DATA.dietary, multi: true, accent: ACCENT.food,
+      value: () => getPrefs().dietary || [],
+      onChange: v => patchPrefs({ dietary: v }, router, refreshStats)
+    })
+  ));
+  wrap.appendChild(h('div', {},
+    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '매운맛 선호'),
+    chipGroup({
+      items: PICK_DATA.spiceLevels, multi: false, accent: ACCENT.food,
+      value: () => getPrefs().spice || null,
+      onChange: v => patchPrefs({ spice: v }, router, refreshStats)
+    })
+  ));
+  return wrap;
+}
+
+function lifePrefsContent(router, refreshStats) {
+  const wrap = h('div', { className: 'pb-5 space-y-4' });
+  wrap.appendChild(h('div', {},
+    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '예산'),
+    chipGroup({
+      items: PICK_DATA.budgets, multi: false, accent: ACCENT.life,
+      value: () => getPrefs().budget || null,
+      onChange: v => patchPrefs({ budget: v }, router, refreshStats)
+    })
+  ));
+  wrap.appendChild(h('div', {},
+    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '소요 시간'),
+    chipGroup({
+      items: PICK_DATA.durations, multi: false, accent: ACCENT.life,
+      value: () => getPrefs().duration || null,
+      onChange: v => patchPrefs({ duration: v }, router, refreshStats)
+    })
+  ));
+  wrap.appendChild(h('div', {},
+    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '음주'),
+    chipGroup({
+      items: PICK_DATA.drinks, multi: false, accent: ACCENT.life,
+      value: () => getPrefs().drinks || null,
+      onChange: v => patchPrefs({ drinks: v }, router, refreshStats)
+    })
+  ));
+  return wrap;
+}
+
+function moodPrefsContent(router, refreshStats) {
+  const wrap = h('div', { className: 'pb-5 space-y-4' });
+  wrap.appendChild(h('div', {},
+    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '관심 카테고리'),
+    chipGroup({
+      items: PICK_DATA.categories, multi: true, accent: ACCENT.mood,
+      value: () => getPrefs().categories || [],
+      onChange: v => patchPrefs({ categories: v }, router, refreshStats)
+    })
+  ));
+  wrap.appendChild(h('div', {},
+    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '분위기 · 스타일'),
+    chipGroup({
+      items: PICK_DATA.moods, multi: true, accent: ACCENT.mood,
+      value: () => getPrefs().moods || [],
+      onChange: v => patchPrefs({ moods: v }, router, refreshStats)
+    })
+  ));
+  return wrap;
+}
+
+function companionPrefsContent(router, refreshStats) {
+  const wrap = h('div', { className: 'pb-5' });
+  wrap.appendChild(h('p', { className: 'font-body text-xs text-onSurfaceVariant mb-3' },
+    '홈 화면 상단의 동행 칩과 동기화됩니다.'
+  ));
+  wrap.appendChild(chipGroup({
+    items: PICK_DATA.companions, multi: false, accent: ACCENT.comp,
+    value: () => getPrefs().companion || null,
+    onChange: v => patchPrefs({ companion: v }, router, refreshStats)
+  }));
+  return wrap;
+}
+
+function renderSavedPreview() {
+  const savedIds = AppState.get(STORAGE_KEYS.saved, []);
   if (savedIds.length === 0) {
     return h('div', { className: 'bg-surfaceContainerLowest rounded-2xl p-6 text-center text-onSurfaceVariant text-sm border border-dashed border-surfaceContainerHighest' },
       '아직 저장한 장소가 없어요. 카드의 ',

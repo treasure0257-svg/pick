@@ -190,7 +190,7 @@ export function HomeView({ router }) {
             h('h2', { className: 'font-headline text-xl md:text-2xl font-extrabold text-onSurface tracking-tight' }, '오늘 누구랑 가세요?'),
             h('p', { className: 'font-body text-xs md:text-sm text-onSurfaceVariant mt-1' }, '동행을 알려주면 그에 맞는 장소를 우선 추천해드려요.')
           ),
-          h('a', { href: '#/preferences', className: 'hidden md:inline-flex items-center gap-1 text-xs text-onSurfaceVariant hover:text-primary' },
+          h('a', { href: '#/mypage', className: 'hidden md:inline-flex items-center gap-1 text-xs text-onSurfaceVariant hover:text-primary' },
             '더 자세한 취향',
             h('span', { className: 'material-symbols-outlined text-[14px]' }, 'chevron_right')
           )
@@ -242,19 +242,19 @@ export function HomeView({ router }) {
           h('div', { className: 'flex-grow' },
             h('span', { className: 'font-label text-xs text-primary uppercase tracking-widest' }, '취향으로 좁히기'),
             h('h3', { className: 'font-headline text-2xl md:text-3xl font-bold text-onSurface mt-2 tracking-tight' },
-              '카테고리·무드·예산을 정하면 ', h('br', { className: 'hidden md:block' }),
+              '식이·예산·무드를 설정하면 ', h('br', { className: 'hidden md:block' }),
               '맞춤 추천을 드려요.'
             ),
             h('p', { className: 'font-body text-sm md:text-base text-onSurfaceVariant mt-3 leading-relaxed' },
-              '몇 가지 질문으로 당신의 오늘을 좁혀갑니다.'
+              '마이페이지에서 언제든 수정할 수 있어요.'
             )
           ),
           h('a', {
-            href: '#/preferences',
+            href: '#/mypage',
             className: 'inline-flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-primary-dim text-onPrimary font-body font-semibold py-4 px-8 rounded-xl hover:shadow-[0px_12px_32px_rgba(45,51,53,0.12)] transition-all duration-300 hover:-translate-y-0.5 flex-none'
           },
             h('span', { className: 'material-symbols-outlined' }, 'tune'),
-            '취향 설정 시작'
+            '마이페이지에서 설정'
           )
         )
       )

@@ -3,8 +3,8 @@ import { h } from '../utils/dom.js';
 export function Header(router) {
   const navLinks = [
     { name: '홈', path: '#/' },
-    { name: '취향 설정', path: '#/preferences' },
-    { name: '저장됨', path: '#/saved' }
+    { name: '저장됨', path: '#/saved' },
+    { name: '마이페이지', path: '#/mypage' }
   ];
 
   const currentPath = window.location.hash || '#/';
