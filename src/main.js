@@ -33,7 +33,12 @@ const routes = [
 const appRouter = new Router(routes);
 appRouter.init();
 
+// 헤더의 #auth-slot 은 라우트 이동마다 새로 생성되므로,
+// 마지막으로 알려진 사용자 상태를 캐시했다가 매 navigation 직후 재적용한다.
+let latestAuthUser = null;
+
 function updateAuthUI(user) {
+  latestAuthUser = user;
   const slots = document.querySelectorAll('#auth-slot');
   slots.forEach(slot => {
     slot.innerHTML = '';
@@ -63,3 +68,10 @@ function updateAuthUI(user) {
 }
 
 initAuth(updateAuthUI);
+
+// 라우트 이동 후 새 Header의 빈 auth-slot에 캐시된 사용자 정보를 즉시 다시 칠한다.
+// (이렇게 안 하면 새로고침 전까진 헤더가 비어있어 보임)
+window.addEventListener('hashchange', () => {
+  // Router.handleRoute가 동기적으로 새 DOM을 그리고 끝난 직후에 실행되도록 microtask 큐로 미룸
+  queueMicrotask(() => updateAuthUI(latestAuthUser));
+});
