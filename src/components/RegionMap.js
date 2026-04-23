@@ -26,6 +26,13 @@ const ID_TO_PREFIX = {
   gyeongbuk: '37', gyeongnam: '38', jeju: '39'
 };
 
+const PREFIX_TO_SIDO_LABEL = {
+  '11': '서울', '21': '부산', '22': '대구', '23': '인천', '24': '광주',
+  '25': '대전', '26': '울산', '29': '세종', '31': '경기', '32': '강원',
+  '33': '충북', '34': '충남', '35': '전북', '36': '전남',
+  '37': '경북', '38': '경남', '39': '제주'
+};
+
 let topoCachePromise = null;
 function loadTopo() {
   if (!topoCachePromise) {
@@ -46,17 +53,21 @@ function subIdForFeature(feature, subregions) {
 }
 
 export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
-  const mapEl = h('div', { className: 'w-full h-full', style: { minHeight: '420px' } });
+  const mapEl = h('div', {
+    className: 'w-full h-full',
+    style: { minHeight: '420px', background: 'transparent' }
+  });
 
   const loadingEl = h('div', {
-    className: 'absolute inset-0 flex items-center justify-center bg-surfaceContainerLow text-onSurfaceVariant font-body text-sm gap-2'
+    className: 'absolute inset-0 flex items-center justify-center text-onSurfaceVariant font-body text-sm gap-2'
   },
     h('span', { className: 'material-symbols-outlined text-xl animate-pulse' }, 'map'),
     '지도 로딩 중…'
   );
 
+  // 부드러운 하늘·바다 톤 배경 — 기존 회색 대신 지도 느낌을 살려줌
   const wrapper = h('div', {
-    className: 'relative rounded-2xl overflow-hidden border border-surfaceContainer h-full min-h-[420px]'
+    className: 'relative rounded-2xl overflow-hidden border border-surfaceContainer h-full min-h-[420px] bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50'
   }, mapEl, loadingEl);
 
   // subId → L.Path[] (GeoJSON layer contains many sub-layers; we index them)
@@ -73,6 +84,11 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
     // 매칭 안 되는 구/군은 한 톤 약한 파란색
     return { color: '#FFFFFF', weight: 1.5, fillColor: '#60A5FA', fillOpacity: 0.72 };
   }
+
+  // 주변 시·도용 뮤트 스타일 — 맥락만 주고 시선은 타겟으로 유지
+  const neighborStyle = {
+    color: '#CBD5E1', weight: 0.8, fillColor: '#E2E8F0', fillOpacity: 0.55
+  };
 
   function paint(subId, isHot) {
     const layers = subLayers.get(subId);
@@ -102,21 +118,34 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
       const geo = topojson.feature(topo, topo.objects[objKey]);
 
       const prefix = ID_TO_PREFIX[regionId];
-      const features = prefix
+      const targetFeatures = prefix
         ? geo.features.filter(f => (f.properties.code || '').startsWith(prefix))
         : geo.features;
 
-      if (features.length === 0) {
+      if (targetFeatures.length === 0) {
         loadingEl.classList.add('hidden');
         wrapper.appendChild(
           h('div', {
-            className: 'absolute inset-0 flex items-center justify-center bg-surfaceContainerLow text-onSurfaceVariant font-body text-sm'
+            className: 'absolute inset-0 flex items-center justify-center text-onSurfaceVariant font-body text-sm'
           }, '이 지역의 지도 데이터가 없어요')
         );
         return;
       }
 
-      // 타일 없는 정적 테마 지도 (배경은 컨테이너 색)
+      // 타깃 바운즈 계산 후 약간 확장 → 주변 시·도 feature 를 찾아 맥락으로 그려줌
+      const targetBounds = L.geoJSON({ type: 'FeatureCollection', features: targetFeatures }).getBounds();
+      const neighborBounds = targetBounds.pad(0.45);
+      const neighborFeatures = prefix
+        ? geo.features.filter(f => {
+            const code = f.properties.code || '';
+            if (code.startsWith(prefix)) return false;
+            try {
+              return neighborBounds.intersects(L.geoJSON(f).getBounds());
+            } catch { return false; }
+          })
+        : [];
+
+      // 타일 없는 정적 테마 지도 (배경은 wrapper 그라데이션)
       const map = L.map(mapEl, {
         zoomControl: false,
         scrollWheelZoom: false,
@@ -129,7 +158,16 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
         zoomSnap: 0.25
       });
 
-      const geoLayer = L.geoJSON({ type: 'FeatureCollection', features }, {
+      // 1) 주변 시·도 (뮤트, 인터랙션 없음) — 먼저 그려서 타겟 아래 배치
+      if (neighborFeatures.length > 0) {
+        L.geoJSON({ type: 'FeatureCollection', features: neighborFeatures }, {
+          style: () => neighborStyle,
+          interactive: false
+        }).addTo(map);
+      }
+
+      // 2) 타겟 시·도 — 상위 레이어로 포커스
+      const geoLayer = L.geoJSON({ type: 'FeatureCollection', features: targetFeatures }, {
         style: (feature) => {
           const subId = subIdForFeature(feature, subregions);
           return styleFor(subId, false);
@@ -153,17 +191,36 @@ export function RegionMap({ regionId, subregions = [], onSubHover } = {}) {
         }
       }).addTo(map);
 
-      // 해당 시·도 전체가 한눈에 들어오게 맞춤
-      map.fitBounds(geoLayer.getBounds(), { padding: [12, 12] });
+      // 타겟 중심 + 살짝 여유 (주변 맥락 feature 가 살짝 보이도록)
+      map.fitBounds(geoLayer.getBounds(), { padding: [24, 24] });
 
-      // 각 구/군별로 이름 라벨을 중심에 영구 표시
-      features.forEach(feature => {
+      // 타겟 구/군 이름 라벨
+      targetFeatures.forEach(feature => {
         const center = L.geoJSON(feature).getBounds().getCenter();
         const name = feature.properties?.name || '';
         if (!name) return;
         const labelIcon = L.divIcon({
           className: 'region-feature-label-wrap',
           html: `<span class="region-feature-label">${name}</span>`,
+          iconSize: [0, 0]
+        });
+        L.marker(center, { icon: labelIcon, interactive: false, keyboard: false }).addTo(map);
+      });
+
+      // 주변 시·도 이름 라벨 (작고 연하게) — 맥락용
+      const seenSidoCodes = new Set();
+      neighborFeatures.forEach(feature => {
+        const code = (feature.properties.code || '').slice(0, 2);
+        if (!code || seenSidoCodes.has(code)) return;
+        // 각 주변 시·도의 첫 번째 feature 에만 시·도 단위 라벨 표시
+        seenSidoCodes.add(code);
+        const sidoLabel = PREFIX_TO_SIDO_LABEL[code];
+        if (!sidoLabel) return;
+        const siblingFeatures = neighborFeatures.filter(f => (f.properties.code || '').startsWith(code));
+        const center = L.geoJSON({ type: 'FeatureCollection', features: siblingFeatures }).getBounds().getCenter();
+        const labelIcon = L.divIcon({
+          className: 'region-feature-label-wrap',
+          html: `<span class="region-neighbor-label">${sidoLabel}</span>`,
           iconSize: [0, 0]
         });
         L.marker(center, { icon: labelIcon, interactive: false, keyboard: false }).addTo(map);
