@@ -1,6 +1,7 @@
 import { h } from '../utils/dom.js';
 import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
+import { Footer } from '../components/Footer.js';
 import { PlacesMap } from '../components/PlacesMap.js';
 import { PICK_DATA } from '../data.js';
 import { AppState, STORAGE_KEYS, recommend, savePlace, isSaved } from '../App.js';
@@ -318,6 +319,7 @@ export function ResultsView({ router, params }) {
 
   const main = h('main', { className: 'flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12 pb-32 md:pb-12' });
   container.appendChild(main);
+  container.appendChild(Footer());
   container.appendChild(BottomNav(router));
 
   main.appendChild(

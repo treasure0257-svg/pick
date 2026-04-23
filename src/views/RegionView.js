@@ -2,6 +2,7 @@ import { h } from '../utils/dom.js';
 import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
 import { RegionMap } from '../components/RegionMap.js';
+import { Footer } from '../components/Footer.js';
 import { PICK_DATA } from '../data.js';
 import { REGIONS, countPlacesBySubregion, placesInRegion, featuredFor } from '../regions.js';
 import { keywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
@@ -207,6 +208,7 @@ export function RegionView({ router, params }) {
     subGrid.appendChild(tile);
   });
 
+  container.appendChild(Footer());
   container.appendChild(BottomNav(router));
   return container;
 }

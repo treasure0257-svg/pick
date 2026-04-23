@@ -1,6 +1,7 @@
 import { h } from '../utils/dom.js';
 import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
+import { Footer } from '../components/Footer.js';
 import { PlacesMap } from '../components/PlacesMap.js';
 import { getCachedPlace, nearbySearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
 import { makeSaveBtn, haversineKm, formatDistance, categoryMeta } from '../utils/place-ui.js';
@@ -21,6 +22,7 @@ export function PlaceDetailView({ router, params }) {
       return m;
     })()
   );
+  container.appendChild(Footer());
   container.appendChild(BottomNav(router));
   const main = container._main;
 

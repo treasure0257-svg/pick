@@ -1,6 +1,7 @@
 import { h } from '../utils/dom.js';
 import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
+import { Footer } from '../components/Footer.js';
 import { PICK_DATA } from '../data.js';
 import { AppState, STORAGE_KEYS, unsavePlace } from '../App.js';
 import { auth } from '../firebase-setup.js';
@@ -15,6 +16,7 @@ export function SavedView({ router }) {
 
   const main = h('main', { className: 'flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 md:py-14 pb-32 md:pb-14' });
   container.appendChild(main);
+  container.appendChild(Footer());
   container.appendChild(BottomNav(router));
 
   main.appendChild(

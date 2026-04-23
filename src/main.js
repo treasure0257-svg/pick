@@ -7,6 +7,10 @@ import { SavedView } from './views/SavedView.js';
 import { LoginView } from './views/LoginView.js';
 import { RegionView } from './views/RegionView.js';
 import { PlaceDetailView } from './views/PlaceDetailView.js';
+import { AboutView } from './views/AboutView.js';
+import { GuideView } from './views/GuideView.js';
+import { PrivacyView } from './views/PrivacyView.js';
+import { TermsView } from './views/TermsView.js';
 import { initAuth, logout } from './firebase-setup.js';
 import { h } from './utils/dom.js';
 
@@ -17,7 +21,11 @@ const routes = [
   { path: '#/results', component: ResultsView },
   { path: '#/place', component: PlaceDetailView },
   { path: '#/saved', component: SavedView },
-  { path: '#/login', component: LoginView }
+  { path: '#/login', component: LoginView },
+  { path: '#/about', component: AboutView },
+  { path: '#/guide', component: GuideView },
+  { path: '#/privacy', component: PrivacyView },
+  { path: '#/terms', component: TermsView }
 ];
 
 const appRouter = new Router(routes);

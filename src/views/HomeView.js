@@ -1,6 +1,7 @@
 import { h } from '../utils/dom.js';
 import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
+import { Footer } from '../components/Footer.js';
 import { PICK_DATA } from '../data.js';
 import { REGIONS, countPlacesByRegion, regionFromAddress } from '../regions.js';
 
@@ -211,6 +212,7 @@ export function HomeView({ router }) {
       )
     ),
 
+    Footer(),
     BottomNav(router)
   );
 }
