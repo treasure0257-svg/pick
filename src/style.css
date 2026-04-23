@@ -79,37 +79,17 @@
   100% { transform: translateX(100%); }
 }
 
-/* Per-feature (구/군) permanent label markers (divIcon) */
-.region-feature-label-wrap { background: transparent; border: none; pointer-events: none; }
+/* Per-feature (구/군) permanent label markers — Kakao CustomOverlay */
 .region-feature-label {
   display: inline-block;
   font-family: 'Inter', sans-serif;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   color: #FFFFFF;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.75), 0 0 2px rgba(0,0,0,0.5);
   white-space: nowrap;
-  transform: translate(-50%, -50%);
   letter-spacing: -0.2px;
-}
-
-/* 주변 시·도 label — 회색톤, 작고 연하게 */
-.region-neighbor-label {
-  display: inline-block;
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  color: #64748B;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.9);
-  white-space: nowrap;
-  transform: translate(-50%, -50%);
-  letter-spacing: -0.1px;
-  opacity: 0.75;
-}
-
-/* 정적 테마 지도 배경 — 투명으로 바꿔 wrapper 의 그라데이션이 보이게 */
-.leaflet-container {
-  background: transparent;
+  pointer-events: none;
 }
 
 .region-map-tooltip {
