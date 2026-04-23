@@ -22,7 +22,16 @@ export const REGIONS = [
       { id: 'jongno',    label: '종로·을지로',  hint: '광화문·익선동·을지로',    keywords: ['종로구', '중구', '을지로', '익선동', '삼청로', '광화문'] },
       { id: 'yeouido',   label: '여의도·영등포', hint: '여의도 한강공원',        keywords: ['여의도', '영등포구'] },
       { id: 'gangbuk',   label: '강북·성북',    hint: '북한산·우이동·삼청',      keywords: ['강북구', '도봉구', '성북구', '우이동'] },
-      { id: 'seodaemun', label: '서대문·은평',  hint: '연희동·신촌·독립문',      keywords: ['서대문구', '연희동', '은평구', '신촌'] }
+      { id: 'seodaemun', label: '서대문·은평',  hint: '연희동·신촌·독립문',      keywords: ['서대문구', '연희동', '은평구', '신촌'] },
+      { id: 'jamsil',    label: '잠실·송파',    hint: '롯데월드·석촌호수',       keywords: ['송파구', '잠실', '석촌동', '문정동', '방이동', '올림픽공원'] },
+      { id: 'gangdong',  label: '강동·천호',    hint: '천호·암사·고덕',          keywords: ['강동구', '천호동', '암사동', '고덕동', '길동'] },
+      { id: 'nowon',     label: '노원·중랑',    hint: '노원·상계·중계·면목',     keywords: ['노원구', '상계동', '중계동', '중랑구', '면목동', '상봉동'] },
+      { id: 'dongdaemun', label: '동대문·청량리', hint: '회기·청량리·DDP',        keywords: ['동대문구', '회기동', '청량리', '전농동', '이문동'] },
+      { id: 'gangseo',   label: '강서·마곡',    hint: '마곡·발산·김포공항',      keywords: ['강서구', '마곡', '발산', '화곡동', '가양동'] },
+      { id: 'gwanak',    label: '관악·사당',    hint: '신림·서울대·사당',        keywords: ['관악구', '신림', '서울대', '봉천동', '사당'] },
+      { id: 'guro',      label: '구로·가산',    hint: '가산디지털·구로디지털',   keywords: ['구로구', '금천구', '가산디지털', '구로디지털', '신도림'] },
+      { id: 'yangcheon', label: '양천·목동',    hint: '목동·오목교·신정',        keywords: ['양천구', '목동', '신정동', '오목교'] },
+      { id: 'dongjak',   label: '동작·노량진',  hint: '노량진·사당·흑석',        keywords: ['동작구', '노량진', '흑석동', '상도동'] }
     ]
   },
   { id: 'gyeonggi', label: '경기', hint: '수원 화성·양평', icon: 'domain',
@@ -33,7 +42,12 @@ export const REGIONS = [
       { id: 'ilsan',     label: '고양·일산',    hint: '일산·호수공원',          keywords: ['고양시', '일산동구', '일산서구'] },
       { id: 'yangpyeong', label: '양평·가평',   hint: '북한강·청평·서종',        keywords: ['양평군', '가평군', '서종면'] },
       { id: 'yeoju',     label: '여주·이천',    hint: '남한강·도자기·쌀',       keywords: ['여주시', '이천시'] },
-      { id: 'incheon_nearby', label: '안양·광명·부천', hint: '서울 서남권 근교', keywords: ['안양시', '광명시', '부천시'] }
+      { id: 'incheon_nearby', label: '안양·광명·부천', hint: '서울 서남권 근교', keywords: ['안양시', '광명시', '부천시'] },
+      { id: 'yongin',    label: '용인·수지',    hint: '에버랜드·광교·수지',     keywords: ['용인시', '수지구', '기흥구', '처인구'] },
+      { id: 'hanam',     label: '하남·남양주',  hint: '스타필드·한강뷰',         keywords: ['하남시', '남양주시', '미사'] },
+      { id: 'uijeongbu', label: '의정부·양주',  hint: '북부 경기·부대찌개',      keywords: ['의정부시', '양주시', '동두천시'] },
+      { id: 'pyeongtaek', label: '평택·안성',   hint: '평택항·안성 먹거리',      keywords: ['평택시', '안성시', '오산시'] },
+      { id: 'ansan',     label: '안산·시흥',    hint: '대부도·서해안',           keywords: ['안산시', '시흥시', '대부도'] }
     ]
   },
   { id: 'incheon', label: '인천', hint: '송도·인천대교', icon: 'anchor',
@@ -42,7 +56,9 @@ export const REGIONS = [
       { id: 'songdo',    label: '송도',          hint: '센트럴파크·국제도시',   keywords: ['송도', '연수구'] },
       { id: 'wolmi',     label: '월미도·차이나타운', hint: '개항장·월미도',      keywords: ['중구', '월미도', '차이나타운'] },
       { id: 'ganghwa',   label: '강화도',        hint: '전등사·마니산',         keywords: ['강화군', '강화도'] },
-      { id: 'yeongjong', label: '영종도·을왕리', hint: '공항·을왕리해변',       keywords: ['영종도', '을왕리', '중구 운서'] }
+      { id: 'yeongjong', label: '영종도·을왕리', hint: '공항·을왕리해변',       keywords: ['영종도', '을왕리', '중구 운서'] },
+      { id: 'bupyeong',  label: '부평·계양',     hint: '부평역·계양산',          keywords: ['부평구', '계양구', '부평동'] },
+      { id: 'guwol',     label: '구월·논현',     hint: '남동구 중심 상권',       keywords: ['남동구', '구월동', '논현동'] }
     ]
   },
   { id: 'busan', label: '부산', hint: '해운대·광안대교', icon: 'sailing',
@@ -52,7 +68,10 @@ export const REGIONS = [
       { id: 'gwangalli', label: '광안리·수영',     hint: '광안대교·민락',       keywords: ['수영구', '광안리', '민락동'] },
       { id: 'nampo',     label: '남포동·자갈치',   hint: '원도심·국제시장',     keywords: ['중구', '자갈치', '남포동'] },
       { id: 'seomyeon',  label: '서면·전포',       hint: '부산 중심 상권',       keywords: ['부산진구', '서면', '전포동'] },
-      { id: 'gijang',    label: '기장·송정',       hint: '서핑·해안 드라이브',   keywords: ['기장군', '송정동'] }
+      { id: 'gijang',    label: '기장·송정',       hint: '서핑·해안 드라이브',   keywords: ['기장군', '송정동'] },
+      { id: 'dongrae',   label: '동래·온천장',     hint: '동래읍성·온천',        keywords: ['동래구', '온천장', '명륜동'] },
+      { id: 'sasang',    label: '사상·구포',       hint: '서부산 교통 중심',     keywords: ['사상구', '북구', '구포동', '덕천동'] },
+      { id: 'namgu',     label: '남구·용호',       hint: 'UN평화공원·이기대',    keywords: ['남구', '용호동', '대연동'] }
     ]
   },
   { id: 'daegu', label: '대구', hint: '팔공산·동성로', icon: 'park',
@@ -61,7 +80,10 @@ export const REGIONS = [
       { id: 'dongseongro', label: '동성로·반월당', hint: '도심 상권',          keywords: ['중구', '동성로', '반월당'] },
       { id: 'suseong',   label: '수성못·범어',     hint: '수성못·들안길',        keywords: ['수성구', '수성못', '범어동'] },
       { id: 'palgongsan', label: '팔공산',         hint: '갓바위·케이블카',      keywords: ['팔공산', '동구'] },
-      { id: 'seomun',    label: '서문시장·북성로', hint: '전통시장·맥주길',      keywords: ['서문시장', '북성로', '중구'] }
+      { id: 'seomun',    label: '서문시장·북성로', hint: '전통시장·맥주길',      keywords: ['서문시장', '북성로', '중구'] },
+      { id: 'dalseo',    label: '달서·성서',       hint: '두류공원·이월드',      keywords: ['달서구', '두류동', '성서', '상인동'] },
+      { id: 'bukgu',     label: '북구·칠곡',       hint: '대구 북부·칠곡지구',   keywords: ['북구', '칠곡', '침산동', '산격동'] },
+      { id: 'dalseong',  label: '달성·화원',       hint: '비슬산·사문진',        keywords: ['달성군', '화원읍', '비슬산', '가창'] }
     ]
   },
   { id: 'gwangju', label: '광주', hint: '무등산·아시아문화전당', icon: 'yard',
@@ -70,7 +92,8 @@ export const REGIONS = [
       { id: 'chungjangno', label: '충장로·금남로', hint: '도심 쇼핑거리',        keywords: ['동구', '충장로', '금남로'] },
       { id: 'mudeung',   label: '무등산',           hint: '등산·의재미술관',      keywords: ['무등산', '동구'] },
       { id: 'yangdong',  label: '양동시장·송정',    hint: '전통시장·송정역',      keywords: ['서구', '양동시장', '송정'] },
-      { id: 'acc',       label: '국립아시아문화전당', hint: '예술의 거리',         keywords: ['국립아시아', '문화전당'] }
+      { id: 'acc',       label: '국립아시아문화전당', hint: '예술의 거리',         keywords: ['국립아시아', '문화전당'] },
+      { id: 'sangmu',    label: '상무지구·첨단',    hint: '광주 신도심',           keywords: ['서구', '상무지구', '광산구', '첨단'] }
     ]
   },
   { id: 'daejeon', label: '대전', hint: '엑스포·한빛탑', icon: 'science',
@@ -79,7 +102,8 @@ export const REGIONS = [
       { id: 'dunsan',    label: '둔산·타임월드',   hint: '대전 중심 상권',       keywords: ['서구', '둔산동', '타임월드'] },
       { id: 'yuseong',   label: '유성·온천',       hint: '온천·카이스트 근처',   keywords: ['유성구', '유성온천'] },
       { id: 'expo',      label: '엑스포·한빛탑',   hint: '엑스포과학공원',       keywords: ['엑스포', '한빛탑', '유성구 도룡동'] },
-      { id: 'daehan',    label: '대흥동·은행동',   hint: '원도심 카페거리',      keywords: ['중구', '대흥동', '은행동'] }
+      { id: 'daehan',    label: '대흥동·은행동',   hint: '원도심 카페거리',      keywords: ['중구', '대흥동', '은행동'] },
+      { id: 'doan',      label: '도안·관저',       hint: '서남부 신도심',         keywords: ['서구 도안', '관저동', '유성구 도안'] }
     ]
   },
   { id: 'ulsan', label: '울산', hint: '태화강·대왕암', icon: 'factory',
@@ -107,7 +131,8 @@ export const REGIONS = [
       { id: 'chuncheon', label: '춘천',            hint: '의암호·남이섬 근교',   keywords: ['춘천시'] },
       { id: 'yangyang',  label: '양양',            hint: '서핑·죽도',             keywords: ['양양군'] },
       { id: 'pyeongchang', label: '평창·정선',     hint: '스키·산간 레저',        keywords: ['평창군', '정선군'] },
-      { id: 'donghae',   label: '동해·삼척',       hint: '바닷가 드라이브',        keywords: ['동해시', '삼척시'] }
+      { id: 'donghae',   label: '동해·삼척',       hint: '바닷가 드라이브',        keywords: ['동해시', '삼척시'] },
+      { id: 'wonju',     label: '원주·횡성',       hint: '소금산 출렁다리·한우',  keywords: ['원주시', '횡성군'] }
     ]
   },
   { id: 'chungbuk', label: '충북', hint: '청주·단양', icon: 'landscape',
@@ -135,7 +160,8 @@ export const REGIONS = [
       { id: 'jeonju',    label: '전주 한옥마을',   hint: '경기전·한옥마을',        keywords: ['전주시'] },
       { id: 'gunsan',    label: '군산',            hint: '경암동·근대건축',        keywords: ['군산시'] },
       { id: 'namwon',    label: '남원',            hint: '지리산·춘향',            keywords: ['남원시'] },
-      { id: 'gochang',   label: '고창·부안',       hint: '선운산·변산',            keywords: ['고창군', '부안군'] }
+      { id: 'gochang',   label: '고창·부안',       hint: '선운산·변산',            keywords: ['고창군', '부안군'] },
+      { id: 'iksan',     label: '익산·정읍',       hint: '미륵사지·내장산',        keywords: ['익산시', '정읍시'] }
     ]
   },
   { id: 'jeonnam', label: '전남', hint: '순천만·여수·담양', icon: 'temple_buddhist',
@@ -145,7 +171,9 @@ export const REGIONS = [
       { id: 'suncheon',  label: '순천',            hint: '순천만·드라마세트장',   keywords: ['순천시'] },
       { id: 'damyang',   label: '담양',            hint: '죽녹원·메타세쿼이아',   keywords: ['담양군'] },
       { id: 'mokpo',     label: '목포',            hint: '유달산·근대역사거리',   keywords: ['목포시'] },
-      { id: 'wando',     label: '완도·해남',       hint: '청산도·땅끝',            keywords: ['완도군', '해남군'] }
+      { id: 'wando',     label: '완도·해남',       hint: '청산도·땅끝',            keywords: ['완도군', '해남군'] },
+      { id: 'naju',      label: '나주·장성',       hint: '영산강·축령산 편백숲',   keywords: ['나주시', '장성군'] },
+      { id: 'boseong',   label: '보성·고흥',       hint: '녹차밭·나로우주센터',    keywords: ['보성군', '고흥군'] }
     ]
   },
   { id: 'gyeongbuk', label: '경북', hint: '경주·안동 하회마을', icon: 'temple_hindu',
@@ -154,7 +182,8 @@ export const REGIONS = [
       { id: 'gyeongju',  label: '경주',            hint: '불국사·보문단지',       keywords: ['경주시'] },
       { id: 'andong',    label: '안동',            hint: '하회마을·월영교',       keywords: ['안동시'] },
       { id: 'pohang',    label: '포항',            hint: '호미곶·죽도시장',       keywords: ['포항시'] },
-      { id: 'yeongju',   label: '영주·봉화',       hint: '부석사·소수서원',       keywords: ['영주시', '봉화군'] }
+      { id: 'yeongju',   label: '영주·봉화',       hint: '부석사·소수서원',       keywords: ['영주시', '봉화군'] },
+      { id: 'gumi',      label: '구미·김천',       hint: '금오산·직지사',          keywords: ['구미시', '김천시'] }
     ]
   },
   { id: 'gyeongnam', label: '경남', hint: '통영·거제·진주', icon: 'fort',
@@ -163,7 +192,9 @@ export const REGIONS = [
       { id: 'tongyeong', label: '통영',            hint: '동피랑·케이블카',        keywords: ['통영시'] },
       { id: 'geoje',     label: '거제·남해',       hint: '외도·바람의언덕',        keywords: ['거제시', '남해군'] },
       { id: 'jinju',     label: '진주',            hint: '진주성·남강',            keywords: ['진주시'] },
-      { id: 'changwon',  label: '창원·김해',       hint: '주남저수지·봉하마을',    keywords: ['창원시', '김해시'] }
+      { id: 'changwon',  label: '창원·김해',       hint: '주남저수지·봉하마을',    keywords: ['창원시', '김해시'] },
+      { id: 'yangsan',   label: '양산·밀양',       hint: '통도사·영남알프스',      keywords: ['양산시', '밀양시'] },
+      { id: 'hadong',    label: '하동·산청',       hint: '지리산·쌍계사·녹차',     keywords: ['하동군', '산청군'] }
     ]
   },
   { id: 'jeju', label: '제주', hint: '성산일출봉·한라산', icon: 'beach_access',
