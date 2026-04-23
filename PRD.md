@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.14 (2026-04-23)
+> Product Requirements Document  ·  v0.3.15 (2026-04-23)
 
 ## 1. 제품 개요
 
@@ -159,6 +159,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-23 | v0.3.15 | **사용자 영역 대폭 확장** — (1) **Footer + 정보 페이지** 신설: `src/components/Footer.js` + `Modal.js` + `info-modals.js`. 모든 메인 뷰(홈·지역·결과·저장·장소 상세·마이) 하단에 푸터 노출, "소개·사용가이드·문의·개인정보처리방침·이용약관" 5개 링크 중 mailto 외 4개는 클릭 시 가운데 모달 팝업(ESC/배경 클릭/× 닫기, scroll-lock). 풀페이지 fallback 라우트(`#/about`, `#/guide`, `#/privacy`, `#/terms`)도 유지(직접 URL/공유용, 모달과 동일 콘텐츠 함수 재사용). (2) **마이페이지** `#/mypage` 신설: 프로필 hero(아바타·이름·이메일·provider 배지) + 활동 통계 카드 3개 + 내 취향 요약 + 저장 미리보기(top 3) + 계정 관리(로그아웃·탈퇴 mailto). 헤더 프로필 클릭이 즉시 로그아웃 → 마이페이지 이동으로 변경(안전성). (3) **취향 시스템 디테일화**: `data.js`에 `dietary`(7종 다중)/`spiceLevels`(3단계)/`companions`(5종) 추가. PreferencesView에 식이·매운맛 섹션 추가, **동행은 HomeView 상단으로 분리**(매일 바뀌는 세션 컨텍스트). `utils/preference-filter.js` 신설 — `applyAllPreferences()`가 Kakao 결과를 식이(키워드 기반 hard filter, FD6 한정)·매운맛(mild→매운 카테고리 제외)·동행(stable sort 가중치)으로 후처리. ResultsView에 활성 취향 chip(보라색, 클릭 시 /preferences로 편집 이동) 표시 |
 | 2026-04-23 | v0.3.14 | **랜드마크 반경 검색 필터** 추가 — ResultsView 카테고리 탭 위에 입력창("어디에 계신가요? 현재 눈 앞에 보이는 것을 검색해보세요!"). 사용자가 건물명 입력 시 Kakao keywordSearch로 좌표 확보 → haversine 1km 반경으로 카드/지도 동시 필터링, 활성 chip(📍 X 주변 1km)에 × 해제. **SEO 보강 패키지** — index.html에 JSON-LD WebApplication schema(SearchAction 포함, 구글 사이트 내 검색창 노출 가능) + canonical URL + meta keywords/author/robots/googlebot 추가. `public/robots.txt` 신설(전체 허용 + sw.js 제외 + sitemap 링크). `public/sitemap.xml` 신설(루트 + 주요 hash 라우트 4개). 검색엔진 verification 토큰은 placeholder 주석으로만 보존. ResultsView 간격 5단계 조정(헤더·input·칩·탭·카드 gap 확대 — 빽빽함 해소) |
 | 2026-04-23 | v0.3.13 | RegionMap을 **Leaflet thematic → Kakao Map 실타일 + TopoJSON polygon overlay**로 전환 — 도로·랜드마크가 보이는 실제 지도 위에 시·도 행정구역 polygon(blue 38%, hover purple 70%)으로 강조, 드래그·줌 활성화. ResultsView 카드 **번호 뱃지 → 랭크/태그 시그널**(🥇🥈🥉 1-3위, 📍근처 500m이내, 🔥인기 4-10위). 카드에 **카카오맵 별점·후기 deep-link 버튼**(amber chip, place_url 새 탭)으로 평점 데이터 무료 확보. **Naver 블로그 후기 수 chip** 추가(emerald, "블로그 1.2k건"), Cloudflare Worker `type=blog` 엔드포인트 추가 필요(openapi.naver.com/v1/search/blog.json), `naverLocal.js` getBlogCount + 24h localStorage 캐시. OG 이미지 우상단 작은 로고 배지 제거(카톡 미리보기에서 비대칭 인상 → 클린업) |
 | 2026-04-23 | v0.3.12 | subregions 대폭 확장(56 → 83개, +27개) — **서울** 8 → 18개(잠실·송파/강동·천호/노원·중랑/동대문·청량리/강서·마곡/관악·사당/구로·가산/양천·목동/동작·노량진 추가, 25개 구 거의 전체 커버), **경기** 6 → 11개(용인·수지/하남·남양주/의정부·양주/평택·안성/안산·시흥), **인천** 4 → 6개(부평·계양/구월·논현), **부산** 5 → 8개(동래·온천장/사상·구포/남구·용호), **대구** 4 → 7개(달서·성서/북구·칠곡/달성·화원), **광주** 4 → 5개(상무지구·첨단), **대전** 4 → 5개(도안·관저), **강원** 6 → 7개(원주·횡성), **전북** 4 → 5개(익산·정읍), **전남** 5 → 7개(나주·장성/보성·고흥), **경북** 4 → 5개(구미·김천), **경남** 4 → 6개(양산·밀양/하동·산청) |

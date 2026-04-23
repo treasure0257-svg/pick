@@ -13,8 +13,11 @@
 |---|---|---|
 | 지역으로 찾기 | `#/region?id=<id>` → `#/results?region=<id>&area=<sub>` → `#/place?id=<id>` | 홈 타일·지도·검색 → 세부 권역 grid → 카테고리 탭·하루 코스 → 장소 상세 |
 | 장소·키워드 검색 | 홈 검색창 | 지역명/장소명/카테고리/무드 전체 텍스트 매칭, 드롭다운에 미리보기 |
-| 취향 기반 추천 | `#/preferences` → `#/results?source=preferences` | 카테고리/무드/예산/기간/음주 선택 후 `scorePlace()`로 랭킹 |
+| 취향 기반 추천 | `#/preferences` → `#/results?source=preferences` | 카테고리/무드/예산/기간/음주/식이/매운맛 선택 후 `scorePlace()`+ `applyAllPreferences()`로 필터·랭킹 |
+| 동행 빠른 토글 | 홈 상단 chip | 혼자/데이트/친구/가족/회식 클릭 즉시 저장, 결과 정렬에 가중치 |
 | 로그인 | `#/login` | Google / Kakao / Naver 3-way OAuth |
+| 마이페이지 | `#/mypage` | 프로필·활동 통계·취향 요약·저장 미리보기·로그아웃·탈퇴 |
+| 정보 페이지 | `#/about`, `#/guide`, `#/privacy`, `#/terms` | 푸터 클릭 시 모달, 직접 URL 접속 시 풀페이지 |
 
 현재 샘플 데이터가 들어간 지역은 서울·경기·강원이고 나머지 14개 시·도는 "준비 중" 상태로 노출됩니다 (API 연동 후 자동 채워짐).
 
@@ -63,6 +66,9 @@ pick/
 │   ├── components/
 │   │   ├── Header.js
 │   │   ├── BottomNav.js
+│   │   ├── Footer.js         # 5개 정보 링크 + 태그라인, 모든 메인 뷰 하단에 주입
+│   │   ├── Modal.js          # 가운데 모달 오버레이 (ESC/배경 클릭 닫기)
+│   │   ├── info-modals.js    # About/Guide/Privacy/Terms 컨텐츠 단일 소스 + openInfoModal
 │   │   ├── RegionMap.js      # Kakao Map 타일 + TopoJSON polygon overlay + 양방향 호버 API
 │   │   └── PlacesMap.js      # Kakao Maps 기반 장소 핀(카테고리 색상, setPlaces 동적 갱신)
 │   ├── services/
@@ -70,16 +76,18 @@ pick/
 │   │   └── naverLocal.js     # Naver Local/Image/Blog API (Cloudflare Worker 프록시 경유, CORS 우회 + getBlogCount 24h 캐시)
 │   ├── utils/
 │   │   ├── dom.js            # h() 엘리먼트 헬퍼
-│   │   └── place-ui.js       # makeSaveBtn, haversine, formatDistance, categoryMeta 공유
+│   │   ├── place-ui.js       # makeSaveBtn, haversine, formatDistance, categoryMeta 공유
+│   │   └── preference-filter.js # 식이제한/매운맛 필터 + 동행 가중치 정렬 (Kakao 결과에 적용)
 │   ├── views/
-│   │   ├── HomeView.js       # 한옥 hero + 검색 + 17개 시·도 grid + 취향 CTA
-│   │   ├── PreferencesView.js
-│   │   ├── RegionView.js     # 시·도 drill-down + 정적 thematic 지도 연동
-│   │   ├── ResultsView.js    # 카테고리 탭 + 2-col 목록/지도 + 하루 코스 배너
+│   │   ├── HomeView.js       # 한옥 hero + 검색 + 동행 chip + 17개 시·도 grid + 취향 CTA
+│   │   ├── PreferencesView.js # 카테고리·무드·예산·기간·음주·식이·매운맛 (동행은 홈에서)
+│   │   ├── RegionView.js     # 시·도 drill-down + Kakao Map 지도 연동
+│   │   ├── ResultsView.js    # 카테고리 탭 + 랜드마크 검색 + 2-col 목록/지도 + 취향 chip
 │   │   ├── PlaceDetailView.js # 장소 상세(주소·전화·지도·Kakao CTA·주변 장소 1.5km)
 │   │   ├── SavedView.js
-│   │   └── LoginView.js      # 3-way OAuth (Google/Kakao/Naver)
-│   └── utils/dom.js        # h() 엘리먼트 헬퍼
+│   │   ├── LoginView.js      # 3-way OAuth (Google/Kakao/Naver)
+│   │   ├── MyPageView.js     # 프로필·활동 통계·취향 요약·저장 미리보기·계정 관리
+│   │   ├── AboutView.js, GuideView.js, PrivacyView.js, TermsView.js  # 풀페이지 fallback (모달과 콘텐츠 공유)
 ├── vite.config.js
 ├── tailwind.config.js
 ├── postcss.config.js
