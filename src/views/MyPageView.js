@@ -179,12 +179,16 @@ function statCard(label, value, icon) {
 }
 
 function renderPrefSummary(prefs) {
+  const labelOf = (arr, id) => (arr.find(x => x.id === id) || {}).label || id;
   const rows = [];
-  if (prefs.categories?.length) rows.push(['카테고리', prefs.categories.join(' · ')]);
-  if (prefs.moods?.length)      rows.push(['무드',     prefs.moods.join(' · ')]);
-  if (prefs.budget)             rows.push(['예산',     prefs.budget]);
-  if (prefs.duration)           rows.push(['기간',     prefs.duration]);
-  if (prefs.alcohol != null)    rows.push(['음주',     prefs.alcohol ? '음주 OK' : '논알콜']);
+  if (prefs.categories?.length) rows.push(['카테고리', prefs.categories.map(c => labelOf(PICK_DATA.categories, c)).join(' · ')]);
+  if (prefs.moods?.length)      rows.push(['무드',     prefs.moods.map(m => labelOf(PICK_DATA.moods, m)).join(' · ')]);
+  if (prefs.budget)             rows.push(['예산',     labelOf(PICK_DATA.budgets, prefs.budget)]);
+  if (prefs.duration)           rows.push(['기간',     labelOf(PICK_DATA.durations, prefs.duration)]);
+  if (prefs.drinks)             rows.push(['음주',     labelOf(PICK_DATA.drinks, prefs.drinks)]);
+  if (prefs.dietary?.length)    rows.push(['식이 제한', prefs.dietary.map(d => labelOf(PICK_DATA.dietary, d)).join(' · ')]);
+  if (prefs.spice)              rows.push(['매운맛',    labelOf(PICK_DATA.spiceLevels, prefs.spice)]);
+  if (prefs.companion)          rows.push(['동행',      labelOf(PICK_DATA.companions, prefs.companion)]);
 
   if (rows.length === 0) {
     return h('div', { className: 'bg-surfaceContainerLowest rounded-2xl p-5 text-onSurfaceVariant text-sm' },

@@ -10,7 +10,10 @@ export function PreferencesView({ router }) {
     moods: new Set(),
     budget: null,
     duration: null,
-    drinks: null
+    drinks: null,
+    dietary: new Set(),
+    spice: null,
+    companion: null
   };
 
   const saved = AppState.get(STORAGE_KEYS.preferences, null);
@@ -20,6 +23,9 @@ export function PreferencesView({ router }) {
     state.budget = saved.budget || null;
     state.duration = saved.duration || null;
     state.drinks = saved.drinks || null;
+    (saved.dietary || []).forEach(x => state.dietary.add(x));
+    state.spice = saved.spice || null;
+    state.companion = saved.companion || null;
   }
 
   function renderChips(items, stateKey, multi = true, hasIcon = true) {
@@ -92,10 +98,27 @@ export function PreferencesView({ router }) {
           h('h2', { className: 'font-headline text-2xl font-bold text-onSurface mb-2' }, '술은 어떻게?'),
           renderChips(PICK_DATA.drinks, 'drinks', false, true)
         ),
-        
+        h('section', { className: 'bg-surfaceContainerLow rounded-[2rem] p-8 md:p-10' },
+          h('h2', { className: 'font-headline text-2xl font-bold text-onSurface mb-2' }, '식이 제한 · 알레르기'),
+          h('p', { className: 'font-body text-sm text-onSurfaceVariant mb-6' },
+            '맞지 않는 식당은 자동으로 추천에서 제외됩니다. 복수 선택 가능.'
+          ),
+          renderChips(PICK_DATA.dietary, 'dietary', true, true)
+        ),
+        h('section', { className: 'grid sm:grid-cols-2 gap-6' },
+          h('div', { className: 'bg-surfaceContainerLow rounded-[2rem] p-8' },
+            h('h3', { className: 'font-headline text-xl font-bold text-onSurface mb-4' }, '매운맛 선호'),
+            renderChips(PICK_DATA.spiceLevels, 'spice', false, true)
+          ),
+          h('div', { className: 'bg-surfaceContainerLow rounded-[2rem] p-8' },
+            h('h3', { className: 'font-headline text-xl font-bold text-onSurface mb-4' }, '오늘 누구랑?'),
+            renderChips(PICK_DATA.companions, 'companion', false, true)
+          )
+        ),
+
         h('div', { className: 'flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2' },
           h('a', { href: '#/', className: 'inline-flex items-center justify-center gap-2 bg-transparent text-onSurfaceVariant font-body font-semibold py-4 px-6 rounded-xl hover:bg-surfaceContainer transition-colors' }, '돌아가기'),
-          h('button', { 
+          h('button', {
             className: 'inline-flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-primary-dim text-onPrimary font-body font-semibold py-4 px-10 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5',
             onClick: () => {
               const prefs = {
@@ -103,7 +126,10 @@ export function PreferencesView({ router }) {
                 moods:      Array.from(state.moods),
                 budget:     state.budget,
                 duration:   state.duration,
-                drinks:     state.drinks
+                drinks:     state.drinks,
+                dietary:    Array.from(state.dietary),
+                spice:      state.spice,
+                companion:  state.companion
               };
               AppState.set(STORAGE_KEYS.preferences, prefs);
               router.showToast('취향이 저장되었습니다.', 'success');

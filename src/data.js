@@ -36,6 +36,30 @@ export const PICK_DATA = {
     { id: "party",    label: "제대로 한잔", icon: "local_bar" },
     { id: "flex",     label: "상관없음",    icon: "all_inclusive" }
   ],
+  // 식이 제한 — 다중 선택. 맛집 결과 필터링에 사용.
+  dietary: [
+    { id: "vegan",            label: "비건",            icon: "eco" },
+    { id: "vegetarian",       label: "채식 (락토오보)", icon: "spa" },
+    { id: "halal",            label: "할랄",            icon: "mosque" },
+    { id: "glutenFree",       label: "글루텐 프리",     icon: "grain" },
+    { id: "noPork",           label: "돼지고기 X",      icon: "block" },
+    { id: "nutAllergy",       label: "견과류 알레르기", icon: "warning" },
+    { id: "shellfishAllergy", label: "갑각류 알레르기", icon: "warning" }
+  ],
+  // 매운맛 선호 — 단일.
+  spiceLevels: [
+    { id: "mild",   label: "안 매운 거", icon: "sentiment_satisfied" },
+    { id: "medium", label: "보통",       icon: "sentiment_neutral" },
+    { id: "hot",    label: "매운 거 OK", icon: "local_fire_department" }
+  ],
+  // 동행 유형 — 단일. 무드 점수에 가중치.
+  companions: [
+    { id: "solo",    label: "혼자",   icon: "person" },
+    { id: "couple",  label: "데이트", icon: "favorite" },
+    { id: "friends", label: "친구",   icon: "groups" },
+    { id: "family",  label: "가족",   icon: "family_restroom" },
+    { id: "work",    label: "회식·동료", icon: "work" }
+  ],
   places: [
     {
       id: "p1", name: "북한산 둘레길 산책", category: "outdoor",

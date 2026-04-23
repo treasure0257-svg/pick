@@ -8,6 +8,7 @@ import { AppState, STORAGE_KEYS, recommend, savePlace, isSaved } from '../App.js
 import { regionLabel, subregionLabel, REGIONS } from '../regions.js';
 import { multiKeywordSearch, keywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
 import { naverLocalSearch, normalizeNaverPlace, getPlaceImage, getBlogCount } from '../services/naverLocal.js';
+import { applyAllPreferences } from '../utils/preference-filter.js';
 
 const KAKAO_CAT_BADGE = {
   FD6: { icon: 'restaurant',     label: '맛집' },
@@ -703,22 +704,52 @@ export function ResultsView({ router, params }) {
 
         function renderLandmarkChip() {
           landmarkChipSlot.innerHTML = '';
-          if (!landmark) return;
-          landmarkChipSlot.appendChild(
-            h('span', {
-              className: 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primaryContainer text-onPrimaryContainer text-xs font-body font-medium'
-            },
-              h('span', { className: 'material-symbols-outlined text-[15px]' }, 'near_me'),
-              `${landmark.name} 주변 ${landmark.radiusKm}km`,
-              h('button', {
-                className: 'ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-onPrimaryContainer/10',
-                title: '필터 해제',
-                onClick: () => { landmark = null; landmarkInput.value = ''; applyTab(); }
+          if (landmark) {
+            landmarkChipSlot.appendChild(
+              h('span', {
+                className: 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primaryContainer text-onPrimaryContainer text-xs font-body font-medium'
               },
-                h('span', { className: 'material-symbols-outlined text-[14px]' }, 'close')
+                h('span', { className: 'material-symbols-outlined text-[15px]' }, 'near_me'),
+                `${landmark.name} 주변 ${landmark.radiusKm}km`,
+                h('button', {
+                  className: 'ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-onPrimaryContainer/10',
+                  title: '필터 해제',
+                  onClick: () => { landmark = null; landmarkInput.value = ''; applyTab(); }
+                },
+                  h('span', { className: 'material-symbols-outlined text-[14px]' }, 'close')
+                )
               )
-            )
-          );
+            );
+          }
+
+          // 취향 활성 chip
+          const prefs = AppState.get(STORAGE_KEYS.preferences, {});
+          const activePrefSummary = [];
+          if (prefs.dietary?.length) {
+            const dietLabels = prefs.dietary.map(d => {
+              const item = (PICK_DATA.dietary || []).find(x => x.id === d);
+              return item?.label || d;
+            });
+            activePrefSummary.push(...dietLabels);
+          }
+          if (prefs.spice === 'mild') activePrefSummary.push('순한맛');
+          if (prefs.spice === 'hot')  activePrefSummary.push('매운맛 OK');
+          if (prefs.companion) {
+            const c = (PICK_DATA.companions || []).find(x => x.id === prefs.companion);
+            if (c) activePrefSummary.push(c.label + ' 모드');
+          }
+          if (activePrefSummary.length > 0) {
+            landmarkChipSlot.appendChild(
+              h('a', {
+                href: '#/preferences',
+                className: 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondaryContainer text-onSecondaryContainer text-xs font-body font-medium hover:opacity-80 transition-opacity'
+              },
+                h('span', { className: 'material-symbols-outlined text-[15px]' }, 'tune'),
+                activePrefSummary.join(' · '),
+                h('span', { className: 'material-symbols-outlined text-[13px] opacity-60' }, 'edit')
+              )
+            );
+          }
         }
 
         function applyTab() {
@@ -733,6 +764,9 @@ export function ResultsView({ router, params }) {
               haversineKm(landmark.lat, landmark.lng, p.lat, p.lng) <= landmark.radiusKm
             );
           }
+          // 사용자 취향 적용 (식이 제한 필터 + 매운맛 필터 + 동행 가중치 정렬)
+          const prefs = AppState.get(STORAGE_KEYS.preferences, {});
+          filtered = applyAllPreferences(filtered, prefs);
           renderTabs(
             allPlaces,
             activeTab,
