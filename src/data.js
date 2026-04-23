@@ -54,11 +54,12 @@ export const PICK_DATA = {
   ],
   // 동행 유형 — 단일. 무드 점수에 가중치.
   companions: [
-    { id: "solo",    label: "혼자",   icon: "person" },
-    { id: "couple",  label: "데이트", icon: "favorite" },
-    { id: "friends", label: "친구",   icon: "groups" },
-    { id: "family",  label: "가족",   icon: "family_restroom" },
-    { id: "work",    label: "회식·동료", icon: "work" }
+    { id: "solo",     label: "혼자",      icon: "person" },
+    { id: "couple",   label: "데이트",    icon: "favorite" },
+    { id: "opposite", label: "이성친구",  icon: "diversity_1" },
+    { id: "friends",  label: "친구",      icon: "groups" },
+    { id: "family",   label: "가족",      icon: "family_restroom" },
+    { id: "work",     label: "회식·동료", icon: "work" }
   ],
   places: [
     {

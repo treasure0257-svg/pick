@@ -65,11 +65,12 @@ export function applySpiceFilter(places, prefs) {
 
 // 동행 유형에 따른 카테고리/키워드 가중치 → 정렬 순서만 재배치
 const COMPANION_BOOST_KEYWORDS = {
-  solo:    { categories: ['CE7', 'AT4'],         keywords: ['카페', '북카페', '서점', '미술관', '전시'] },
-  couple:  { categories: ['CE7', 'AT4', 'FD6'],  keywords: ['데이트', '뷰', '전망', '루프탑', '이탈리안', '와인', '스테이크'] },
-  friends: { categories: ['FD6', 'AT4'],         keywords: ['고기', '술집', '치맥', '노래방', '방탈출', '체험'] },
-  family:  { categories: ['AT4', 'FD6'],         keywords: ['가족', '키즈', '동물원', '수족관', '한정식', '뷔페'] },
-  work:    { categories: ['FD6'],                keywords: ['한정식', '룸', '회식', '갈비', '한우', '코스'] }
+  solo:     { categories: ['CE7', 'AT4'],         keywords: ['카페', '북카페', '서점', '미술관', '전시'] },
+  couple:   { categories: ['CE7', 'AT4', 'FD6'],  keywords: ['데이트', '뷰', '전망', '루프탑', '이탈리안', '와인', '스테이크'] },
+  opposite: { categories: ['CE7', 'AT4', 'FD6'],  keywords: ['카페', '브런치', '디저트', '와인바', '뷰', '전시', '미술관', '한강', '루프탑'] },
+  friends:  { categories: ['FD6', 'AT4'],         keywords: ['고기', '술집', '치맥', '노래방', '방탈출', '체험'] },
+  family:   { categories: ['AT4', 'FD6'],         keywords: ['가족', '키즈', '동물원', '수족관', '한정식', '뷔페'] },
+  work:     { categories: ['FD6'],                keywords: ['한정식', '룸', '회식', '갈비', '한우', '코스'] }
 };
 
 export function applyCompanionBoost(places, prefs) {
