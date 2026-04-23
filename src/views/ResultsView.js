@@ -191,8 +191,9 @@ function buildQueriesForArea(regionL, subL, subregion) {
   const queries = new Set();
   const areaTerms = [subL];
   if (subregion?.keywords?.length) {
-    const first = subregion.keywords[0];
-    if (first && !areaTerms.includes(first)) areaTerms.push(first);
+    for (const kw of subregion.keywords) {
+      if (kw && !areaTerms.includes(kw)) areaTerms.push(kw);
+    }
   }
   for (const a of areaTerms) {
     for (const group of Object.values(SEARCH_KEYWORDS)) {
@@ -604,7 +605,7 @@ export function ResultsView({ router, params }) {
           seen.add(k);
           return true;
         });
-        const allPlaces = [...kakaoPlaces, ...uniqueNaver].slice(0, 400);
+        const allPlaces = [...kakaoPlaces, ...uniqueNaver].slice(0, 1000);
         cachePlaces(allPlaces);
 
         // Side map (starts with all places)
