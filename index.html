@@ -3,9 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>정해줘 — 어디로 갈지 정해드려요</title>
-  <meta name="description" content="바쁜 현대인을 위한 정보집합소. 지역·키워드로 검색해 하루의 동선을 결정해드립니다." />
+  <title>정해줘 — 어디로 갈지 정해드려요 | 전국 맛집·카페·관광지 추천</title>
+  <meta name="description" content="바쁜 현대인을 위한 정보집합소. 서울·부산·제주 등 전국 17개 시·도의 실시간 맛집·카페·관광지·숙소를 지역과 키워드로 검색해 오늘의 하루를 정해드립니다." />
+  <meta name="keywords" content="정해줘, 맛집, 카페, 관광지, 데이트, 여행, 추천, 서울 맛집, 부산 맛집, 제주 여행, 핫플, 가볼만한곳, 주말 추천, 서울 데이트, 강남 맛집, 홍대 카페" />
+  <meta name="author" content="Neotis" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="googlebot" content="index, follow" />
+  <link rel="canonical" href="https://pick-concierge.web.app/" />
   <link rel="icon" type="image/png" href="/logo.png" />
+
+  <!-- JSON-LD: WebApplication structured data (검색 엔진 리치 결과용) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "정해줘",
+    "alternateName": "Pick · The Concierge",
+    "url": "https://pick-concierge.web.app/",
+    "description": "바쁜 현대인을 위한 정보집합소. 전국 17개 시·도의 실시간 맛집·카페·관광지·숙소를 지역과 키워드로 검색합니다.",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "Web",
+    "inLanguage": "ko-KR",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" },
+    "image": "https://pick-concierge.web.app/og-image.jpg",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://pick-concierge.web.app/#/results?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Neotis",
+      "logo": { "@type": "ImageObject", "url": "https://pick-concierge.web.app/logo.png" }
+    }
+  }
+  </script>
+
+  <!-- 검색엔진 사이트 등록 verification (사용자 직접 발급 필요)
+  <meta name="google-site-verification" content="YOUR_GOOGLE_TOKEN" />
+  <meta name="naver-site-verification" content="YOUR_NAVER_TOKEN" />
+  -->
+
 
   <!-- Open Graph (카카오톡, 페이스북 등 공유 미리보기) -->
   <meta property="og:type" content="website" />
