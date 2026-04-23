@@ -344,34 +344,34 @@ export function ResultsView({ router, params }) {
   );
 
   const listSection = h('section', {});
-  const listHeader = h('div', { className: 'flex items-center justify-between mb-3' },
+  const listHeader = h('div', { className: 'flex items-center justify-between mb-5' },
     h('h2', { className: 'font-headline text-lg font-bold text-onSurface' }, '장소'),
     h('span', { className: 'font-label text-xs text-onSurfaceVariant' }, '맛집 · 카페 · 명소')
   );
   // Landmark filter — 사용자가 현재 보이는 건물명을 검색해 그 주변만 필터링
-  const landmarkChipSlot = h('div', { className: 'flex flex-wrap gap-2 mb-2 empty:hidden' });
+  const landmarkChipSlot = h('div', { className: 'flex flex-wrap gap-2 mb-3 empty:hidden' });
   const landmarkInput = h('input', {
     type: 'text',
-    placeholder: '어디에 계신가요? 현재 보이는것은 검색해보세요!',
-    className: 'flex-grow min-w-0 px-4 py-2.5 rounded-xl border border-surfaceContainerHighest bg-surfaceContainerLowest text-sm font-body text-onSurface placeholder:text-onSurfaceVariant focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors'
+    placeholder: '어디에 계신가요? 현재 눈 앞에 보이는 것을 검색해보세요!',
+    className: 'flex-grow min-w-0 px-4 py-3 rounded-xl border border-surfaceContainerHighest bg-surfaceContainerLowest text-sm font-body text-onSurface placeholder:text-onSurfaceVariant focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors'
   });
   const landmarkBtn = h('button', {
     type: 'submit',
-    className: 'flex-none inline-flex items-center gap-1 px-4 py-2.5 rounded-xl bg-primary text-onPrimary text-sm font-body font-semibold hover:opacity-90 transition-opacity disabled:opacity-50'
+    className: 'flex-none inline-flex items-center gap-1 px-4 py-3 rounded-xl bg-primary text-onPrimary text-sm font-body font-semibold hover:opacity-90 transition-opacity disabled:opacity-50'
   },
     h('span', { className: 'material-symbols-outlined text-[18px]' }, 'near_me'),
     '주변 보기'
   );
-  const landmarkForm = h('form', { className: 'flex gap-2' }, landmarkInput, landmarkBtn);
+  const landmarkForm = h('form', { className: 'flex gap-2 mb-4' }, landmarkInput, landmarkBtn);
   // Category tabs (populated after Kakao results come in)
-  const tabsBar = h('div', { className: 'flex items-center gap-2 mb-3 flex-wrap' });
+  const tabsBar = h('div', { className: 'flex items-center gap-2 mb-5 flex-wrap' });
   listSection.appendChild(listHeader);
   listSection.appendChild(landmarkForm);
   listSection.appendChild(landmarkChipSlot);
   listSection.appendChild(tabsBar);
 
   // Desktop에서 grid (md이상), mobile에서 세로 single column
-  const resultList = h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-3' });
+  const resultList = h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5' });
   listSection.appendChild(resultList);
 
   const mapCol = h('aside', { className: 'hidden md:block md:sticky md:top-[88px] md:self-start' });
