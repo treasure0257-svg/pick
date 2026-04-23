@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.3.16 (2026-04-23)
+> Product Requirements Document  ·  v0.4.0 (2026-04-23)
 
 ## 1. 제품 개요
 
@@ -159,6 +159,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-23 | v0.4.0 | **PreferencesView 완전 삭제 → MyPageView로 흡수.** 내 취향을 4개 확장형 카드로 재설계 (음식 취향=orange / 라이프스타일=blue / 카테고리·무드=purple / 동행=rose). 각 카드 헤더는 현재 값 한 줄 요약, 클릭으로 펼치면 chip grid, chip 클릭 즉시 저장 + "저장되었습니다" 토스트 — 제출 버튼 없는 모던 설정 앱 스타일. 활동 통계 "취향 설정" 카드가 `N/8` 카운터로 바뀌어 변경 즉시 반영. BottomNav `취향` 탭 → `마이` 탭(person 아이콘), Header nav `취향 설정` → `마이페이지`. HomeView CTA "취향 설정 시작" → "마이페이지에서 설정"(#/mypage). `#/preferences` 라우트는 `#/mypage` 리다이렉트로 대체(외부 공유 URL 호환), 사용가이드 step 6 카피 갱신 |
 | 2026-04-23 | v0.3.16 | 동행 칩에 **이성친구** 추가 (혼자/데이트/이성친구/친구/가족/회식 6종). opposite tier 가중치는 카페·브런치·디저트·와인바·뷰·전시·미술관·한강·루프탑 키워드(데이트보다 캐주얼, 친구보다 분위기). **헤더 auth-slot 버그 수정** — 라우트 이동마다 Header DOM이 새로 그려지면서 #auth-slot 이 빈 상태로 남아 F5 새로고침 전엔 프로필이 안 보이던 이슈, main.js에 latestAuthUser 캐시 + hashchange 리스너로 매 navigation 직후 queueMicrotask로 다시 칠하도록 수정 |
 | 2026-04-23 | v0.3.15 | **사용자 영역 대폭 확장** — (1) **Footer + 정보 페이지** 신설: `src/components/Footer.js` + `Modal.js` + `info-modals.js`. 모든 메인 뷰(홈·지역·결과·저장·장소 상세·마이) 하단에 푸터 노출, "소개·사용가이드·문의·개인정보처리방침·이용약관" 5개 링크 중 mailto 외 4개는 클릭 시 가운데 모달 팝업(ESC/배경 클릭/× 닫기, scroll-lock). 풀페이지 fallback 라우트(`#/about`, `#/guide`, `#/privacy`, `#/terms`)도 유지(직접 URL/공유용, 모달과 동일 콘텐츠 함수 재사용). (2) **마이페이지** `#/mypage` 신설: 프로필 hero(아바타·이름·이메일·provider 배지) + 활동 통계 카드 3개 + 내 취향 요약 + 저장 미리보기(top 3) + 계정 관리(로그아웃·탈퇴 mailto). 헤더 프로필 클릭이 즉시 로그아웃 → 마이페이지 이동으로 변경(안전성). (3) **취향 시스템 디테일화**: `data.js`에 `dietary`(7종 다중)/`spiceLevels`(3단계)/`companions`(5종) 추가. PreferencesView에 식이·매운맛 섹션 추가, **동행은 HomeView 상단으로 분리**(매일 바뀌는 세션 컨텍스트). `utils/preference-filter.js` 신설 — `applyAllPreferences()`가 Kakao 결과를 식이(키워드 기반 hard filter, FD6 한정)·매운맛(mild→매운 카테고리 제외)·동행(stable sort 가중치)으로 후처리. ResultsView에 활성 취향 chip(보라색, 클릭 시 /preferences로 편집 이동) 표시 |
 | 2026-04-23 | v0.3.14 | **랜드마크 반경 검색 필터** 추가 — ResultsView 카테고리 탭 위에 입력창("어디에 계신가요? 현재 눈 앞에 보이는 것을 검색해보세요!"). 사용자가 건물명 입력 시 Kakao keywordSearch로 좌표 확보 → haversine 1km 반경으로 카드/지도 동시 필터링, 활성 chip(📍 X 주변 1km)에 × 해제. **SEO 보강 패키지** — index.html에 JSON-LD WebApplication schema(SearchAction 포함, 구글 사이트 내 검색창 노출 가능) + canonical URL + meta keywords/author/robots/googlebot 추가. `public/robots.txt` 신설(전체 허용 + sw.js 제외 + sitemap 링크). `public/sitemap.xml` 신설(루트 + 주요 hash 라우트 4개). 검색엔진 verification 토큰은 placeholder 주석으로만 보존. ResultsView 간격 5단계 조정(헤더·input·칩·탭·카드 gap 확대 — 빽빽함 해소) |
