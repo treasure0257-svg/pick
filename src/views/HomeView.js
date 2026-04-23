@@ -4,6 +4,7 @@ import { BottomNav } from '../components/BottomNav.js';
 import { Footer } from '../components/Footer.js';
 import { PICK_DATA } from '../data.js';
 import { REGIONS, countPlacesByRegion, regionFromAddress } from '../regions.js';
+import { AppState, STORAGE_KEYS } from '../App.js';
 
 export function HomeView({ router }) {
   const counts = countPlacesByRegion(PICK_DATA.places);
@@ -180,6 +181,53 @@ export function HomeView({ router }) {
     ),
 
     h('main', { className: 'flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 pb-32 md:pb-16' },
+
+      // 오늘 누구랑? — 세션성 컨텍스트, 권역 선택 전에 빠르게 고르도록 grid 위에 배치
+      (function () {
+        const wrap = h('section', { className: 'mb-10 md:mb-14' });
+        const headerRow = h('div', { className: 'flex items-end justify-between mb-4' },
+          h('div', {},
+            h('h2', { className: 'font-headline text-xl md:text-2xl font-extrabold text-onSurface tracking-tight' }, '오늘 누구랑 가세요?'),
+            h('p', { className: 'font-body text-xs md:text-sm text-onSurfaceVariant mt-1' }, '동행을 알려주면 그에 맞는 장소를 우선 추천해드려요.')
+          ),
+          h('a', { href: '#/preferences', className: 'hidden md:inline-flex items-center gap-1 text-xs text-onSurfaceVariant hover:text-primary' },
+            '더 자세한 취향',
+            h('span', { className: 'material-symbols-outlined text-[14px]' }, 'chevron_right')
+          )
+        );
+        const chipsRow = h('div', { className: 'flex flex-wrap gap-2 md:gap-3' });
+
+        function renderChips() {
+          chipsRow.innerHTML = '';
+          const prefs = AppState.get(STORAGE_KEYS.preferences, {}) || {};
+          const current = prefs.companion || null;
+          PICK_DATA.companions.forEach(c => {
+            const selected = current === c.id;
+            const btn = h('button', {
+              className: `inline-flex items-center gap-1.5 py-2.5 px-4 rounded-full font-body text-sm font-medium transition-colors border ${
+                selected
+                  ? 'bg-primary text-onPrimary border-primary shadow-sm'
+                  : 'bg-surfaceContainerLowest text-onSurface border-surfaceContainerHighest hover:border-primary/40'
+              }`,
+              onClick: () => {
+                const next = AppState.get(STORAGE_KEYS.preferences, {}) || {};
+                next.companion = selected ? null : c.id; // 같은 거 다시 누르면 해제
+                AppState.set(STORAGE_KEYS.preferences, next);
+                renderChips();
+              }
+            },
+              h('span', { className: 'material-symbols-outlined text-[18px]' }, c.icon),
+              c.label
+            );
+            chipsRow.appendChild(btn);
+          });
+        }
+        renderChips();
+
+        wrap.appendChild(headerRow);
+        wrap.appendChild(chipsRow);
+        return wrap;
+      })(),
 
       h('section', { className: 'mb-12 md:mb-16' },
         h('div', { className: 'flex items-end justify-between mb-5' },

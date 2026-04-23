@@ -105,15 +105,12 @@ export function PreferencesView({ router }) {
           ),
           renderChips(PICK_DATA.dietary, 'dietary', true, true)
         ),
-        h('section', { className: 'grid sm:grid-cols-2 gap-6' },
-          h('div', { className: 'bg-surfaceContainerLow rounded-[2rem] p-8' },
-            h('h3', { className: 'font-headline text-xl font-bold text-onSurface mb-4' }, '매운맛 선호'),
-            renderChips(PICK_DATA.spiceLevels, 'spice', false, true)
+        h('section', { className: 'bg-surfaceContainerLow rounded-[2rem] p-8 md:p-10' },
+          h('h2', { className: 'font-headline text-2xl font-bold text-onSurface mb-2' }, '매운맛 선호'),
+          h('p', { className: 'font-body text-sm text-onSurfaceVariant mb-6' },
+            '"안 매운 거" 선택 시 매운 음식 카테고리는 추천에서 제외됩니다.'
           ),
-          h('div', { className: 'bg-surfaceContainerLow rounded-[2rem] p-8' },
-            h('h3', { className: 'font-headline text-xl font-bold text-onSurface mb-4' }, '오늘 누구랑?'),
-            renderChips(PICK_DATA.companions, 'companion', false, true)
-          )
+          renderChips(PICK_DATA.spiceLevels, 'spice', false, true)
         ),
 
         h('div', { className: 'flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2' },
