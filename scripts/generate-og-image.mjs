@@ -41,13 +41,10 @@ const overlay = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${
   </g>
 </svg>`;
 
-// Compose: base + text overlay + logo badge (top-right)
-const logoSmall = await sharp(LOGO).resize(120, 120).png().toBuffer();
-
+// Compose: base + text overlay (로고 배지는 '정해줘' 큰 타이틀과 중복 + 비대칭 인상 → 제거)
 await sharp(base)
   .composite([
-    { input: Buffer.from(overlay), top: 0, left: 0 },
-    { input: logoSmall, top: 60, left: W - 60 - 120 }
+    { input: Buffer.from(overlay), top: 0, left: 0 }
   ])
   .jpeg({ quality: 86, progressive: true, mozjpeg: true })
   .toFile(OUT);
