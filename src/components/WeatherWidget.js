@@ -48,13 +48,34 @@ function vibe(temp, code) {
 const SEOUL = { lat: 37.5665, lng: 126.9780, name: '서울' };
 
 async function fetchWeather(lat, lng) {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code&timezone=Asia%2FSeoul`;
+  // 현재 + 시간별 (오늘 24h) — 'now / +3h / +6h' 미니 forecast 표시용
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code&hourly=temperature_2m,weather_code&timezone=Asia%2FSeoul&forecast_days=1`;
   const r = await fetch(url);
   if (!r.ok) throw new Error('weather HTTP ' + r.status);
   const j = await r.json();
+
+  // 현재 시각 기준 +3h, +6h 슬롯 인덱스 찾기
+  const nowHour = new Date().getHours();
+  const hourly = j.hourly?.time || [];
+  const idxNow = hourly.findIndex(t => new Date(t).getHours() === nowHour);
+  const slots = [];
+  if (idxNow >= 0) {
+    [3, 6].forEach(off => {
+      const i = idxNow + off;
+      if (i < hourly.length) {
+        slots.push({
+          time: new Date(hourly[i]).getHours() + '시',
+          temp: j.hourly.temperature_2m[i],
+          code: j.hourly.weather_code[i]
+        });
+      }
+    });
+  }
+
   return {
     temp: j.current?.temperature_2m,
-    code: j.current?.weather_code
+    code: j.current?.weather_code,
+    slots
   };
 }
 
@@ -86,7 +107,7 @@ export function WeatherWidget() {
   );
   card.appendChild(skeleton);
 
-  function paint(city, temp, code) {
+  function paint(city, temp, code, slots = []) {
     card.innerHTML = '';
     const w = WEATHER_MAP[code] || { icon: 'wb_cloudy', label: '날씨' };
     const v = vibe(temp, code);
@@ -105,6 +126,23 @@ export function WeatherWidget() {
         )
       )
     );
+
+    // 시간별 미니 forecast (+3h, +6h) — 데이터 있을 때만
+    if (slots.length > 0) {
+      const row = h('div', { className: 'flex items-center gap-2 w-full' });
+      slots.forEach(s => {
+        const sw = WEATHER_MAP[s.code] || { icon: 'wb_cloudy' };
+        row.appendChild(
+          h('div', { className: 'flex-1 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg bg-surfaceContainer/50' },
+            h('span', { className: 'font-label text-[10px] text-onSurfaceVariant' }, s.time),
+            h('span', { className: 'material-symbols-outlined text-[16px] text-amber-700' }, sw.icon),
+            h('span', { className: 'font-body text-[11px] font-semibold text-onSurface' }, s.temp != null ? `${Math.round(s.temp)}°` : '—')
+          )
+        );
+      });
+      card.appendChild(row);
+    }
+
     card.appendChild(
       h('p', { className: `font-body text-[11px] md:text-xs px-2.5 py-1 rounded-full self-start ${v.tone}` }, v.msg)
     );
@@ -112,8 +150,8 @@ export function WeatherWidget() {
 
   function load(lat, lng, name) {
     fetchWeather(lat, lng)
-      .then(({ temp, code }) => paint(name, temp, code))
-      .catch(() => paint(name, null, 0));
+      .then(({ temp, code, slots }) => paint(name, temp, code, slots))
+      .catch(() => paint(name, null, 0, []));
   }
 
   if ('geolocation' in navigator) {
