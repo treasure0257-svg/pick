@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.4.2 (2026-04-24)
+> Product Requirements Document  ·  v0.5.0 (2026-04-24)
 
 ## 1. 제품 개요
 
@@ -159,6 +159,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-24 | v0.5.0 | **종합 리뷰 기반 22개 항목 전수 적용 — Batch 1-3.** **Batch 1**: `src/utils/share.js` 신설 — `SITE_ORIGIN` 상수, `sharePlace()` (Web Share API + 클립보드 폴백), `mapLinks()` (카카오맵/네이버지도/구글맵 deep-link 생성기). 카드·상세뷰 모두 공유 chip + 길찾기 3-grid 박스. `App.js` 에 `STORAGE_KEYS.visited` / `.recentRegions` + 관련 헬퍼. ResultsView 카드에 방문함 toggle + 정렬 selector(관련도/거리/블로그 후기수). SavedView 방문 배지 + 토글, MyPage 활동 통계에 '방문 완료' 카드. **Batch 2**: 홈 hero 아래 '최근 본 권역' chip(LRU 5개), BottomNav 활성 상태 강화(상단 막대 인디케이터 + 아이콘 확대 + FILL), 하루 코스 배너에 '코스 저장' 버튼(3장소 한 번에 saved). **Batch 3**: WeatherWidget +3h/+6h 시간별 forecast 미니 카드 추가, **SETUP-V2.md** 신설 — App Check / Firestore 보안 규칙 / 검색엔진 등록 / 커스텀 도메인 / 코드 스플리팅 / FCM 푸시 운영 강화 가이드 |
 | 2026-04-24 | v0.4.2 | **헤더·저장됨·로고·hero·날씨 위젯 정리** — (1) 데스크톱 Header에서 홈/저장됨 nav 제거(로고 클릭으로 홈, 마이페이지에서 저장됨 접근), 마이페이지 텍스트 링크는 프로필 사진 왼쪽으로 이동. (2) SavedView **지역별 그룹핑** — `regionFromAddress` 기반 시·도 별 섹션 분리, 헤더에 카운트 + "더 보기" 링크, 매칭 안 되는 장소는 '기타' 섹션으로 맨 뒤. (3) SavedView 빈 상태 카피 두 줄로 분리("나만의 컬렉션을 만들어보세요"가 단어 중간에서 잘리지 않도록). (4) **로고 전면 교체**: 사용자가 새로 보낸 핑크/오렌지 로고 → 오렌지→핑크→보라 3-stop 그라데이션 + 큰 흰색 'p+체크' (font-size 360, 4면 둥근 모서리 균형). theme_color #7C3AED → #EC4899. (5) 경남 hero 사진 통영 콜라주 → 진주성 단일 사진. (6) 메인 hero 화질 1280px → 2560px @ q92 + mozjpeg + 4:4:4 chroma. (7) **`WeatherWidget`** 신설 — Open-Meteo 무료 API(no key, CORS OK), navigator.geolocation 좌표→날씨/온도→외출 vibe 메시지(7단계: 산책 좋아요/시원한 카페/실내 추천 등). 홈 "오늘 누구랑" 섹션 우측에 배치(데스크톱), 모바일은 위에 |
 | 2026-04-24 | v0.4.1 | **RegionMap 중심 이동 버그 수정** — Kakao Map 컨테이너가 첫 렌더에 0 사이즈이면 `setBounds()` 가 무효화되어 모든 비-Seoul 지역(부산/대구/제주/전남 등)이 지도 기본 center(36.5, 127.8, 충청도 근처)에 머물러 있던 이슈. `map.relayout()` + ResizeObserver로 실제 사이즈(>50×50px)가 반영되는 순간 한 번만 재적용 후 disconnect — 사용자 드래그 방해 없음 |
 | 2026-04-23 | v0.4.0 | **PreferencesView 완전 삭제 → MyPageView로 흡수.** 내 취향을 4개 확장형 카드로 재설계 (음식 취향=orange / 라이프스타일=blue / 카테고리·무드=purple / 동행=rose). 각 카드 헤더는 현재 값 한 줄 요약, 클릭으로 펼치면 chip grid, chip 클릭 즉시 저장 + "저장되었습니다" 토스트 — 제출 버튼 없는 모던 설정 앱 스타일. 활동 통계 "취향 설정" 카드가 `N/8` 카운터로 바뀌어 변경 즉시 반영. BottomNav `취향` 탭 → `마이` 탭(person 아이콘), Header nav `취향 설정` → `마이페이지`. HomeView CTA "취향 설정 시작" → "마이페이지에서 설정"(#/mypage). `#/preferences` 라우트는 `#/mypage` 리다이렉트로 대체(외부 공유 URL 호환), 사용가이드 step 6 카피 갱신 |
