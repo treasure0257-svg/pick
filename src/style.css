@@ -2,7 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ──────────────────────────────────────────────────────────
+   Color tokens — Tailwind config 의 모든 컬러는 이 변수를 참조.
+   :root = 라이트, :root.dark = 다크. <html class='dark'> 토글로 스왑.
+   값은 'R G B' 공백 구분 (Tailwind 의 / <alpha-value> 와 호환).
+   ────────────────────────────────────────────────────────── */
+:root {
+  --c-background:              250 249 246;  /* #FAF9F6 */
+  --c-onBackground:             26  28  30;  /* #1A1C1E */
+  --c-surface:                 255 255 255;
+  --c-surfaceVariant:          225 226 228;
+  --c-surfaceContainerLowest:  255 255 255;
+  --c-surfaceContainerLow:     247 246 243;
+  --c-surfaceContainer:        234 235 232;
+  --c-surfaceContainerHighest: 227 228 225;
+  --c-onSurface:                26  28  30;
+  --c-onSurfaceVariant:         68  71  73;
+  --c-primary:                  67 107  83;  /* #436B53 green */
+  --c-onPrimary:               255 255 255;
+  --c-primaryContainer:        196 241 212;
+  --c-onPrimaryContainer:        0  33  17;
+  --c-primaryFixed:            196 241 212;
+  --c-primaryFixedDim:         168 213 184;
+  --c-secondaryContainer:      226 227 224;
+  --c-onSecondaryContainer:     26  28  30;
+  --c-secondaryFixedDim:       198 199 196;
+  --c-tertiaryFixed:           242 223 226;
+  --c-onTertiaryContainer:      59   7  22;
+}
+
+:root.dark {
+  --c-background:                14  15  17;  /* near-black, warm tinted */
+  --c-onBackground:             236 237 239;
+  --c-surface:                   22  24  27;
+  --c-surfaceVariant:            48  50  54;
+  --c-surfaceContainerLowest:    18  20  23;
+  --c-surfaceContainerLow:       28  30  33;
+  --c-surfaceContainer:          36  39  43;
+  --c-surfaceContainerHighest:   54  57  62;
+  --c-onSurface:                236 237 239;
+  --c-onSurfaceVariant:         180 184 188;
+  --c-primary:                  130 200 158;  /* lighter green for dark contrast */
+  --c-onPrimary:                  0  37  19;
+  --c-primaryContainer:          39  78  56;
+  --c-onPrimaryContainer:       196 241 212;
+  --c-primaryFixed:             196 241 212;
+  --c-primaryFixedDim:          112 156 130;
+  --c-secondaryContainer:        46  48  52;
+  --c-onSecondaryContainer:     236 237 239;
+  --c-secondaryFixedDim:         92  95 100;
+  --c-tertiaryFixed:            120  46  60;
+  --c-onTertiaryContainer:      255 217 224;
+}
+
 @layer base {
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
   body {
     @apply bg-background text-onBackground font-body antialiased min-h-screen flex flex-col;
   }

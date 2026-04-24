@@ -156,6 +156,41 @@ export function MyPageView({ router }) {
     h('section', { className: 'mt-12 bg-surfaceContainerLowest rounded-2xl p-5 md:p-6' },
       h('h2', { className: 'font-headline text-base font-bold text-onSurface mb-4' }, '계정 관리'),
       h('div', { className: 'flex flex-col gap-3' },
+        // 다크 모드 토글
+        (function () {
+          const wrap = h('div', {
+            className: 'inline-flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-surface text-onSurface font-body text-sm font-medium'
+          });
+          const labelGroup = h('span', { className: 'flex items-center gap-2' });
+          const iconSpan = h('span', { className: 'material-symbols-outlined text-[18px]' });
+          labelGroup.appendChild(iconSpan);
+          labelGroup.appendChild(h('span', {}, '다크 모드'));
+          const toggle = h('button', {
+            type: 'button',
+            className: 'relative w-12 h-7 rounded-full transition-colors',
+            onClick: () => {
+              const next = !document.documentElement.classList.contains('dark');
+              document.documentElement.classList.toggle('dark', next);
+              localStorage.setItem('pick.theme', next ? 'dark' : 'light');
+              paint();
+              router.showToast(next ? '다크 모드 켜짐' : '라이트 모드 켜짐');
+            }
+          });
+          const knob = h('span', {
+            className: 'absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform'
+          });
+          toggle.appendChild(knob);
+          function paint() {
+            const dark = document.documentElement.classList.contains('dark');
+            iconSpan.textContent = dark ? 'dark_mode' : 'light_mode';
+            toggle.style.background = dark ? '#7C3AED' : '#CBD5E1';
+            knob.style.transform = dark ? 'translateX(20px)' : 'translateX(2px)';
+          }
+          paint();
+          wrap.appendChild(labelGroup);
+          wrap.appendChild(toggle);
+          return wrap;
+        })(),
         h('button', {
           className: 'inline-flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-surface hover:bg-surfaceContainer text-onSurface font-body text-sm font-medium transition-colors',
           onClick: async () => {

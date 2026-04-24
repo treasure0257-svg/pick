@@ -1,5 +1,17 @@
 import './style.css';
 import { Router } from './router.js';
+
+// 다크 모드 초기화 — 사용자 저장값 우선, 없으면 시스템 설정 따름.
+(function initTheme() {
+  try {
+    const saved = localStorage.getItem('pick.theme'); // 'light' | 'dark' | null
+    let dark;
+    if (saved === 'dark') dark = true;
+    else if (saved === 'light') dark = false;
+    else dark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+    document.documentElement.classList.toggle('dark', dark);
+  } catch { /* noop */ }
+})();
 import { HomeView } from './views/HomeView.js';
 import { ResultsView } from './views/ResultsView.js';
 import { SavedView } from './views/SavedView.js';
