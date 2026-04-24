@@ -24,7 +24,7 @@ const ORIGINALS = {
   jeonbuk:   'https://upload.wikimedia.org/wikipedia/commons/f/f2/%EC%A0%84%EC%A3%BC%ED%95%9C%EC%98%A5%EB%A7%88%EC%9D%84_%EC%A0%84%EA%B2%BD.JPG',
   jeonnam:   'https://upload.wikimedia.org/wikipedia/commons/3/35/20181231_Suncheon_Bay_002.jpg',
   gyeongbuk: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Lotus_Flower_Bridge_and_Seven_Treasure_Bridge_at_Bulguksa_in_Gyeongju%2C_Korea.jpg',
-  gyeongnam: 'https://upload.wikimedia.org/wikipedia/commons/7/7f/Korea-Tongyeong-Collage-01.jpg',
+  gyeongnam: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Jinju_castle-Chosuk_gate.jpg',
   jeju:      'https://upload.wikimedia.org/wikipedia/commons/e/e3/%EC%84%B1%EC%82%B0%EC%9D%BC%EC%B6%9C%EB%B4%89_%EC%B2%9C%EC%97%B0%EB%B3%B4%ED%98%B8%EA%B5%AC%EC%97%AD_2019%EB%85%84_%EC%B4%AC%EC%98%81%28%EC%B6%9C%EC%B2%98_%EB%AC%B8%ED%99%94%EC%9E%AC%EC%B2%AD_%EB%8C%80%EB%B3%80%EC%9D%B8%EC%8B%A4%29.jpg'
 };
 
