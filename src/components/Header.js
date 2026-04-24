@@ -1,29 +1,14 @@
 import { h } from '../utils/dom.js';
 
-export function Header(router) {
-  const navLinks = [
-    { name: '홈', path: '#/' },
-    { name: '저장됨', path: '#/saved' },
-    { name: '마이페이지', path: '#/mypage' }
-  ];
+// Desktop nav 정리: 홈/저장됨 제거 (홈은 로고 클릭, 저장됨은 마이페이지에서 접근).
+// 마이페이지 링크는 main.js updateAuthUI 에서 프로필 버튼 옆에 함께 렌더 — 로그인 상태일 때만 노출.
 
-  const currentPath = window.location.hash || '#/';
-
+export function Header() {
   return h('header', { className: 'bg-surface text-primary font-headline font-semibold tracking-tight sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4' },
     h('a', { href: '#/', className: 'flex items-center gap-3' },
       h('img', { src: '/logo.png', alt: '정해줘', className: 'w-9 h-9 rounded-xl' }),
       h('span', { className: 'text-xl font-bold tracking-tight' }, '정해줘')
     ),
-    h('nav', { className: 'hidden md:flex items-center gap-6' },
-      ...navLinks.map(link =>
-        h('a', {
-          href: link.path,
-          className: currentPath === link.path
-            ? 'text-primary font-bold rounded-lg px-3 py-1'
-            : 'text-onSurfaceVariant hover:bg-surfaceContainer rounded-lg px-3 py-1 transition-colors'
-        }, link.name)
-      )
-    ),
-    h('div', { id: 'auth-slot', className: 'flex items-center gap-2' })
+    h('div', { id: 'auth-slot', className: 'flex items-center gap-3' })
   );
 }

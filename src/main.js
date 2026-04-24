@@ -47,6 +47,13 @@ function updateAuthUI(user) {
   slots.forEach(slot => {
     slot.innerHTML = '';
     if (user) {
+      // 데스크톱 한정: '마이페이지' 텍스트 링크 → 프로필 사진 묶음으로 표시 (왼→오른쪽)
+      const myPageLink = h('a', {
+        href: '#/mypage',
+        className: 'hidden md:inline-flex items-center text-sm font-medium text-onSurface hover:text-primary transition-colors no-underline px-2'
+      }, '마이페이지');
+      slot.appendChild(myPageLink);
+
       // 프로필 클릭 → 마이페이지 (로그아웃은 마이페이지 안에 분리)
       const profileLink = h('a', {
         href: '#/mypage',
