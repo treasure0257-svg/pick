@@ -69,6 +69,7 @@ pick/
 │   │   ├── Footer.js         # 5개 정보 링크 + 태그라인, 모든 메인 뷰 하단에 주입
 │   │   ├── Modal.js          # 가운데 모달 오버레이 (ESC/배경 클릭 닫기)
 │   │   ├── info-modals.js    # About/Guide/Privacy/Terms 컨텐츠 단일 소스 + openInfoModal
+│   │   ├── WeatherWidget.js  # Open-Meteo 무료 API 기반 현재 날씨 + 외출 vibe 메시지
 │   │   ├── RegionMap.js      # Kakao Map 타일 + TopoJSON polygon overlay + 양방향 호버 API
 │   │   └── PlacesMap.js      # Kakao Maps 기반 장소 핀(카테고리 색상, setPlaces 동적 갱신)
 │   ├── services/
