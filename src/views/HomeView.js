@@ -269,33 +269,93 @@ export function HomeView({ router }) {
         wrap.appendChild(subCopy);
         wrap.appendChild(chipsRow);
 
-        // 빠른 필터 row — 반려동물 동반 토글 (즉시 저장)
+        // 빠른 필터 row — 반려동물 + 5개 환경 필터 (즉시 저장)
         (function () {
           const filterRow = h('div', { className: 'mt-3 flex items-center gap-2 flex-wrap' });
           filterRow.appendChild(
-            h('span', { className: 'font-label text-[11px] uppercase tracking-wider text-onSurfaceVariant mr-1' }, '빠른 필터')
+            h('span', { className: 'font-label text-[11px] uppercase tracking-wider text-onSurfaceVariant mr-1 self-center' }, '빠른 필터')
           );
-          const petBtn = h('button', { type: 'button' });
-          function paintPet() {
-            const on = !!(AppState.get(STORAGE_KEYS.preferences, {}) || {}).petFriendly;
-            petBtn.className = `inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full font-body text-xs font-medium transition-colors border ${
-              on
-                ? 'bg-emerald-600 text-white border-emerald-600'
-                : 'bg-surfaceContainerLowest text-onSurface border-surfaceContainerHighest hover:border-emerald-500/40'
-            }`;
-            petBtn.innerHTML = '';
-            petBtn.appendChild(h('span', { className: 'material-symbols-outlined text-[16px]', style: on ? { fontVariationSettings: "'FILL' 1" } : {} }, 'pets'));
-            petBtn.appendChild(h('span', {}, on ? '반려동물 동반 ON' : '반려동물 동반'));
+
+          // 정의: id, label, icon, activeClass(active 시 컬러)
+          const QUICK_FILTERS = [
+            { id: 'petFriendly', label: '반려동물', icon: 'pets',          tone: 'emerald' },
+            { id: 'parking',     label: '주차',     icon: 'local_parking', tone: 'blue' },
+            { id: 'view',        label: '뷰 좋은',  icon: 'visibility',    tone: 'purple' },
+            { id: 'privateRoom', label: '단체석/룸', icon: 'meeting_room', tone: 'amber' },
+            { id: 'open24h',     label: '24시간',   icon: 'schedule',      tone: 'rose' }
+          ];
+          const TONE_CLS = {
+            emerald: { on: 'bg-emerald-600 text-white border-emerald-600',
+                       off: 'hover:border-emerald-500/40' },
+            blue:    { on: 'bg-blue-600 text-white border-blue-600',
+                       off: 'hover:border-blue-500/40' },
+            purple:  { on: 'bg-purple-600 text-white border-purple-600',
+                       off: 'hover:border-purple-500/40' },
+            amber:   { on: 'bg-amber-600 text-white border-amber-600',
+                       off: 'hover:border-amber-500/40' },
+            rose:    { on: 'bg-rose-600 text-white border-rose-600',
+                       off: 'hover:border-rose-500/40' },
+            slate:   { on: 'bg-slate-700 text-white border-slate-700',
+                       off: 'hover:border-slate-500/40' }
+          };
+
+          function makeToggle(filter) {
+            const btn = h('button', { type: 'button' });
+            function paint() {
+              const on = !!(AppState.get(STORAGE_KEYS.preferences, {}) || {})[filter.id];
+              const cls = TONE_CLS[filter.tone];
+              btn.className = `inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full font-body text-xs font-medium transition-colors border ${
+                on ? cls.on : `bg-surfaceContainerLowest text-onSurface border-surfaceContainerHighest ${cls.off}`
+              }`;
+              btn.innerHTML = '';
+              btn.appendChild(h('span', {
+                className: 'material-symbols-outlined text-[16px]',
+                style: on ? { fontVariationSettings: "'FILL' 1" } : {}
+              }, filter.icon));
+              btn.appendChild(h('span', {}, filter.label));
+            }
+            btn.addEventListener('click', () => {
+              const next = AppState.get(STORAGE_KEYS.preferences, {}) || {};
+              next[filter.id] = !next[filter.id];
+              AppState.set(STORAGE_KEYS.preferences, next);
+              paint();
+              router.showToast(next[filter.id] ? `${filter.label} ON` : `${filter.label} 해제`);
+            });
+            paint();
+            return btn;
           }
-          petBtn.addEventListener('click', () => {
-            const next = AppState.get(STORAGE_KEYS.preferences, {}) || {};
-            next.petFriendly = !next.petFriendly;
-            AppState.set(STORAGE_KEYS.preferences, next);
-            paintPet();
-            router.showToast(next.petFriendly ? '🐾 반려동물 동반 업체만 표시' : '반려동물 필터 해제');
-          });
-          paintPet();
-          filterRow.appendChild(petBtn);
+          QUICK_FILTERS.forEach(f => filterRow.appendChild(makeToggle(f)));
+
+          // 키즈존 — 단일 3-state cycle (none → kids → noKids → none)
+          (function () {
+            const btn = h('button', { type: 'button' });
+            function paint() {
+              const v = (AppState.get(STORAGE_KEYS.preferences, {}) || {}).kids || null;
+              const cls = TONE_CLS.slate;
+              const on = v != null;
+              btn.className = `inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full font-body text-xs font-medium transition-colors border ${
+                on ? cls.on : `bg-surfaceContainerLowest text-onSurface border-surfaceContainerHighest ${cls.off}`
+              }`;
+              btn.innerHTML = '';
+              const icon = v === 'noKids' ? 'do_not_disturb' : 'child_friendly';
+              btn.appendChild(h('span', {
+                className: 'material-symbols-outlined text-[16px]',
+                style: on ? { fontVariationSettings: "'FILL' 1" } : {}
+              }, icon));
+              btn.appendChild(h('span', {}, v === 'kids' ? '키즈존 OK' : v === 'noKids' ? '노키즈' : '키즈존'));
+            }
+            btn.addEventListener('click', () => {
+              const next = AppState.get(STORAGE_KEYS.preferences, {}) || {};
+              const cur = next.kids;
+              next.kids = cur == null ? 'kids' : cur === 'kids' ? 'noKids' : null;
+              AppState.set(STORAGE_KEYS.preferences, next);
+              paint();
+              router.showToast(next.kids === 'kids' ? '👶 키즈존 OK' : next.kids === 'noKids' ? '🚫 노키즈 선호' : '키즈 필터 해제');
+            });
+            paint();
+            filterRow.appendChild(btn);
+          })();
+
           wrap.appendChild(filterRow);
         })();
 

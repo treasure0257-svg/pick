@@ -14,13 +14,12 @@ const PROVIDER_BADGE = {
   naver:  { label: 'Naver',  cls: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' }
 };
 
-// 취향 카드 액센트 (음식·라이프·무드·동행·환경)
+// 취향 카드 액센트 (음식·라이프·무드·동행)
 const ACCENT = {
   food:    { iconBg: 'bg-orange-100', iconColor: 'text-orange-700', chipActive: 'bg-orange-600 text-white border-orange-600' },
   life:    { iconBg: 'bg-blue-100',   iconColor: 'text-blue-700',   chipActive: 'bg-blue-600 text-white border-blue-600' },
   mood:    { iconBg: 'bg-purple-100', iconColor: 'text-purple-700', chipActive: 'bg-purple-600 text-white border-purple-600' },
-  comp:    { iconBg: 'bg-rose-100',   iconColor: 'text-rose-700',   chipActive: 'bg-rose-600 text-white border-rose-600' },
-  env:     { iconBg: 'bg-teal-100',   iconColor: 'text-teal-700',   chipActive: 'bg-teal-600 text-white border-teal-600' }
+  comp:    { iconBg: 'bg-rose-100',   iconColor: 'text-rose-700',   chipActive: 'bg-rose-600 text-white border-rose-600' }
 };
 
 export function MyPageView({ router }) {
@@ -106,7 +105,7 @@ export function MyPageView({ router }) {
     return h('section', { className: 'mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4' },
       statCard('저장한 장소', String(savedCount), 'bookmark'),
       statCard('방문 완료', String(visitedCount), 'check_circle'),
-      statCard('취향 설정', `${prefSet}/14`, 'tune'),
+      statCard('취향 설정', `${prefSet}/9`, 'tune'),
       statCard('로그인 방식', provider.label, 'shield')
     );
   }
@@ -130,8 +129,6 @@ export function MyPageView({ router }) {
           render: () => foodPrefsContent(router, refreshStats) }),
         prefCard({ key: 'life', icon: 'savings', title: '라이프스타일', accent: ACCENT.life,
           render: () => lifePrefsContent(router, refreshStats) }),
-        prefCard({ key: 'env', icon: 'tune', title: '환경 · 분위기', accent: ACCENT.env,
-          render: () => envPrefsContent(router, refreshStats) }),
         prefCard({ key: 'mood', icon: 'palette', title: '카테고리 · 무드', accent: ACCENT.mood,
           render: () => moodPrefsContent(router, refreshStats) }),
         prefCard({ key: 'comp', icon: 'group', title: '동행', accent: ACCENT.comp,
@@ -212,11 +209,6 @@ function countSetPrefs(prefs) {
   if (prefs.categories?.length) n++;
   if (prefs.moods?.length)      n++;
   if (prefs.companion)          n++;
-  if (prefs.parking)            n++;
-  if (prefs.view)               n++;
-  if (prefs.privateRoom)        n++;
-  if (prefs.kids)               n++;
-  if (prefs.open24h)            n++;
   return n;
 }
 
@@ -284,18 +276,6 @@ function prefCard({ icon, title, accent, defaultOpen, render }) {
   );
 }
 
-const ENV_OPTIONS = [
-  { id: 'parking',     label: '주차 가능',    icon: 'local_parking' },
-  { id: 'view',        label: '뷰 좋은',      icon: 'visibility' },
-  { id: 'privateRoom', label: '단체석/룸',    icon: 'meeting_room' },
-  { id: 'open24h',     label: '24시간 영업',  icon: 'schedule' }
-];
-
-const KIDS_OPTIONS = [
-  { id: 'kids',   label: '키즈존 OK', icon: 'child_friendly' },
-  { id: 'noKids', label: '노키즈 선호', icon: 'do_not_disturb' }
-];
-
 function summaryFor(title, prefs) {
   const labelOf = (arr, id) => (arr.find(x => x.id === id) || {}).label || id;
   if (title === '음식 취향') {
@@ -320,16 +300,6 @@ function summaryFor(title, prefs) {
   }
   if (title === '동행') {
     return prefs.companion ? labelOf(PICK_DATA.companions, prefs.companion) : '아직 설정 안 함';
-  }
-  if (title === '환경 · 분위기') {
-    const parts = [];
-    if (prefs.parking)     parts.push('🅿 주차');
-    if (prefs.view)        parts.push('뷰');
-    if (prefs.privateRoom) parts.push('룸');
-    if (prefs.kids === 'kids')   parts.push('키즈OK');
-    if (prefs.kids === 'noKids') parts.push('노키즈');
-    if (prefs.open24h)     parts.push('24시');
-    return parts.length ? parts.join(' · ') : '아직 설정 안 함';
   }
   return '';
 }
@@ -461,35 +431,6 @@ function moodPrefsContent(router, refreshStats) {
       value: () => getPrefs().moods || [],
       onChange: v => patchPrefs({ moods: v }, router, refreshStats)
     })
-  ));
-  return wrap;
-}
-
-function envPrefsContent(router, refreshStats) {
-  const wrap = h('div', { className: 'pb-5 space-y-4' });
-  // 4개 boolean toggle (다중 선택 가능 = chipGroup multi)
-  wrap.appendChild(h('div', {},
-    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '편의·환경'),
-    chipGroup({
-      items: ENV_OPTIONS, multi: true, accent: ACCENT.env,
-      value: () => ENV_OPTIONS.filter(o => getPrefs()[o.id]).map(o => o.id),
-      onChange: (selectedIds) => {
-        const patch = {};
-        ENV_OPTIONS.forEach(o => { patch[o.id] = selectedIds.includes(o.id); });
-        patchPrefs(patch, router, refreshStats);
-      }
-    })
-  ));
-  wrap.appendChild(h('div', {},
-    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '키즈존 / 노키즈존'),
-    chipGroup({
-      items: KIDS_OPTIONS, multi: false, accent: ACCENT.env,
-      value: () => getPrefs().kids || null,
-      onChange: v => patchPrefs({ kids: v }, router, refreshStats)
-    })
-  ));
-  wrap.appendChild(h('p', { className: 'font-label text-[11px] text-onSurfaceVariant leading-relaxed' },
-    '맛집·카페·숙소 결과에서 해당 키워드가 명시된 곳만 보여줍니다. (관광 카테고리는 영향 없음, 일부 업체는 명시 안 했을 수 있음)'
   ));
   return wrap;
 }
