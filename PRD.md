@@ -1,6 +1,6 @@
 # 정해줘 (Pick) · PRD
 
-> Product Requirements Document  ·  v0.5.2 (2026-04-24)
+> Product Requirements Document  ·  v0.5.3 (2026-04-24)
 
 ## 1. 제품 개요
 
@@ -159,6 +159,7 @@ SPA 구조 (hash 라우팅).
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-04-24 | v0.5.3 | **다크 모드 hero swap + 4K 화질 + 빠른 필터 row 7종.** (1) 다크 모드 시 hero 자동 swap — 라이트 경복궁 / 다크 반포대교 무지개분수 + N서울타워 야경. Tailwind `dark:` prefix 로 두 `<img>` 토글, 주간/야경 모두 3840px @ q95 mozjpeg 4:4:4 chroma 업그레이드 (각 2.8MB / 3.0MB). (2) **반려동물 동반 필터** — `applyPetFilter()`, FD6/CE7/AD5에 17개 키워드(애견·펫동반·도그카페·애견펜션·펫호텔 등) 매칭. (3) **WeatherWidget compact 모드** — `{compact:true}` 가로 pill, 홈 '오늘 누구랑' 타이틀 옆 inline 배치. (4) **홈 빠른 필터 row** — 동행 chip 아래 7개 컬러 코드 chip: 🐾 반려동물(emerald) · 🅿 주차(blue) · 👁 뷰(purple) · 🚪 룸(amber) · 🌙 24시(rose) · 👶 키즈존(slate, 3-state none→kids→noKids→none). 모두 즉시 저장 + 토스트. `applyEnvFilters()` 가 prefs 보고 자동 필터링. ResultsView 활성 prefs chip 라벨 모두 반영 |
 | 2026-04-24 | v0.5.2 | 다크 모드 토글을 마이페이지 계정 관리 → **헤더 우상단(마이페이지 링크 옆)** 으로 이동. 모든 페이지·로그인 여부 무관하게 즉시 접근 가능. `main.js makeThemeToggle()` 헬퍼로 분리, 인스턴스 간 동기화는 `data-theme-toggle` 속성으로 |
 | 2026-04-24 | v0.5.1 | **풀 다크 모드 — Batch 4.** Tailwind 컬러 토큰 23개를 모두 CSS 변수(`rgb(var(--c-X)/<alpha-value>)`) 참조로 변환, `tailwind.config.js`에 `darkMode: 'class'` 활성화. `src/style.css` 상단에 `:root` (라이트) vs `:root.dark` (warm-tinted near-black bg + lighter green primary, WCAG AA contrast 만족) 두 팔레트 정의 → `<html>` `.dark` 토글로 모든 컴포넌트 자동 스왑(컴포넌트 코드 0줄 수정). `main.js` 초기화: localStorage `pick.theme` 우선 → 없으면 `prefers-color-scheme` 자동 감지. MyPageView 계정 관리 섹션 최상단에 토글 pill — 클릭 시 즉시 반영 + 영구 저장 + 토스트 |
 | 2026-04-24 | v0.5.0 | **종합 리뷰 기반 22개 항목 전수 적용 — Batch 1-3.** **Batch 1**: `src/utils/share.js` 신설 — `SITE_ORIGIN` 상수, `sharePlace()` (Web Share API + 클립보드 폴백), `mapLinks()` (카카오맵/네이버지도/구글맵 deep-link 생성기). 카드·상세뷰 모두 공유 chip + 길찾기 3-grid 박스. `App.js` 에 `STORAGE_KEYS.visited` / `.recentRegions` + 관련 헬퍼. ResultsView 카드에 방문함 toggle + 정렬 selector(관련도/거리/블로그 후기수). SavedView 방문 배지 + 토글, MyPage 활동 통계에 '방문 완료' 카드. **Batch 2**: 홈 hero 아래 '최근 본 권역' chip(LRU 5개), BottomNav 활성 상태 강화(상단 막대 인디케이터 + 아이콘 확대 + FILL), 하루 코스 배너에 '코스 저장' 버튼(3장소 한 번에 saved). **Batch 3**: WeatherWidget +3h/+6h 시간별 forecast 미니 카드 추가, **SETUP-V2.md** 신설 — App Check / Firestore 보안 규칙 / 검색엔진 등록 / 커스텀 도메인 / 코드 스플리팅 / FCM 푸시 운영 강화 가이드 |
