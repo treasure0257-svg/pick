@@ -3,7 +3,7 @@ import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
 import { Footer } from '../components/Footer.js';
 import { PICK_DATA } from '../data.js';
-import { AppState, STORAGE_KEYS, unsavePlace } from '../App.js';
+import { AppState, STORAGE_KEYS, unsavePlace, isVisited, markVisited, unmarkVisited } from '../App.js';
 import { auth } from '../firebase-setup.js';
 import { getCachedPlace } from '../services/kakaoLocal.js';
 import { categoryMeta, makeSaveBtn } from '../utils/place-ui.js';
@@ -139,15 +139,50 @@ export function SavedView({ router }) {
         href: `#/place?id=${encodeURIComponent(p.id)}`,
         className: 'p-5 flex-grow flex flex-col'
       },
-        h('span', {
-          className: `inline-flex self-start items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${cat.accent} mb-2`
-        },
-          h('span', { className: 'material-symbols-outlined text-[13px]' }, cat.icon),
-          p.categoryLabel || cat.label
+        h('div', { className: 'flex items-center gap-1.5 flex-wrap mb-2' },
+          h('span', {
+            className: `inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${cat.accent}`
+          },
+            h('span', { className: 'material-symbols-outlined text-[13px]' }, cat.icon),
+            p.categoryLabel || cat.label
+          ),
+          isVisited(p.id)
+            ? h('span', { className: 'inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-600 text-white' },
+                h('span', { className: 'material-symbols-outlined text-[13px]', style: { fontVariationSettings: "'FILL' 1" } }, 'check_circle'),
+                '방문함'
+              )
+            : null
         ),
         h('h3', { className: 'font-headline text-lg font-bold text-onSurface truncate' }, p.name),
         h('p', { className: 'font-body text-xs text-onSurfaceVariant mt-1 truncate' }, p.address || p.blurb || '')
-      )
+      ),
+      // 방문함 토글 버튼 (좌측 하단 작은 chip)
+      (function () {
+        const btn = h('button', {
+          type: 'button',
+          className: 'absolute bottom-3 left-3 inline-flex items-center gap-0.5 text-[11px] font-medium px-2 py-1 rounded-full transition-colors backdrop-blur',
+          title: '방문함 토글',
+          onClick: (e) => {
+            e.preventDefault(); e.stopPropagation();
+            if (isVisited(p.id)) { unmarkVisited(p.id); router.showToast('방문 취소'); }
+            else { markVisited(p.id); router.showToast('방문 완료'); }
+            // 카드 자체 다시 그림
+            const next = makeCard(p);
+            card.replaceWith(next);
+          }
+        });
+        function paint() {
+          const v = isVisited(p.id);
+          btn.classList.remove('bg-emerald-600', 'text-white', 'bg-white/90', 'text-emerald-700');
+          if (v) btn.classList.add('bg-emerald-600', 'text-white');
+          else btn.classList.add('bg-white/90', 'text-emerald-700');
+          btn.innerHTML = '';
+          btn.appendChild(h('span', { className: 'material-symbols-outlined text-[13px]', style: v ? { fontVariationSettings: "'FILL' 1" } : {} }, 'check_circle'));
+          btn.appendChild(h('span', {}, v ? '방문함' : '방문 표시'));
+        }
+        paint();
+        return btn;
+      })()
     );
     return card;
   }

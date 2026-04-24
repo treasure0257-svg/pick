@@ -4,11 +4,12 @@ import { BottomNav } from '../components/BottomNav.js';
 import { Footer } from '../components/Footer.js';
 import { PlacesMap } from '../components/PlacesMap.js';
 import { PICK_DATA } from '../data.js';
-import { AppState, STORAGE_KEYS, recommend, savePlace, isSaved } from '../App.js';
+import { AppState, STORAGE_KEYS, recommend, savePlace, isSaved, isVisited, markVisited, unmarkVisited, pushRecentRegion } from '../App.js';
 import { regionLabel, subregionLabel, REGIONS } from '../regions.js';
 import { multiKeywordSearch, keywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
-import { naverLocalSearch, normalizeNaverPlace, getPlaceImage, getBlogCount } from '../services/naverLocal.js';
+import { naverLocalSearch, normalizeNaverPlace, getPlaceImage, getBlogCount, getCachedBlogCount } from '../services/naverLocal.js';
 import { applyAllPreferences } from '../utils/preference-filter.js';
+import { sharePlace } from '../utils/share.js';
 
 const KAKAO_CAT_BADGE = {
   FD6: { icon: 'restaurant',     label: '맛집' },
@@ -193,28 +194,64 @@ function renderCard(p, index, router, userCoord, mapApi, fromContext) {
               )
             : null
         ),
-        // Action row: save + 카카오맵 별점/후기 link + "자세히" chevron
-        h('div', { className: 'flex items-center gap-2 mt-3 flex-wrap' },
-          saveBtn,
-          p.placeUrl
-            ? h('button', {
-                className: 'inline-flex items-center gap-0.5 text-[11px] font-medium text-amber-800 bg-amber-50 px-2 py-1 rounded-full hover:bg-amber-100 transition-colors',
-                title: '카카오맵에서 별점·후기 보기',
-                onClick: (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  window.open(p.placeUrl, '_blank', 'noopener,noreferrer');
-                }
-              },
-                h('span', { className: 'material-symbols-outlined text-[13px]', style: { fontVariationSettings: "'FILL' 1" } }, 'star'),
-                '별점·후기'
-              )
-            : null,
-          h('span', { className: 'ml-auto inline-flex items-center gap-0.5 text-xs font-medium text-primary' },
-            '자세히',
-            h('span', { className: 'material-symbols-outlined text-[16px]' }, 'chevron_right')
-          )
-        )
+        // Action row: save + 방문함 + 별점/후기 + 공유 + 자세히
+        (function () {
+          // 방문함 toggle (이벤트 stopPropagation 으로 카드 링크 진입 방지)
+          const visitBtn = h('button', { type: 'button', title: '방문함 토글' });
+          function paintVisit() {
+            const v = isVisited(p.id);
+            visitBtn.className = `inline-flex items-center gap-0.5 text-[11px] font-medium px-2 py-1 rounded-full transition-colors ${
+              v ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+            }`;
+            visitBtn.innerHTML = '';
+            visitBtn.appendChild(h('span', {
+              className: 'material-symbols-outlined text-[13px]',
+              style: v ? { fontVariationSettings: "'FILL' 1" } : {}
+            }, 'check_circle'));
+            visitBtn.appendChild(h('span', {}, v ? '방문함' : '방문 표시'));
+          }
+          visitBtn.addEventListener('click', (e) => {
+            e.preventDefault(); e.stopPropagation();
+            if (isVisited(p.id)) { unmarkVisited(p.id); router.showToast('방문 표시 취소'); }
+            else { markVisited(p.id); router.showToast('방문 완료로 표시'); }
+            paintVisit();
+          });
+          paintVisit();
+
+          return h('div', { className: 'flex items-center gap-2 mt-3 flex-wrap' },
+            saveBtn,
+            visitBtn,
+            p.placeUrl
+              ? h('button', {
+                  className: 'inline-flex items-center gap-0.5 text-[11px] font-medium text-amber-800 bg-amber-50 px-2 py-1 rounded-full hover:bg-amber-100 transition-colors',
+                  title: '카카오맵에서 별점·후기 보기',
+                  onClick: (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    window.open(p.placeUrl, '_blank', 'noopener,noreferrer');
+                  }
+                },
+                  h('span', { className: 'material-symbols-outlined text-[13px]', style: { fontVariationSettings: "'FILL' 1" } }, 'star'),
+                  '별점·후기'
+                )
+              : null,
+            h('button', {
+              type: 'button',
+              className: 'inline-flex items-center gap-0.5 text-[11px] font-medium text-onSurface bg-surfaceContainer px-2 py-1 rounded-full hover:bg-surfaceContainerHigh transition-colors',
+              title: '장소 공유',
+              onClick: (e) => {
+                e.preventDefault(); e.stopPropagation();
+                sharePlace(p, router);
+              }
+            },
+              h('span', { className: 'material-symbols-outlined text-[13px]' }, 'share'),
+              '공유'
+            ),
+            h('span', { className: 'ml-auto inline-flex items-center gap-0.5 text-xs font-medium text-primary' },
+              '자세히',
+              h('span', { className: 'material-symbols-outlined text-[16px]' }, 'chevron_right')
+            )
+          );
+        })()
       )
     )
   );
@@ -367,11 +404,25 @@ export function ResultsView({ router, params }) {
   );
   const landmarkForm = h('form', { className: 'flex gap-2 mb-4' }, landmarkInput, landmarkBtn);
   // Category tabs (populated after Kakao results come in)
-  const tabsBar = h('div', { className: 'flex items-center gap-2 mb-5 flex-wrap' });
+  const tabsBar = h('div', { className: 'flex items-center gap-2 mb-3 flex-wrap' });
+  // 정렬 selector — applyTab에서 sortMode 읽어 적용
+  const sortSelect = h('select', {
+    className: 'text-xs font-body text-onSurface bg-surfaceContainerLowest border border-surfaceContainerHighest rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-primary',
+    title: '정렬 방식'
+  },
+    h('option', { value: 'relevance' }, '관련도순'),
+    h('option', { value: 'distance' },  '가까운 순'),
+    h('option', { value: 'blog' },      '블로그 후기 많은 순')
+  );
+  const sortBar = h('div', { className: 'flex items-center justify-between gap-3 mb-4' },
+    h('span', { className: 'font-label text-xs text-onSurfaceVariant' }, '정렬'),
+    sortSelect
+  );
   listSection.appendChild(listHeader);
   listSection.appendChild(landmarkForm);
   listSection.appendChild(landmarkChipSlot);
   listSection.appendChild(tabsBar);
+  listSection.appendChild(sortBar);
 
   // Desktop에서 grid (md이상), mobile에서 세로 single column
   const resultList = h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5' });
@@ -701,6 +752,43 @@ export function ResultsView({ router, params }) {
         let activeTab = 'all';
         let activeCuisine = 'all';
         let landmark = null; // { name, lat, lng, radiusKm }
+        let sortMode = 'relevance'; // 'relevance' | 'distance' | 'blog'
+
+        // 권역 진입 기록 (LRU)
+        if (region) pushRecentRegion(region, area);
+
+        sortSelect.onchange = (e) => {
+          sortMode = e.target.value;
+          applyTab();
+        };
+
+        function applySort(list) {
+          if (sortMode === 'distance') {
+            // userCoord 없으면 정렬 불가 → 토스트 + 원본 유지
+            if (!userCoord) {
+              router.showToast?.('위치 권한을 허용하면 거리순 정렬이 됩니다.');
+              return list;
+            }
+            return [...list].sort((a, b) => {
+              const da = (Number.isFinite(a.lat) && Number.isFinite(a.lng))
+                ? haversineKm(userCoord.lat, userCoord.lng, a.lat, a.lng) : Infinity;
+              const db = (Number.isFinite(b.lat) && Number.isFinite(b.lng))
+                ? haversineKm(userCoord.lat, userCoord.lng, b.lat, b.lng) : Infinity;
+              return da - db;
+            });
+          }
+          if (sortMode === 'blog') {
+            // 캐시된 블로그 후기 수만으로 정렬 (없으면 -1 → 뒤로)
+            return [...list].sort((a, b) => {
+              const ka = `${a.name} ${a.address ? a.address.split(' ').slice(0, 2).join(' ') : ''}`.trim();
+              const kb = `${b.name} ${b.address ? b.address.split(' ').slice(0, 2).join(' ') : ''}`.trim();
+              const na = getCachedBlogCount(ka) ?? -1;
+              const nb = getCachedBlogCount(kb) ?? -1;
+              return nb - na;
+            });
+          }
+          return list; // relevance — 원본 순서
+        }
 
         function renderLandmarkChip() {
           landmarkChipSlot.innerHTML = '';
@@ -767,6 +855,8 @@ export function ResultsView({ router, params }) {
           // 사용자 취향 적용 (식이 제한 필터 + 매운맛 필터 + 동행 가중치 정렬)
           const prefs = AppState.get(STORAGE_KEYS.preferences, {});
           filtered = applyAllPreferences(filtered, prefs);
+          // 사용자 선택 정렬 (관련도/거리/블로그)
+          filtered = applySort(filtered);
           renderTabs(
             allPlaces,
             activeTab,

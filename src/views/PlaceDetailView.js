@@ -5,6 +5,8 @@ import { Footer } from '../components/Footer.js';
 import { PlacesMap } from '../components/PlacesMap.js';
 import { getCachedPlace, nearbySearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
 import { makeSaveBtn, haversineKm, formatDistance, categoryMeta } from '../utils/place-ui.js';
+import { sharePlace, mapLinks } from '../utils/share.js';
+import { isVisited, markVisited, unmarkVisited } from '../App.js';
 
 export function PlaceDetailView({ router, params }) {
   const id = params.get('id');
@@ -109,8 +111,51 @@ export function PlaceDetailView({ router, params }) {
   detailCol.appendChild(overview);
 
   // Actions row (primary)
+  const visitToggle = (function () {
+    const btn = h('button', {
+      type: 'button',
+      className: '',
+      onClick: () => {
+        if (isVisited(place.id)) {
+          unmarkVisited(place.id);
+          router.showToast('방문 표시 취소');
+        } else {
+          markVisited(place.id);
+          router.showToast('방문함으로 표시');
+        }
+        paint();
+      }
+    });
+    function paint() {
+      const visited = isVisited(place.id);
+      btn.className = `inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-full text-sm font-body font-semibold transition-colors ${
+        visited
+          ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+          : 'bg-surfaceContainerLowest text-onSurface hover:bg-surfaceContainer'
+      }`;
+      btn.innerHTML = '';
+      btn.appendChild(h('span', {
+        className: 'material-symbols-outlined text-[18px]',
+        style: visited ? { fontVariationSettings: "'FILL' 1" } : {}
+      }, visited ? 'check_circle' : 'check_circle'));
+      btn.appendChild(h('span', {}, visited ? '방문 완료' : '방문함'));
+    }
+    paint();
+    return btn;
+  })();
+
+  const shareBtn = h('button', {
+    type: 'button',
+    className: 'inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-full text-sm font-body font-semibold bg-surfaceContainerLowest text-onSurface hover:bg-surfaceContainer transition-colors',
+    onClick: () => sharePlace(place, router)
+  },
+    h('span', { className: 'material-symbols-outlined text-[18px]' }, 'share'),
+    '공유'
+  );
+
   const actions = h('div', { className: 'flex items-center gap-2 flex-wrap' },
     makeSaveBtn(place, router, { variant: 'button' }),
+    visitToggle,
     place.placeUrl
       ? h('a', {
           href: place.placeUrl, target: '_blank', rel: 'noopener',
@@ -120,14 +165,7 @@ export function PlaceDetailView({ router, params }) {
           '사진·리뷰 보기'
         )
       : null,
-    h('a', {
-        href: `https://map.kakao.com/link/to/${encodeURIComponent(place.name)},${place.lat},${place.lng}`,
-        target: '_blank', rel: 'noopener',
-        className: 'inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-full text-sm font-body font-semibold bg-secondaryContainer text-onSecondaryContainer hover:bg-secondaryFixedDim transition-colors'
-      },
-        h('span', { className: 'material-symbols-outlined text-[18px]' }, 'directions'),
-        '길찾기'
-      ),
+    shareBtn,
     place.phone
       ? h('a', {
           href: `tel:${place.phone}`,
@@ -139,6 +177,39 @@ export function PlaceDetailView({ router, params }) {
       : null
   );
   detailCol.appendChild(actions);
+
+  // 길찾기 — 카카오맵 / 네이버지도 / 구글맵 3개 deep-link
+  const links = mapLinks(place);
+  if (links) {
+    detailCol.appendChild(
+      h('div', { className: 'bg-surfaceContainerLowest rounded-2xl p-4' },
+        h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-3' }, '길찾기 (선호하는 앱 선택)'),
+        h('div', { className: 'grid grid-cols-3 gap-2' },
+          h('a', {
+            href: links.kakao, target: '_blank', rel: 'noopener',
+            className: 'inline-flex flex-col items-center justify-center gap-1 px-3 py-3 rounded-xl text-xs font-body font-semibold bg-yellow-50 text-yellow-900 hover:bg-yellow-100 transition-colors border border-yellow-200'
+          },
+            h('span', { className: 'material-symbols-outlined text-[20px]' }, 'directions_car'),
+            '카카오맵'
+          ),
+          h('a', {
+            href: links.naver, target: '_blank', rel: 'noopener',
+            className: 'inline-flex flex-col items-center justify-center gap-1 px-3 py-3 rounded-xl text-xs font-body font-semibold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition-colors border border-emerald-200'
+          },
+            h('span', { className: 'material-symbols-outlined text-[20px]' }, 'map'),
+            '네이버지도'
+          ),
+          h('a', {
+            href: links.google, target: '_blank', rel: 'noopener',
+            className: 'inline-flex flex-col items-center justify-center gap-1 px-3 py-3 rounded-xl text-xs font-body font-semibold bg-blue-50 text-blue-800 hover:bg-blue-100 transition-colors border border-blue-200'
+          },
+            h('span', { className: 'material-symbols-outlined text-[20px]' }, 'public'),
+            '구글맵'
+          )
+        )
+      )
+    );
+  }
 
   // Kakao Place CTA — info Kakao has that we don't
   detailCol.appendChild(

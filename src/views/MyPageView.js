@@ -99,10 +99,12 @@ export function MyPageView({ router }) {
   // 2) 활동 통계
   function statsRow() {
     const savedCount = AppState.get(STORAGE_KEYS.saved, []).length;
+    const visitedCount = AppState.get(STORAGE_KEYS.visited, []).length;
     const prefs = AppState.get(STORAGE_KEYS.preferences, {}) || {};
     const prefSet = countSetPrefs(prefs);
-    return h('section', { className: 'mt-8 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4' },
+    return h('section', { className: 'mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4' },
       statCard('저장한 장소', String(savedCount), 'bookmark'),
+      statCard('방문 완료', String(visitedCount), 'check_circle'),
       statCard('취향 설정', `${prefSet}/8`, 'tune'),
       statCard('로그인 방식', provider.label, 'shield')
     );

@@ -131,6 +131,13 @@ function saveBlogCache(cache) {
 
 const blogInflight = new Map();
 
+// 캐시에 있는 값만 동기적으로 조회 (정렬용 — fetch 안 함)
+export function getCachedBlogCount(query) {
+  if (!query) return null;
+  const cache = loadBlogCache();
+  return cache[query.trim()]?.n ?? null;
+}
+
 export async function getBlogCount(query) {
   if (!query) return 0;
   const key = query.trim();
