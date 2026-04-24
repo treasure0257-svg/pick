@@ -66,7 +66,10 @@ export function SavedView({ router }) {
           h('span', { className: 'inline-flex items-center gap-0.5 mx-1 px-1.5 py-0.5 rounded-md bg-surfaceContainer text-primary font-semibold text-xs' },
             h('span', { className: 'material-symbols-outlined text-[14px]' }, 'bookmark_add'), '저장'
           ),
-          '버튼을 눌러 나만의 컬렉션을 만들어보세요.'
+          '버튼을 눌러보세요.'
+        ),
+        h('p', { className: 'font-body text-onSurfaceVariant mt-1.5 max-w-md mx-auto leading-relaxed' },
+          '나만의 컬렉션을 만들어보세요.'
         ),
 
         isLoggedIn
