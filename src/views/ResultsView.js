@@ -841,6 +841,12 @@ export function ResultsView({ router, params }) {
           if (prefs.spice === 'mild') activePrefSummary.push('순한맛');
           if (prefs.spice === 'hot')  activePrefSummary.push('매운맛 OK');
           if (prefs.petFriendly) activePrefSummary.push('🐾 반려동물 동반');
+          if (prefs.parking)     activePrefSummary.push('🅿 주차');
+          if (prefs.view)        activePrefSummary.push('뷰');
+          if (prefs.privateRoom) activePrefSummary.push('단체석/룸');
+          if (prefs.kids === 'kids')   activePrefSummary.push('👶 키즈OK');
+          if (prefs.kids === 'noKids') activePrefSummary.push('🚫 노키즈');
+          if (prefs.open24h)     activePrefSummary.push('🌙 24시');
           if (prefs.companion) {
             const c = (PICK_DATA.companions || []).find(x => x.id === prefs.companion);
             if (c) activePrefSummary.push(c.label + ' 모드');

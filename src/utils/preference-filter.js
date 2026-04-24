@@ -47,6 +47,16 @@ const PET_FRIENDLY_KEYWORDS = [
   '애견풀빌라', '반려견풀빌라', '애견글램핑'
 ];
 
+// 환경·분위기 필터 키워드 셋 (모두 휴리스틱 — name + categoryFull 에서 매칭)
+const ENV_KEYWORDS = {
+  parking:     ['주차', '주차장', '발레파킹', '발렛'],
+  view:        ['루프탑', '테라스', '한강뷰', '오션뷰', '야경', '전망', '스카이', '리버뷰', '한라산뷰'],
+  privateRoom: ['룸', '단체석', '연회장', '프라이빗', '단체'],
+  kids:        ['키즈', '패밀리', '아동', '어린이'],
+  noKids:      ['노키즈'],
+  open24h:     ['24시', '심야', '00시', '24h']
+};
+
 export function applyDietaryFilter(places, prefs) {
   if (!prefs?.dietary?.length) return places;
   const excludeKeywords = new Set();
@@ -82,6 +92,22 @@ export function applyPetFilter(places, prefs) {
   });
 }
 
+// 환경·분위기 필터 — 음식점·카페·숙소에 적용 (관광 통과). 키워드 매칭 없으면 제외.
+export function applyEnvFilters(places, prefs) {
+  if (!prefs) return places;
+  return places.filter(p => {
+    if (p.category !== 'FD6' && p.category !== 'CE7' && p.category !== 'AD5') return true;
+    const haystack = `${p.name || ''} ${p.categoryFull || ''} ${p.categoryLabel || ''}`;
+    if (prefs.parking     && !hasAny(haystack, ENV_KEYWORDS.parking))     return false;
+    if (prefs.view        && !hasAny(haystack, ENV_KEYWORDS.view))        return false;
+    if (prefs.privateRoom && !hasAny(haystack, ENV_KEYWORDS.privateRoom)) return false;
+    if (prefs.kids === 'kids'   && !hasAny(haystack, ENV_KEYWORDS.kids))   return false;
+    if (prefs.kids === 'noKids' && !hasAny(haystack, ENV_KEYWORDS.noKids)) return false;
+    if (prefs.open24h     && !hasAny(haystack, ENV_KEYWORDS.open24h))     return false;
+    return true;
+  });
+}
+
 // 동행 유형에 따른 카테고리/키워드 가중치 → 정렬 순서만 재배치
 const COMPANION_BOOST_KEYWORDS = {
   solo:     { categories: ['CE7', 'AT4'],         keywords: ['카페', '북카페', '서점', '미술관', '전시'] },
@@ -114,6 +140,7 @@ export function applyAllPreferences(places, prefs) {
   let out = applyDietaryFilter(places, prefs);
   out = applySpiceFilter(out, prefs);
   out = applyPetFilter(out, prefs);
+  out = applyEnvFilters(out, prefs);
   out = applyCompanionBoost(out, prefs);
   return out;
 }
