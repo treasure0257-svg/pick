@@ -94,9 +94,13 @@ function inferCityName(lat, lng) {
   return '내 위치';
 }
 
-export function WeatherWidget() {
+export function WeatherWidget({ compact = false } = {}) {
+  // compact: 한 줄짜리 가로 pill (forecast 슬롯 생략) — 타이틀 옆 placement 용
+  // 기본(compact=false): 카드형 + 시간별 forecast 포함
   const card = h('div', {
-    className: 'bg-surfaceContainerLowest rounded-2xl p-4 md:p-5 min-w-[200px] flex items-center gap-4 md:flex-col md:items-start md:gap-3 shadow-sm'
+    className: compact
+      ? 'inline-flex items-center gap-2.5 bg-surfaceContainerLowest rounded-full px-3.5 py-2 shadow-sm'
+      : 'bg-surfaceContainerLowest rounded-2xl p-4 md:p-5 min-w-[200px] flex items-center gap-4 md:flex-col md:items-start md:gap-3 shadow-sm'
   });
   const skeleton = h('div', { className: 'flex items-center gap-3' },
     h('div', { className: 'w-10 h-10 rounded-full bg-surfaceContainer animate-pulse' }),
@@ -111,6 +115,28 @@ export function WeatherWidget() {
     card.innerHTML = '';
     const w = WEATHER_MAP[code] || { icon: 'wb_cloudy', label: '날씨' };
     const v = vibe(temp, code);
+
+    if (compact) {
+      // 가로 pill: [☀] 18° 맑음 · 산책 OK
+      card.appendChild(
+        h('span', { className: 'material-symbols-outlined text-[20px] text-amber-700 flex-none' }, w.icon)
+      );
+      card.appendChild(
+        h('span', { className: 'font-headline font-bold text-onSurface text-base leading-none' },
+          temp != null ? `${Math.round(temp)}°` : '—'
+        )
+      );
+      card.appendChild(
+        h('span', { className: 'font-body text-xs text-onSurfaceVariant' }, w.label)
+      );
+      card.appendChild(
+        h('span', { className: 'text-onSurfaceVariant/40' }, '·')
+      );
+      card.appendChild(
+        h('span', { className: 'font-body text-xs text-emerald-700' }, v.msg)
+      );
+      return;
+    }
 
     card.appendChild(
       h('div', { className: 'flex items-center gap-2 md:gap-3 w-full' },

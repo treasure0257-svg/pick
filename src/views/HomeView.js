@@ -220,13 +220,17 @@ export function HomeView({ router }) {
         return wrap;
       })(),
 
-      // 오늘 누구랑? + 날씨 위젯 — 상단 row(헤더 텍스트 + 날씨), 하단 row(chip)
+      // 오늘 누구랑? + 날씨 위젯(가로 pill) — 타이틀 옆 inline 배치
       (function () {
         const wrap = h('section', { className: 'mb-10 md:mb-14' });
-        const titleBlock = h('div', { className: 'flex-grow min-w-0' },
+        // 타이틀 + 가로 pill 날씨 한 줄 (mobile 은 wrap)
+        const titleRow = h('div', { className: 'flex flex-wrap items-center gap-x-4 gap-y-2' },
           h('h2', { className: 'font-headline text-xl md:text-2xl font-extrabold text-onSurface tracking-tight' }, '오늘 누구랑 가세요?'),
-          h('p', { className: 'font-body text-xs md:text-sm text-onSurfaceVariant mt-1' }, '동행을 알려주면 그에 맞는 장소를 우선 추천해드려요.'),
-          h('a', { href: '#/mypage', className: 'hidden md:inline-flex items-center gap-1 mt-2 text-xs text-onSurfaceVariant hover:text-primary' },
+          WeatherWidget({ compact: true })
+        );
+        const subCopy = h('div', { className: 'flex items-center justify-between gap-3 mt-1' },
+          h('p', { className: 'font-body text-xs md:text-sm text-onSurfaceVariant' }, '동행을 알려주면 그에 맞는 장소를 우선 추천해드려요.'),
+          h('a', { href: '#/mypage', className: 'hidden md:inline-flex items-center gap-1 text-xs text-onSurfaceVariant hover:text-primary flex-none' },
             '더 자세한 취향',
             h('span', { className: 'material-symbols-outlined text-[14px]' }, 'chevron_right')
           )
@@ -260,14 +264,9 @@ export function HomeView({ router }) {
         }
         renderChips();
 
-        // 상단: 좌측 타이틀+서브카피+더보기 링크, 우측 날씨 위젯
-        // 중간: 동행 chip
-        // 하단: 빠른 필터 (반려동물 동반)
-        const topRow = h('div', { className: 'flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6' },
-          titleBlock,
-          h('div', { className: 'flex-none w-full md:w-auto md:max-w-[280px]' }, WeatherWidget())
-        );
-        wrap.appendChild(topRow);
+        // 새 레이아웃 (단일 컬럼): 타이틀+inline 날씨 → 서브카피 → chip → 빠른 필터
+        wrap.appendChild(titleRow);
+        wrap.appendChild(subCopy);
         wrap.appendChild(chipsRow);
 
         // 빠른 필터 row — 반려동물 동반 토글 (즉시 저장)
