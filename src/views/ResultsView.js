@@ -840,6 +840,7 @@ export function ResultsView({ router, params }) {
           }
           if (prefs.spice === 'mild') activePrefSummary.push('순한맛');
           if (prefs.spice === 'hot')  activePrefSummary.push('매운맛 OK');
+          if (prefs.petFriendly) activePrefSummary.push('🐾 반려동물 동반');
           if (prefs.companion) {
             const c = (PICK_DATA.companions || []).find(x => x.id === prefs.companion);
             if (c) activePrefSummary.push(c.label + ' 모드');

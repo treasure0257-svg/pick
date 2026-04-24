@@ -205,6 +205,7 @@ function countSetPrefs(prefs) {
   if (prefs.budget)             n++;
   if (prefs.duration)           n++;
   if (prefs.drinks)             n++;
+  if (prefs.petFriendly)        n++;
   if (prefs.categories?.length) n++;
   if (prefs.moods?.length)      n++;
   if (prefs.companion)          n++;
@@ -288,6 +289,7 @@ function summaryFor(title, prefs) {
     if (prefs.budget)   parts.push(labelOf(PICK_DATA.budgets, prefs.budget));
     if (prefs.duration) parts.push(labelOf(PICK_DATA.durations, prefs.duration));
     if (prefs.drinks)   parts.push(labelOf(PICK_DATA.drinks, prefs.drinks));
+    if (prefs.petFriendly) parts.push('🐾 반려동물 동반');
     return parts.length ? parts.join(' · ') : '아직 설정 안 함';
   }
   if (title === '카테고리 · 무드') {
@@ -395,6 +397,19 @@ function lifePrefsContent(router, refreshStats) {
       value: () => getPrefs().drinks || null,
       onChange: v => patchPrefs({ drinks: v }, router, refreshStats)
     })
+  ));
+  // 반려동물 동반 가능 — single boolean toggle (chip 형태)
+  wrap.appendChild(h('div', {},
+    h('h4', { className: 'font-label text-xs uppercase tracking-wider text-onSurfaceVariant mb-2' }, '반려동물 동반'),
+    chipGroup({
+      items: [{ id: true, label: '동반 가능 업체만 보기', icon: 'pets' }],
+      multi: false, accent: ACCENT.life,
+      value: () => (getPrefs().petFriendly ? true : null),
+      onChange: v => patchPrefs({ petFriendly: !!v }, router, refreshStats)
+    }),
+    h('p', { className: 'font-label text-[11px] text-onSurfaceVariant mt-2 leading-relaxed' },
+      '맛집·카페·숙소 결과에서 "애견동반·반려동물·펫동반·애견펜션·펫스테이" 키워드가 명시된 곳만 보여줍니다. (관광 카테고리는 영향 없음)'
+    )
   ));
   return wrap;
 }

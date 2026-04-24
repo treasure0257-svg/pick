@@ -39,6 +39,14 @@ const DIETARY_EXCLUDE_KEYWORDS = {
 
 const SPICY_KEYWORDS = ['매운', '마라', '떡볶이', '닭갈비', '낙지', '아구찜', '짬뽕', '쭈꾸미', '불닭'];
 
+// 반려동물 동반 가능 keyword — Kakao categoryFull/name 에 명시된 경우만 매칭 (heuristic)
+// 음식점·카페·숙소 모두 적용 (애견동반 펜션/호텔/풀빌라 포함)
+const PET_FRIENDLY_KEYWORDS = [
+  '애견', '애완', '반려동물', '반려견', '펫동반', '펫프렌들리', 'pet-friendly', '강아지동반',
+  '도그카페', '애견동반', '반려견동반', '애견숙소', '애견펜션', '반려견펜션', '펫호텔', '펫스테이',
+  '애견풀빌라', '반려견풀빌라', '애견글램핑'
+];
+
 export function applyDietaryFilter(places, prefs) {
   if (!prefs?.dietary?.length) return places;
   const excludeKeywords = new Set();
@@ -60,6 +68,17 @@ export function applySpiceFilter(places, prefs) {
     if (p.category !== 'FD6') return true;
     const haystack = `${p.name || ''} ${p.categoryFull || ''}`;
     return !hasAny(haystack, SPICY_KEYWORDS);
+  });
+}
+
+// 반려동물 동반 — 음식점·카페·숙소 한정으로 키워드 매칭 (관광은 통과)
+export function applyPetFilter(places, prefs) {
+  if (!prefs?.petFriendly) return places;
+  return places.filter(p => {
+    // FD6 음식점 / CE7 카페 / AD5 숙소 만 필터링, 관광·문화 통과
+    if (p.category !== 'FD6' && p.category !== 'CE7' && p.category !== 'AD5') return true;
+    const haystack = `${p.name || ''} ${p.categoryFull || ''} ${p.categoryLabel || ''}`;
+    return hasAny(haystack, PET_FRIENDLY_KEYWORDS);
   });
 }
 
@@ -94,6 +113,7 @@ export function applyCompanionBoost(places, prefs) {
 export function applyAllPreferences(places, prefs) {
   let out = applyDietaryFilter(places, prefs);
   out = applySpiceFilter(out, prefs);
+  out = applyPetFilter(out, prefs);
   out = applyCompanionBoost(out, prefs);
   return out;
 }
