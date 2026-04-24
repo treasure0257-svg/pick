@@ -150,12 +150,18 @@ export function HomeView({ router }) {
       className: 'relative w-full overflow-hidden',
       style: { minHeight: '480px' }
     },
+      // 라이트 모드: 경복궁 주간 / 다크 모드: 반포대교 야경 — Tailwind dark: prefix 로 자동 swap
       h('img', {
         src: '/hero-hanok.jpg',
         alt: '한옥 전경',
-        className: 'absolute inset-0 w-full h-full object-cover'
+        className: 'absolute inset-0 w-full h-full object-cover dark:hidden'
       }),
-      h('div', { className: 'absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60' }),
+      h('img', {
+        src: '/hero-hanok-night.jpg',
+        alt: '서울 야경 — 반포대교 무지개분수',
+        className: 'absolute inset-0 w-full h-full object-cover hidden dark:block'
+      }),
+      h('div', { className: 'absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60 dark:from-black/35 dark:via-black/20 dark:to-black/55' }),
       h('div', { className: 'relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 md:pt-20 pb-10 md:pb-16' },
         h('div', { className: 'text-center text-white' },
           h('span', { className: 'inline-block bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-3 py-1 rounded-full mb-4 border border-white/20' },
