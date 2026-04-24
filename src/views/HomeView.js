@@ -220,20 +220,18 @@ export function HomeView({ router }) {
         return wrap;
       })(),
 
-      // 오늘 누구랑? + 날씨 위젯 — 좌측 동행 chip, 우측(데스크톱) 날씨
+      // 오늘 누구랑? + 날씨 위젯 — 상단 row(헤더 텍스트 + 날씨), 하단 row(chip)
       (function () {
         const wrap = h('section', { className: 'mb-10 md:mb-14' });
-        const headerRow = h('div', { className: 'flex items-end justify-between mb-4' },
-          h('div', {},
-            h('h2', { className: 'font-headline text-xl md:text-2xl font-extrabold text-onSurface tracking-tight' }, '오늘 누구랑 가세요?'),
-            h('p', { className: 'font-body text-xs md:text-sm text-onSurfaceVariant mt-1' }, '동행을 알려주면 그에 맞는 장소를 우선 추천해드려요.')
-          ),
-          h('a', { href: '#/mypage', className: 'hidden md:inline-flex items-center gap-1 text-xs text-onSurfaceVariant hover:text-primary' },
+        const titleBlock = h('div', { className: 'flex-grow min-w-0' },
+          h('h2', { className: 'font-headline text-xl md:text-2xl font-extrabold text-onSurface tracking-tight' }, '오늘 누구랑 가세요?'),
+          h('p', { className: 'font-body text-xs md:text-sm text-onSurfaceVariant mt-1' }, '동행을 알려주면 그에 맞는 장소를 우선 추천해드려요.'),
+          h('a', { href: '#/mypage', className: 'hidden md:inline-flex items-center gap-1 mt-2 text-xs text-onSurfaceVariant hover:text-primary' },
             '더 자세한 취향',
             h('span', { className: 'material-symbols-outlined text-[14px]' }, 'chevron_right')
           )
         );
-        const chipsRow = h('div', { className: 'flex flex-wrap gap-2 md:gap-3' });
+        const chipsRow = h('div', { className: 'flex flex-wrap gap-2 md:gap-3 mt-5' });
 
         function renderChips() {
           chipsRow.innerHTML = '';
@@ -262,16 +260,14 @@ export function HomeView({ router }) {
         }
         renderChips();
 
-        const leftCol = h('div', { className: 'flex-grow min-w-0' });
-        leftCol.appendChild(headerRow);
-        leftCol.appendChild(chipsRow);
-
-        // 데스크톱: 좌측 chip, 우측 날씨. 모바일: 날씨가 위로 배치 (정보가 먼저 보이게)
-        const row = h('div', { className: 'flex flex-col-reverse md:flex-row items-stretch md:items-end gap-4 md:gap-6' },
-          leftCol,
-          h('div', { className: 'flex-none w-full md:w-auto' }, WeatherWidget())
+        // 상단: 좌측 타이틀+서브카피+더보기 링크, 우측 날씨 위젯
+        // 하단: chip row (풀폭)
+        const topRow = h('div', { className: 'flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6' },
+          titleBlock,
+          h('div', { className: 'flex-none w-full md:w-auto md:max-w-[280px]' }, WeatherWidget())
         );
-        wrap.appendChild(row);
+        wrap.appendChild(topRow);
+        wrap.appendChild(chipsRow);
         return wrap;
       })(),
 
