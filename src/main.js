@@ -53,11 +53,43 @@ appRouter.init();
 // 마지막으로 알려진 사용자 상태를 캐시했다가 매 navigation 직후 재적용한다.
 let latestAuthUser = null;
 
+function makeThemeToggle() {
+  const btn = h('button', {
+    type: 'button',
+    title: '다크 모드 전환',
+    'aria-label': '다크 모드 전환'
+  });
+  function paint() {
+    const dark = document.documentElement.classList.contains('dark');
+    btn.className = 'inline-flex items-center justify-center w-9 h-9 rounded-full bg-surfaceContainerLow hover:bg-surfaceContainer text-onSurface transition-colors';
+    btn.innerHTML = '';
+    btn.appendChild(h('span', { className: 'material-symbols-outlined text-[20px]' }, dark ? 'light_mode' : 'dark_mode'));
+  }
+  btn.addEventListener('click', () => {
+    const next = !document.documentElement.classList.contains('dark');
+    document.documentElement.classList.toggle('dark', next);
+    try { localStorage.setItem('pick.theme', next ? 'dark' : 'light'); } catch {}
+    // 모든 헤더의 toggle 아이콘 갱신
+    document.querySelectorAll('[data-theme-toggle]').forEach(el => {
+      const isDark = next;
+      el.innerHTML = '';
+      el.appendChild(h('span', { className: 'material-symbols-outlined text-[20px]' }, isDark ? 'light_mode' : 'dark_mode'));
+    });
+  });
+  paint();
+  btn.setAttribute('data-theme-toggle', '');
+  return btn;
+}
+
 function updateAuthUI(user) {
   latestAuthUser = user;
   const slots = document.querySelectorAll('#auth-slot');
   slots.forEach(slot => {
     slot.innerHTML = '';
+
+    // 다크 모드 토글 — 로그인 여부 무관, 항상 가장 왼쪽에 노출
+    slot.appendChild(makeThemeToggle());
+
     if (user) {
       // 데스크톱 한정: '마이페이지' 텍스트 링크 → 프로필 사진 묶음으로 표시 (왼→오른쪽)
       const myPageLink = h('a', {
