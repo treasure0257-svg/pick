@@ -261,13 +261,45 @@ export function HomeView({ router }) {
         renderChips();
 
         // 상단: 좌측 타이틀+서브카피+더보기 링크, 우측 날씨 위젯
-        // 하단: chip row (풀폭)
+        // 중간: 동행 chip
+        // 하단: 빠른 필터 (반려동물 동반)
         const topRow = h('div', { className: 'flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6' },
           titleBlock,
           h('div', { className: 'flex-none w-full md:w-auto md:max-w-[280px]' }, WeatherWidget())
         );
         wrap.appendChild(topRow);
         wrap.appendChild(chipsRow);
+
+        // 빠른 필터 row — 반려동물 동반 토글 (즉시 저장)
+        (function () {
+          const filterRow = h('div', { className: 'mt-3 flex items-center gap-2 flex-wrap' });
+          filterRow.appendChild(
+            h('span', { className: 'font-label text-[11px] uppercase tracking-wider text-onSurfaceVariant mr-1' }, '빠른 필터')
+          );
+          const petBtn = h('button', { type: 'button' });
+          function paintPet() {
+            const on = !!(AppState.get(STORAGE_KEYS.preferences, {}) || {}).petFriendly;
+            petBtn.className = `inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full font-body text-xs font-medium transition-colors border ${
+              on
+                ? 'bg-emerald-600 text-white border-emerald-600'
+                : 'bg-surfaceContainerLowest text-onSurface border-surfaceContainerHighest hover:border-emerald-500/40'
+            }`;
+            petBtn.innerHTML = '';
+            petBtn.appendChild(h('span', { className: 'material-symbols-outlined text-[16px]', style: on ? { fontVariationSettings: "'FILL' 1" } : {} }, 'pets'));
+            petBtn.appendChild(h('span', {}, on ? '반려동물 동반 ON' : '반려동물 동반'));
+          }
+          petBtn.addEventListener('click', () => {
+            const next = AppState.get(STORAGE_KEYS.preferences, {}) || {};
+            next.petFriendly = !next.petFriendly;
+            AppState.set(STORAGE_KEYS.preferences, next);
+            paintPet();
+            router.showToast(next.petFriendly ? '🐾 반려동물 동반 업체만 표시' : '반려동물 필터 해제');
+          });
+          paintPet();
+          filterRow.appendChild(petBtn);
+          wrap.appendChild(filterRow);
+        })();
+
         return wrap;
       })(),
 
