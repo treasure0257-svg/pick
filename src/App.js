@@ -14,7 +14,8 @@ export const STORAGE_KEYS = {
   saved:       "pick.saved",
   visited:     "pick.visited",
   recentRegions: "pick.recentRegions",
-  pinnedRegions: "pick.pinnedRegions"
+  pinnedRegions: "pick.pinnedRegions",
+  searchHistory: "pick.searchHistory"
 };
 
 export function scorePlace(place, prefs) {
@@ -106,4 +107,21 @@ export function togglePinnedRegion(regionId) {
 
 export function getPinnedRegions() {
   return AppState.get(STORAGE_KEYS.pinnedRegions, []);
+}
+
+// --- 검색 히스토리 (홈 검색창 LRU 5) ---
+export function pushSearchTerm(term) {
+  const t = (term || '').trim();
+  if (!t) return;
+  const list = AppState.get(STORAGE_KEYS.searchHistory, []);
+  const next = [t, ...list.filter(x => x !== t)].slice(0, 5);
+  AppState.set(STORAGE_KEYS.searchHistory, next);
+}
+
+export function getSearchHistory() {
+  return AppState.get(STORAGE_KEYS.searchHistory, []);
+}
+
+export function clearSearchHistory() {
+  AppState.set(STORAGE_KEYS.searchHistory, []);
 }

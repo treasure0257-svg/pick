@@ -178,6 +178,21 @@ export function PlaceDetailView({ router, params }) {
   );
   detailCol.appendChild(actions);
 
+  // 영업시간·메뉴 — Naver 검색 deep-link (Naver Place 페이지로 안내)
+  detailCol.appendChild(
+    h('a', {
+      href: `https://search.naver.com/search.naver?query=${encodeURIComponent(place.name + ' ' + (place.address || '') + ' 영업시간')}`,
+      target: '_blank', rel: 'noopener',
+      className: 'inline-flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-body text-sm font-semibold transition-colors'
+    },
+      h('span', { className: 'flex items-center gap-2' },
+        h('span', { className: 'material-symbols-outlined text-[18px]' }, 'schedule'),
+        '🕒 영업시간 · 메뉴 확인 (네이버)'
+      ),
+      h('span', { className: 'material-symbols-outlined text-[18px]' }, 'open_in_new')
+    )
+  );
+
   // 길찾기 — 카카오맵 / 네이버지도 / 구글맵 3개 deep-link
   const links = mapLinks(place);
   if (links) {

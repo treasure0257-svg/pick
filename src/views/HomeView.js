@@ -5,7 +5,7 @@ import { Footer } from '../components/Footer.js';
 import { WeatherWidget } from '../components/WeatherWidget.js';
 import { PICK_DATA } from '../data.js';
 import { REGIONS, countPlacesByRegion, regionFromAddress } from '../regions.js';
-import { AppState, STORAGE_KEYS, getRecentRegions, getPinnedRegions, isRegionPinned, togglePinnedRegion } from '../App.js';
+import { AppState, STORAGE_KEYS, getRecentRegions, getPinnedRegions, isRegionPinned, togglePinnedRegion, getSearchHistory, pushSearchTerm, clearSearchHistory } from '../App.js';
 
 export function HomeView({ router }) {
   const counts = countPlacesByRegion(PICK_DATA.places);
@@ -105,8 +105,47 @@ export function HomeView({ router }) {
     const q = searchInput.value.trim();
     searchResults.innerHTML = '';
 
+    // 입력 비어있으면: 검색 히스토리 chip 노출 (있을 때만)
     if (!q) {
-      searchResults.classList.add('hidden');
+      const history = getSearchHistory();
+      if (history.length === 0) {
+        searchResults.classList.add('hidden');
+        renderRegionGrid('');
+        return;
+      }
+      searchResults.classList.remove('hidden');
+      searchResults.appendChild(
+        h('div', { className: 'flex items-center justify-between px-5 pt-4 pb-1' },
+          h('span', { className: 'font-label text-xs text-onSurfaceVariant uppercase tracking-widest' }, '최근 검색'),
+          h('button', {
+            type: 'button',
+            className: 'text-xs text-onSurfaceVariant hover:text-primary',
+            onClick: (e) => {
+              e.preventDefault();
+              clearSearchHistory();
+              renderSearch();
+            }
+          }, '지우기')
+        )
+      );
+      const histRow = h('div', { className: 'flex flex-wrap gap-1.5 px-5 pb-4' });
+      history.forEach(term => {
+        histRow.appendChild(
+          h('button', {
+            type: 'button',
+            className: 'inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-surfaceContainerLow hover:bg-surfaceContainer text-onSurface text-xs font-body transition-colors',
+            onClick: (e) => {
+              e.preventDefault();
+              searchInput.value = term;
+              scheduleSearch();
+            }
+          },
+            h('span', { className: 'material-symbols-outlined text-[14px] text-onSurfaceVariant' }, 'history'),
+            term
+          )
+        );
+      });
+      searchResults.appendChild(histRow);
       renderRegionGrid('');
       return;
     }
@@ -168,7 +207,25 @@ export function HomeView({ router }) {
     }
   }
 
-  searchInput.addEventListener('input', renderSearch);
+  // Debounce search rendering — 입력 connected (200ms) + Enter/blur 시 history push
+  let searchTimer = null;
+  function scheduleSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(renderSearch, 200);
+  }
+  searchInput.addEventListener('input', scheduleSearch);
+  searchInput.addEventListener('focus', renderSearch); // 포커스 시 history 노출
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && searchInput.value.trim()) {
+      pushSearchTerm(searchInput.value.trim());
+      renderSearch();
+    }
+  });
+  // 결과 row 안에 있는 link 클릭 시도 자동 push (위임)
+  searchResults.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (a) pushSearchTerm(searchInput.value.trim());
+  });
   renderRegionGrid('');
 
   return h('div', { className: 'flex flex-col min-h-screen' },
@@ -218,6 +275,67 @@ export function HomeView({ router }) {
     ),
 
     h('main', { className: 'flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 pb-32 md:pb-16' },
+
+      // 이 계절 추천 — 현재 월 기반 자동 매핑
+      (function () {
+        const month = new Date().getMonth() + 1; // 1-12
+        let season, emoji, items;
+        if (month >= 3 && month <= 5) {
+          season = '봄'; emoji = '🌸';
+          items = [
+            { label: '진해 군항제', region: 'gyeongnam', kw: '진해 군항제' },
+            { label: '서울 윤중로 벚꽃', region: 'seoul',   kw: '여의도 윤중로' },
+            { label: '경주 보문단지',   region: 'gyeongbuk', kw: '경주 보문' },
+            { label: '담양 죽녹원',     region: 'jeonnam',  kw: '담양 죽녹원' }
+          ];
+        } else if (month >= 6 && month <= 8) {
+          season = '여름'; emoji = '🌊';
+          items = [
+            { label: '부산 해운대',     region: 'busan',   kw: '해운대' },
+            { label: '강원 양양 서핑',  region: 'gangwon', kw: '양양 서핑' },
+            { label: '제주 협재해변',   region: 'jeju',    kw: '협재' },
+            { label: '강원 평창 계곡',  region: 'gangwon', kw: '평창 계곡' }
+          ];
+        } else if (month >= 9 && month <= 11) {
+          season = '가을'; emoji = '🍁';
+          items = [
+            { label: '강원 설악산 단풍', region: 'gangwon', kw: '설악산 단풍' },
+            { label: '충북 단양',       region: 'chungbuk', kw: '단양' },
+            { label: '전북 내장산',     region: 'jeonbuk',  kw: '내장산' },
+            { label: '광주 무등산',     region: 'gwangju',  kw: '무등산' }
+          ];
+        } else {
+          season = '겨울'; emoji = '❄️';
+          items = [
+            { label: '강원 평창 스키',  region: 'gangwon', kw: '평창 스키' },
+            { label: '제주 한라산',     region: 'jeju',    kw: '한라산' },
+            { label: '부산 광안리 야경', region: 'busan',  kw: '광안리 야경' },
+            { label: '충남 온양온천',   region: 'chungnam', kw: '온양 온천' }
+          ];
+        }
+
+        const wrap = h('section', { className: 'mb-8 md:mb-10' });
+        wrap.appendChild(h('div', { className: 'flex items-center gap-2 mb-3' },
+          h('span', { className: 'text-base' }, emoji),
+          h('h2', { className: 'font-headline text-sm font-bold text-onSurfaceVariant uppercase tracking-wider' },
+            `${season} 추천 — ${new Date().getMonth() + 1}월`
+          )
+        ));
+        const chips = h('div', { className: 'flex flex-wrap gap-2' });
+        items.forEach(it => {
+          chips.appendChild(
+            h('a', {
+              href: `#/region?id=${it.region}`,
+              className: 'inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-sm font-body bg-surfaceContainerLowest text-onSurface border border-surfaceContainerHighest hover:border-primary/40 transition-colors'
+            },
+              h('span', { className: 'text-base' }, emoji),
+              it.label
+            )
+          );
+        });
+        wrap.appendChild(chips);
+        return wrap;
+      })(),
 
       // 최근 본 권역 chip — 데이터가 있을 때만 노출
       (function () {
