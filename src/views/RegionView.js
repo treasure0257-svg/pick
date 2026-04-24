@@ -6,6 +6,7 @@ import { Footer } from '../components/Footer.js';
 import { PICK_DATA } from '../data.js';
 import { REGIONS, countPlacesBySubregion, placesInRegion, featuredFor } from '../regions.js';
 import { keywordSearch, normalizeKakaoPlace, cachePlaces } from '../services/kakaoLocal.js';
+import { isRegionPinned, togglePinnedRegion } from '../App.js';
 
 export function RegionView({ router, params }) {
   const id = params.get('id');
@@ -41,9 +42,33 @@ export function RegionView({ router, params }) {
           h('span', { className: 'material-symbols-outlined text-[18px]' }, 'arrow_back'),
           '전체 지역'
         ),
-        h('h1', {
-          className: 'font-headline text-[2.25rem] md:text-[2.75rem] font-extrabold text-white tracking-tight drop-shadow-lg'
-        }, region.label),
+        h('div', { className: 'flex items-center gap-3 flex-wrap' },
+          h('h1', {
+            className: 'font-headline text-[2.25rem] md:text-[2.75rem] font-extrabold text-white tracking-tight drop-shadow-lg'
+          }, region.label),
+          // ⭐ 즐겨찾기 토글 (별표) — 클릭 시 즉시 토글 + 토스트
+          (function () {
+            const btn = h('button', { type: 'button', title: '즐겨찾기 토글' });
+            function paint() {
+              const on = isRegionPinned(id);
+              btn.className = `inline-flex items-center justify-center w-9 h-9 rounded-full backdrop-blur transition-colors ${
+                on ? 'bg-yellow-400 text-yellow-900 shadow' : 'bg-white/15 text-white hover:bg-white/25'
+              }`;
+              btn.innerHTML = '';
+              btn.appendChild(h('span', {
+                className: 'material-symbols-outlined text-[22px]',
+                style: on ? { fontVariationSettings: "'FILL' 1" } : {}
+              }, 'star'));
+            }
+            btn.addEventListener('click', () => {
+              const on = togglePinnedRegion(id);
+              paint();
+              router.showToast(on ? `★ ${region.label} 즐겨찾기 추가` : '즐겨찾기 해제');
+            });
+            paint();
+            return btn;
+          })()
+        ),
         h('p', { className: 'font-body text-sm md:text-base text-white/85 mt-1 drop-shadow' }, region.hint)
       )
     )

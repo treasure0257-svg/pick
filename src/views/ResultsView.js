@@ -388,11 +388,13 @@ export function ResultsView({ router, params }) {
     h('h2', { className: 'font-headline text-lg font-bold text-onSurface' }, '장소'),
     h('span', { className: 'font-label text-xs text-onSurfaceVariant' }, '맛집 · 카페 · 명소')
   );
-  // Landmark filter — 사용자가 현재 보이는 건물명을 검색해 그 주변만 필터링
+  // Landmark/Station filter — 모드 토글로 검색 행동 분리
+  // landmark: 키워드 그대로 검색 (1km), station: '역' suffix 자동 + 짧은 반경(0.5km)
+  let searchMode = 'landmark'; // 'landmark' | 'station'
   const landmarkChipSlot = h('div', { className: 'flex flex-wrap gap-2 mb-3 empty:hidden' });
   const landmarkInput = h('input', {
     type: 'text',
-    placeholder: '어디에 계신가요? 현재 눈 앞에 보이는 것을 검색해보세요!',
+    placeholder: '예: 강남경찰서, 스타필드',
     className: 'flex-grow min-w-0 px-4 py-3 rounded-xl border border-surfaceContainerHighest bg-surfaceContainerLowest text-sm font-body text-onSurface placeholder:text-onSurfaceVariant focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors'
   });
   const landmarkBtn = h('button', {
@@ -402,6 +404,39 @@ export function ResultsView({ router, params }) {
     h('span', { className: 'material-symbols-outlined text-[18px]' }, 'near_me'),
     '주변 보기'
   );
+  // 모드 toggle (segmented)
+  const modeToggle = h('div', { className: 'flex items-center gap-1 bg-surfaceContainer p-1 rounded-full text-xs font-body font-medium mb-2 self-start' });
+  function makeModeBtn(mode, icon, label) {
+    const btn = h('button', {
+      type: 'button',
+      onClick: () => {
+        searchMode = mode;
+        landmarkInput.placeholder = mode === 'station'
+          ? '예: 강남역, 홍대입구역, 신림역'
+          : '예: 강남경찰서, 스타필드, 한강공원';
+        paintModes();
+      }
+    });
+    btn.dataset.mode = mode;
+    btn.innerHTML = '';
+    btn.appendChild(h('span', { className: 'material-symbols-outlined text-[15px]' }, icon));
+    btn.appendChild(h('span', {}, label));
+    return btn;
+  }
+  const landmarkBtnMode = makeModeBtn('landmark', 'near_me', '랜드마크');
+  const stationBtnMode  = makeModeBtn('station',  'subway',  '지하철역');
+  function paintModes() {
+    [landmarkBtnMode, stationBtnMode].forEach(b => {
+      const active = b.dataset.mode === searchMode;
+      b.className = `inline-flex items-center gap-1 px-3 py-1 rounded-full transition-colors ${
+        active ? 'bg-surface text-primary shadow-sm' : 'text-onSurfaceVariant hover:text-onSurface'
+      }`;
+    });
+  }
+  modeToggle.appendChild(landmarkBtnMode);
+  modeToggle.appendChild(stationBtnMode);
+  paintModes();
+
   const landmarkForm = h('form', { className: 'flex gap-2 mb-4' }, landmarkInput, landmarkBtn);
   // Category tabs (populated after Kakao results come in)
   const tabsBar = h('div', { className: 'flex items-center gap-2 mb-3 flex-wrap' });
@@ -419,6 +454,7 @@ export function ResultsView({ router, params }) {
     sortSelect
   );
   listSection.appendChild(listHeader);
+  listSection.appendChild(modeToggle);
   listSection.appendChild(landmarkForm);
   listSection.appendChild(landmarkChipSlot);
   listSection.appendChild(tabsBar);
@@ -904,21 +940,24 @@ export function ResultsView({ router, params }) {
           const orig = landmarkBtn.innerHTML;
           landmarkBtn.innerHTML = '검색 중…';
           try {
-            // 현재 region 한정으로 정확도 향상 (예: '서울 강남경찰서')
-            const result = await keywordSearch(`${regionLabel(region)} ${q}`, { size: 1 });
+            // 지하철역 모드: 입력에 '역' 자동 추가, 반경 0.5km
+            const isStation = searchMode === 'station';
+            const queryNorm = isStation && !/역$/.test(q) ? q + '역' : q;
+            const radius = isStation ? 0.5 : 1;
+            const result = await keywordSearch(`${regionLabel(region)} ${queryNorm}`, { size: 1 });
             const first = result?.[0];
             if (!first) {
-              router.showToast(`"${q}" 위치를 찾지 못했어요. 다른 이름으로 시도해보세요.`);
+              router.showToast(`"${queryNorm}" 위치를 찾지 못했어요. 다른 이름으로 시도해보세요.`);
               return;
             }
             landmark = {
               name: first.place_name,
               lat: parseFloat(first.y),
               lng: parseFloat(first.x),
-              radiusKm: 1
+              radiusKm: radius
             };
             applyTab();
-            router.showToast(`📍 ${landmark.name} 주변 1km 표시`);
+            router.showToast(`📍 ${landmark.name} 주변 ${radius * 1000}m 표시`);
           } catch (err) {
             router.showToast('검색 중 오류가 발생했어요.');
             console.error(err);

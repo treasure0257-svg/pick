@@ -13,7 +13,8 @@ export const STORAGE_KEYS = {
   tournament:  "pick.tournament",
   saved:       "pick.saved",
   visited:     "pick.visited",
-  recentRegions: "pick.recentRegions"
+  recentRegions: "pick.recentRegions",
+  pinnedRegions: "pick.pinnedRegions"
 };
 
 export function scorePlace(place, prefs) {
@@ -87,4 +88,22 @@ export function pushRecentRegion(regionId, areaId) {
 
 export function getRecentRegions() {
   return AppState.get(STORAGE_KEYS.recentRegions, []);
+}
+
+// --- 즐겨찾기 권역 (시·도 단위, 별표 토글) ---
+export function isRegionPinned(regionId) {
+  return AppState.get(STORAGE_KEYS.pinnedRegions, []).includes(regionId);
+}
+
+export function togglePinnedRegion(regionId) {
+  const list = AppState.get(STORAGE_KEYS.pinnedRegions, []);
+  const next = list.includes(regionId)
+    ? list.filter(x => x !== regionId)
+    : [...list, regionId];
+  AppState.set(STORAGE_KEYS.pinnedRegions, next);
+  return next.includes(regionId);
+}
+
+export function getPinnedRegions() {
+  return AppState.get(STORAGE_KEYS.pinnedRegions, []);
 }

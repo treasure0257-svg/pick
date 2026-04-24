@@ -5,7 +5,7 @@ import { Footer } from '../components/Footer.js';
 import { WeatherWidget } from '../components/WeatherWidget.js';
 import { PICK_DATA } from '../data.js';
 import { REGIONS, countPlacesByRegion, regionFromAddress } from '../regions.js';
-import { AppState, STORAGE_KEYS, getRecentRegions } from '../App.js';
+import { AppState, STORAGE_KEYS, getRecentRegions, getPinnedRegions, isRegionPinned, togglePinnedRegion } from '../App.js';
 
 export function HomeView({ router }) {
   const counts = countPlacesByRegion(PICK_DATA.places);
@@ -39,9 +39,14 @@ export function HomeView({ router }) {
   function renderRegionGrid(filterLabelQuery = '') {
     regionGrid.innerHTML = '';
     const q = filterLabelQuery.trim().toLowerCase();
-    const visible = q
+    const filtered = q
       ? REGIONS.filter(r => r.label.toLowerCase().includes(q) || r.id.toLowerCase().includes(q))
       : REGIONS;
+    // 즐겨찾기 권역을 grid 상단에 배치 (검색 결과 순서는 유지)
+    const pinned = new Set(getPinnedRegions());
+    const visible = q
+      ? filtered
+      : [...filtered.filter(r => pinned.has(r.id)), ...filtered.filter(r => !pinned.has(r.id))];
 
     visible.forEach(r => {
       const tile = h('a', {
@@ -55,6 +60,31 @@ export function HomeView({ router }) {
           className: 'absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700'
         }),
         h('div', { className: 'absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent' }),
+        // 즐겨찾기 별 토글 (우상단)
+        (function () {
+          const star = h('button', {
+            type: 'button',
+            title: '즐겨찾기 토글',
+            onClick: (e) => {
+              e.preventDefault(); e.stopPropagation();
+              const on = togglePinnedRegion(r.id);
+              renderRegionGrid(filterLabelQuery); // 재배열을 위해 grid 다시 그림
+            }
+          });
+          function paint() {
+            const on = isRegionPinned(r.id);
+            star.className = `absolute top-2 right-2 w-8 h-8 rounded-full backdrop-blur flex items-center justify-center transition-colors z-10 ${
+              on ? 'bg-yellow-400 text-yellow-900 shadow' : 'bg-black/40 text-white/80 hover:bg-black/60'
+            }`;
+            star.innerHTML = '';
+            star.appendChild(h('span', {
+              className: 'material-symbols-outlined text-[18px]',
+              style: on ? { fontVariationSettings: "'FILL' 1" } : {}
+            }, 'star'));
+          }
+          paint();
+          return star;
+        })(),
         h('div', { className: 'absolute inset-x-0 bottom-0 p-3 md:p-4 flex flex-col gap-0.5 text-white' },
           h('span', { className: 'font-headline font-bold text-base md:text-lg leading-tight drop-shadow' }, r.label),
           h('span', { className: 'font-label text-[11px] text-white/80 truncate' }, r.hint)
@@ -269,12 +299,9 @@ export function HomeView({ router }) {
         wrap.appendChild(subCopy);
         wrap.appendChild(chipsRow);
 
-        // 빠른 필터 row — 반려동물 + 5개 환경 필터 (즉시 저장)
+        // 빠른 필터 row — 기본 접힘, '필터 (N)' 토글 버튼 클릭 시 inline 펼침
         (function () {
-          const filterRow = h('div', { className: 'mt-3 flex items-center gap-2 flex-wrap' });
-          filterRow.appendChild(
-            h('span', { className: 'font-label text-[11px] uppercase tracking-wider text-onSurfaceVariant mr-1 self-center' }, '빠른 필터')
-          );
+          const wrapBox = h('div', { className: 'mt-3' });
 
           // 정의: id, label, icon, activeClass(active 시 컬러)
           const QUICK_FILTERS = [
@@ -324,9 +351,20 @@ export function HomeView({ router }) {
             paint();
             return btn;
           }
-          QUICK_FILTERS.forEach(f => filterRow.appendChild(makeToggle(f)));
+          // 활성 카운트 계산 함수
+          function activeCount() {
+            const p = AppState.get(STORAGE_KEYS.preferences, {}) || {};
+            let n = 0;
+            QUICK_FILTERS.forEach(f => { if (p[f.id]) n++; });
+            if (p.kids) n++;
+            return n;
+          }
 
-          // 키즈존 — 단일 3-state cycle (none → kids → noKids → none)
+          // 펼침/접힘 컨테이너 (chip들이 들어감)
+          const expandedRow = h('div', { className: 'mt-3 flex items-center gap-2 flex-wrap', style: { display: 'none' } });
+          QUICK_FILTERS.forEach(f => expandedRow.appendChild(makeToggle(f)));
+
+          // 키즈존 — 3-state cycle
           (function () {
             const btn = h('button', { type: 'button' });
             function paint() {
@@ -350,13 +388,55 @@ export function HomeView({ router }) {
               next.kids = cur == null ? 'kids' : cur === 'kids' ? 'noKids' : null;
               AppState.set(STORAGE_KEYS.preferences, next);
               paint();
+              repaintToggleBtn();
               router.showToast(next.kids === 'kids' ? '👶 키즈존 OK' : next.kids === 'noKids' ? '🚫 노키즈 선호' : '키즈 필터 해제');
             });
             paint();
-            filterRow.appendChild(btn);
+            expandedRow.appendChild(btn);
           })();
 
-          wrap.appendChild(filterRow);
+          // 활성 카운트 변동 시 toggle 버튼도 업데이트하기 위한 hook
+          // makeToggle 내부 click에서 paint 후 repaintToggleBtn 호출되도록 closure 노출
+          let repaintToggleBtn = () => {};
+
+          // 토글 버튼 (기본 접힘 상태)
+          let isOpen = false;
+          const toggleBtn = h('button', {
+            type: 'button',
+            className: 'inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full font-body text-xs font-medium bg-surfaceContainerLowest text-onSurface border border-surfaceContainerHighest hover:border-primary/40 transition-colors'
+          });
+          repaintToggleBtn = () => {
+            const n = activeCount();
+            toggleBtn.innerHTML = '';
+            toggleBtn.appendChild(h('span', { className: 'material-symbols-outlined text-[16px]' }, 'tune'));
+            toggleBtn.appendChild(h('span', {},
+              n > 0 ? `필터 (${n})` : '필터 추가'
+            ));
+            toggleBtn.appendChild(h('span', {
+              className: 'material-symbols-outlined text-[16px] transition-transform',
+              style: { transform: isOpen ? 'rotate(180deg)' : 'none' }
+            }, 'expand_more'));
+          };
+          toggleBtn.addEventListener('click', () => {
+            isOpen = !isOpen;
+            expandedRow.style.display = isOpen ? 'flex' : 'none';
+            repaintToggleBtn();
+          });
+          repaintToggleBtn();
+
+          // header row (label + toggle button)
+          const filterHeader = h('div', { className: 'mt-3 flex items-center gap-2' },
+            h('span', { className: 'font-label text-[11px] uppercase tracking-wider text-onSurfaceVariant' }, '빠른 필터'),
+            toggleBtn
+          );
+
+          // chip click 시 카운트 업데이트 위해 makeToggle 내부 paint 호출 후 repaintToggleBtn 도 호출되도록 wrap
+          // (makeToggle 자체를 수정하기엔 복잡 → MutationObserver 대신 expandedRow click에 위임)
+          expandedRow.addEventListener('click', () => queueMicrotask(repaintToggleBtn));
+
+          wrapBox.appendChild(filterHeader);
+          wrapBox.appendChild(expandedRow);
+          wrap.appendChild(wrapBox);
         })();
 
         return wrap;
