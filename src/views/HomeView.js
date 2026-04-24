@@ -2,6 +2,7 @@ import { h } from '../utils/dom.js';
 import { Header } from '../components/Header.js';
 import { BottomNav } from '../components/BottomNav.js';
 import { Footer } from '../components/Footer.js';
+import { WeatherWidget } from '../components/WeatherWidget.js';
 import { PICK_DATA } from '../data.js';
 import { REGIONS, countPlacesByRegion, regionFromAddress } from '../regions.js';
 import { AppState, STORAGE_KEYS } from '../App.js';
@@ -182,7 +183,7 @@ export function HomeView({ router }) {
 
     h('main', { className: 'flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 pb-32 md:pb-16' },
 
-      // 오늘 누구랑? — 세션성 컨텍스트, 권역 선택 전에 빠르게 고르도록 grid 위에 배치
+      // 오늘 누구랑? + 날씨 위젯 — 좌측 동행 chip, 우측(데스크톱) 날씨
       (function () {
         const wrap = h('section', { className: 'mb-10 md:mb-14' });
         const headerRow = h('div', { className: 'flex items-end justify-between mb-4' },
@@ -224,8 +225,16 @@ export function HomeView({ router }) {
         }
         renderChips();
 
-        wrap.appendChild(headerRow);
-        wrap.appendChild(chipsRow);
+        const leftCol = h('div', { className: 'flex-grow min-w-0' });
+        leftCol.appendChild(headerRow);
+        leftCol.appendChild(chipsRow);
+
+        // 데스크톱: 좌측 chip, 우측 날씨. 모바일: 날씨가 위로 배치 (정보가 먼저 보이게)
+        const row = h('div', { className: 'flex flex-col-reverse md:flex-row items-stretch md:items-end gap-4 md:gap-6' },
+          leftCol,
+          h('div', { className: 'flex-none w-full md:w-auto' }, WeatherWidget())
+        );
+        wrap.appendChild(row);
         return wrap;
       })(),
 
