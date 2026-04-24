@@ -5,7 +5,7 @@ import { Footer } from '../components/Footer.js';
 import { WeatherWidget } from '../components/WeatherWidget.js';
 import { PICK_DATA } from '../data.js';
 import { REGIONS, countPlacesByRegion, regionFromAddress } from '../regions.js';
-import { AppState, STORAGE_KEYS } from '../App.js';
+import { AppState, STORAGE_KEYS, getRecentRegions } from '../App.js';
 
 export function HomeView({ router }) {
   const counts = countPlacesByRegion(PICK_DATA.places);
@@ -182,6 +182,37 @@ export function HomeView({ router }) {
     ),
 
     h('main', { className: 'flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 pb-32 md:pb-16' },
+
+      // 최근 본 권역 chip — 데이터가 있을 때만 노출
+      (function () {
+        const recent = getRecentRegions();
+        if (recent.length === 0) return null;
+        const wrap = h('section', { className: 'mb-8 md:mb-10' });
+        wrap.appendChild(h('div', { className: 'flex items-center gap-2 mb-3' },
+          h('span', { className: 'material-symbols-outlined text-[18px] text-onSurfaceVariant' }, 'history'),
+          h('h2', { className: 'font-headline text-sm font-bold text-onSurfaceVariant uppercase tracking-wider' }, '최근 본 권역')
+        ));
+        const chips = h('div', { className: 'flex flex-wrap gap-2' });
+        recent.forEach(key => {
+          const [rid, aid] = key.split(':');
+          const r = REGIONS.find(x => x.id === rid);
+          if (!r) return;
+          const sub = aid ? r.subregions?.find(s => s.id === aid) : null;
+          const label = sub ? `${r.label} · ${sub.label}` : r.label;
+          const href = sub ? `#/results?region=${rid}&area=${aid}` : `#/region?id=${rid}`;
+          chips.appendChild(
+            h('a', {
+              href,
+              className: 'inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-sm font-body bg-surfaceContainerLowest text-onSurface border border-surfaceContainerHighest hover:border-primary/40 transition-colors'
+            },
+              h('span', { className: 'material-symbols-outlined text-[16px] text-onSurfaceVariant' }, sub ? 'place' : (r.icon || 'location_city')),
+              label
+            )
+          );
+        });
+        wrap.appendChild(chips);
+        return wrap;
+      })(),
 
       // 오늘 누구랑? + 날씨 위젯 — 좌측 동행 chip, 우측(데스크톱) 날씨
       (function () {

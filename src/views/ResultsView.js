@@ -670,19 +670,37 @@ export function ResultsView({ router, params }) {
             h('span', { className: 'font-label text-xs text-primary uppercase tracking-widest' }, '하루 코스 추천'),
             h('h3', { className: 'font-headline text-xl md:text-2xl font-extrabold text-onSurface mt-1' }, '밥 → 카페 → 즐길거리')
           ),
-          h('button', {
-            className: 'inline-flex items-center gap-1 bg-surfaceContainerLowest hover:bg-surfaceContainer transition text-onSurface font-body text-sm font-medium py-2 px-4 rounded-full',
-            onClick: () => {
-              course = {
-                FD6: pickOneFromCategory(allPlaces, 'FD6'),
-                CE7: pickOneFromCategory(allPlaces, 'CE7'),
-                AT4: pickOneFromCategory(allPlaces, 'AT4')
-              };
-              paint();
-            }
-          },
-            h('span', { className: 'material-symbols-outlined text-[18px]' }, 'shuffle'),
-            '다른 조합'
+          h('div', { className: 'flex items-center gap-2 flex-wrap' },
+            h('button', {
+              className: 'inline-flex items-center gap-1 bg-primary text-onPrimary hover:shadow-md transition text-sm font-body font-semibold py-2 px-4 rounded-full',
+              title: '이 코스의 3개 장소를 모두 저장',
+              onClick: () => {
+                const ids = [course.FD6?.id, course.CE7?.id, course.AT4?.id].filter(Boolean);
+                if (ids.length === 0) { router.showToast('저장할 장소가 없어요'); return; }
+                let n = 0;
+                ids.forEach(id => {
+                  if (!isSaved(id)) { savePlace(id); n++; }
+                });
+                router.showToast(n > 0 ? `코스 ${n}곳 저장됨` : '이미 다 저장된 코스에요');
+              }
+            },
+              h('span', { className: 'material-symbols-outlined text-[18px]', style: { fontVariationSettings: "'FILL' 1" } }, 'bookmark'),
+              '코스 저장'
+            ),
+            h('button', {
+              className: 'inline-flex items-center gap-1 bg-surfaceContainerLowest hover:bg-surfaceContainer transition text-onSurface font-body text-sm font-medium py-2 px-4 rounded-full',
+              onClick: () => {
+                course = {
+                  FD6: pickOneFromCategory(allPlaces, 'FD6'),
+                  CE7: pickOneFromCategory(allPlaces, 'CE7'),
+                  AT4: pickOneFromCategory(allPlaces, 'AT4')
+                };
+                paint();
+              }
+            },
+              h('span', { className: 'material-symbols-outlined text-[18px]' }, 'shuffle'),
+              '다른 조합'
+            )
           )
         )
       );
