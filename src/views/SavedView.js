@@ -7,6 +7,7 @@ import { AppState, STORAGE_KEYS, unsavePlace } from '../App.js';
 import { auth } from '../firebase-setup.js';
 import { getCachedPlace } from '../services/kakaoLocal.js';
 import { categoryMeta, makeSaveBtn } from '../utils/place-ui.js';
+import { REGIONS, regionFromAddress, regionLabel } from '../regions.js';
 
 export function SavedView({ router }) {
   const container = h('div', { className: 'flex flex-col min-h-screen' },
@@ -93,10 +94,15 @@ export function SavedView({ router }) {
     return container;
   }
 
-  // 저장된 장소 그리드
-  const grid = h('div', { className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6' });
-
+  // 지역별 그룹핑 (REGIONS 순서 + 매칭 안 되는 것은 '기타'로 묶음)
+  const groups = new Map();
   savedPlaces.forEach(p => {
+    const rid = regionFromAddress(p.address) || '_other';
+    if (!groups.has(rid)) groups.set(rid, []);
+    groups.get(rid).push(p);
+  });
+
+  function makeCard(p) {
     const cat = categoryMeta(p.category);
     const card = h('article', {
       className: 'card-lift bg-surfaceContainerLowest rounded-2xl overflow-hidden flex flex-col group relative'
@@ -113,8 +119,14 @@ export function SavedView({ router }) {
             e.stopPropagation();
             unsavePlace(p.id);
             card.remove();
+            // 같은 그룹의 마지막 카드면 그 섹션도 제거
+            const grid = card.parentElement;
+            if (grid && grid.children.length === 0) {
+              const section = grid.closest('section');
+              section?.remove();
+            }
             router.showToast('저장 취소되었습니다.');
-            if (grid.children.length === 0) router.navigate('#/saved');
+            if (main.querySelector('article') === null) router.navigate('#/saved');
           }
         },
           h('span', { className: 'material-symbols-outlined', style: { fontVariationSettings: "'FILL' 1" } }, 'bookmark')
@@ -134,9 +146,45 @@ export function SavedView({ router }) {
         h('p', { className: 'font-body text-xs text-onSurfaceVariant mt-1 truncate' }, p.address || p.blurb || '')
       )
     );
-    grid.appendChild(card);
+    return card;
+  }
+
+  // REGIONS 순서로 섹션 렌더 → '기타'는 맨 뒤
+  const orderedRegionIds = [
+    ...REGIONS.map(r => r.id).filter(id => groups.has(id)),
+    ...(groups.has('_other') ? ['_other'] : [])
+  ];
+
+  orderedRegionIds.forEach(rid => {
+    const places = groups.get(rid);
+    if (!places || places.length === 0) return;
+    const label = rid === '_other' ? '기타' : regionLabel(rid);
+    const region = REGIONS.find(r => r.id === rid);
+    const section = h('section', { className: 'mb-10' },
+      h('div', { className: 'flex items-center gap-3 mb-4' },
+        region?.icon
+          ? h('span', { className: 'material-symbols-outlined text-primary text-[22px]' }, region.icon)
+          : null,
+        h('h2', { className: 'font-headline text-xl md:text-2xl font-bold text-onSurface' }, label),
+        h('span', { className: 'font-label text-xs text-onSurfaceVariant bg-surfaceContainer px-2.5 py-1 rounded-full' }, `${places.length}곳`),
+        rid !== '_other'
+          ? h('a', {
+              href: `#/region?id=${rid}`,
+              className: 'ml-auto inline-flex items-center gap-0.5 text-xs text-onSurfaceVariant hover:text-primary'
+            },
+              `${label} 더 보기`,
+              h('span', { className: 'material-symbols-outlined text-[14px]' }, 'chevron_right')
+            )
+          : null
+      ),
+      (function () {
+        const grid = h('div', { className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6' });
+        places.forEach(p => grid.appendChild(makeCard(p)));
+        return grid;
+      })()
+    );
+    main.appendChild(section);
   });
-  main.appendChild(grid);
 
   return container;
 }
